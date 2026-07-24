@@ -1,0 +1,7 @@
+.pyenv/
+*/__pycache__
+__pycache__
+.agents/
+.pytest_cache/
+.understand-anything/
+*.zip
