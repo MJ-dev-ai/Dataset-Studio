@@ -1,0 +1,1532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>DatasetStudio</string>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>20</width>
+    <height>20</height>
+   </size>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QStackedWidget" name="workspaceStack">
+      <widget class="QMdiArea" name="mdiArea">
+       <property name="acceptDrops"><bool>true</bool></property>
+       <property name="viewMode"><enum>QMdiArea::TabbedView</enum></property>
+       <property name="tabsClosable"><bool>true</bool></property>
+       <property name="tabsMovable"><bool>true</bool></property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockProject">
+   <property name="windowTitle">
+    <string>Project</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockProjectContents">
+    <layout class="QVBoxLayout" name="projectLayout">
+     <item>
+      <widget class="QLabel" name="lblProject">
+       <property name="text">
+        <string>Dataset Explorer</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="treeProject">
+       <property name="contextMenuPolicy"><enum>Qt::DefaultContextMenu</enum></property>
+       <property name="dragEnabled"><bool>true</bool></property>
+       <property name="dragDropMode"><enum>QAbstractItemView::DragOnly</enum></property>
+       <property name="animated"><bool>true</bool></property>
+       <property name="indentation"><number>18</number></property>
+       <property name="rootIsDecorated"><bool>true</bool></property>
+       <property name="itemsExpandable"><bool>true</bool></property>
+       <property name="headerHidden"><bool>true</bool></property>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblMasks">
+       <property name="text">
+        <string>Patch / Mask Pool</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listMasks">
+       <property name="contextMenuPolicy"><enum>Qt::CustomContextMenu</enum></property>
+       <property name="iconSize"><size><width>64</width><height>64</height></size></property>
+       <property name="dragEnabled"><bool>true</bool></property>
+       <property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockProperties">
+   <property name="minimumSize">
+    <size>
+     <width>220</width>
+     <height>605</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string>Tool / Data Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockPropertiesContents">
+    <property name="minimumSize">
+     <size>
+      <width>210</width>
+      <height>0</height>
+     </size>
+    </property>
+    <layout class="QVBoxLayout" name="propertiesLayout">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <property name="leftMargin">
+      <number>10</number>
+     </property>
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>10</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_property_title">
+       <property name="text">
+        <string>Tool / Data Properties</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_property_subtitle">
+       <property name="text">
+        <string>No active sample</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QStackedWidget" name="stack_properties">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="page_info">
+        <layout class="QVBoxLayout" name="layout_page_info">
+         <item>
+          <widget class="QGroupBox" name="group_info_image">
+           <property name="title">
+            <string>Image</string>
+           </property>
+           <layout class="QFormLayout" name="form_info_image">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_info_file">
+              <property name="text">
+               <string>File</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_info_file_value">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_info_size">
+              <property name="text">
+               <string>Size</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_info_size_value">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_info_zoom">
+              <property name="text">
+               <string>Zoom</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_info_zoom_value">
+              <property name="text">
+               <string>100%</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_info_modified">
+              <property name="text">
+               <string>Modified</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_info_modified_value">
+              <property name="text">
+               <string>No</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="group_info_state">
+           <property name="title">
+            <string>State</string>
+           </property>
+           <layout class="QFormLayout" name="form_info_state">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_info_tool">
+              <property name="text">
+               <string>Tool</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_info_tool_value">
+              <property name="text">
+               <string>None</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_info_selection">
+              <property name="text">
+               <string>Selection</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_info_selection_value">
+              <property name="text">
+               <string>None</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_info_paste">
+              <property name="text">
+               <string>Paste</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_info_paste_value">
+              <property name="text">
+               <string>None</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_page_info">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_empty">
+        <layout class="QVBoxLayout" name="layout_page_empty">
+         <item>
+          <widget class="QLabel" name="label_empty_message">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_page_empty">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_brush">
+        <layout class="QVBoxLayout" name="layout_page_brush">
+         <item>
+          <widget class="QGroupBox" name="group_brush_options">
+           <property name="title">
+            <string>Brush</string>
+           </property>
+           <layout class="QFormLayout" name="form_brush_options">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_brush_size">
+              <property name="text">
+               <string>Size</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <layout class="QHBoxLayout" name="layout_brush_size">
+              <item>
+               <widget class="QSlider" name="slider_brush_size">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spin_brush_size">
+                <property name="suffix">
+                 <string> px</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_brush_color">
+              <property name="text">
+               <string>Color</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="button_brush_color">
+              <property name="text">
+               <string>#000000</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_brush_opacity">
+              <property name="text">
+               <string>Opacity</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="spin_brush_opacity">
+              <property name="suffix">
+               <string>%</string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QCheckBox" name="check_brush_mask_only">
+              <property name="text">
+               <string>Mask Only</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_page_brush">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_selection">
+        <layout class="QVBoxLayout" name="layout_page_selection">
+         <item>
+          <widget class="QGroupBox" name="group_selection_options">
+           <property name="title">
+            <string>Selection</string>
+           </property>
+           <layout class="QFormLayout" name="form_selection_options">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_selection_tool">
+              <property name="text">
+               <string>Tool</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_selection_tool_value">
+              <property name="text">
+               <string>Rectangle</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_selection_mode">
+              <property name="text">
+               <string>Mode</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="combo_selection_mode">
+              <item>
+               <property name="text">
+                <string>Replace</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Add</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Subtract</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_selection_feather">
+              <property name="text">
+               <string>Feather</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="spin_selection_feather">
+              <property name="suffix">
+               <string> px</string>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_selection_bounds">
+              <property name="text">
+               <string>Bounds</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_selection_bounds_value">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_selection_points">
+              <property name="text">
+               <string>Points</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="label_selection_points_value">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="group_labeling">
+           <property name="title">
+            <string>Labeling</string>
+           </property>
+           <layout class="QFormLayout" name="form_labeling">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_label_class_id">
+              <property name="text">
+               <string>Class ID</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="spin_label_class_id">
+              <property name="maximum">
+               <number>9999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_label_class_name">
+              <property name="text">
+               <string>Name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="line_label_class_name">
+              <property name="placeholderText">
+               <string>class name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_annotation_count">
+              <property name="text">
+               <string>Labels</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_annotation_count_value">
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QPushButton" name="button_label_add">
+              <property name="text">
+               <string>Add Label from Selection</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0" colspan="2">
+             <widget class="QPushButton" name="button_label_export_yolo">
+              <property name="text">
+               <string>Export YOLO TXT</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QPushButton" name="button_label_popup">
+              <property name="text">
+               <string>Open Labeling Dialog</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="group_selection_actions">
+           <property name="title">
+            <string>Actions</string>
+           </property>
+           <layout class="QVBoxLayout" name="layout_selection_actions">
+            <item>
+             <widget class="QPushButton" name="button_selection_finish">
+              <property name="text">
+               <string>Finish Selection</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_selection_clear">
+              <property name="text">
+               <string>Clear Selection</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_page_selection">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_paste_transform">
+        <layout class="QVBoxLayout" name="layout_page_paste_transform">
+         <item>
+          <widget class="QGroupBox" name="group_paste_transform">
+           <property name="title">
+            <string>Transform</string>
+           </property>
+           <layout class="QFormLayout" name="form_paste_transform">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_paste_x">
+              <property name="text">
+               <string>X</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="spin_paste_x">
+              <property name="minimum">
+               <number>-99999</number>
+              </property>
+              <property name="maximum">
+               <number>99999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_paste_y">
+              <property name="text">
+               <string>Y</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="spin_paste_y">
+              <property name="minimum">
+               <number>-99999</number>
+              </property>
+              <property name="maximum">
+               <number>99999</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_paste_rotation">
+              <property name="text">
+               <string>Rotation</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDoubleSpinBox" name="double_paste_rotation">
+              <property name="suffix">
+               <string> deg</string>
+              </property>
+              <property name="minimum">
+               <double>-360.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>360.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_paste_scale">
+              <property name="text">
+               <string>Scale</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QDoubleSpinBox" name="double_paste_scale">
+              <property name="minimum">
+               <double>0.100000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>10.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.050000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="group_paste_actions">
+           <property name="title">
+            <string>Actions</string>
+           </property>
+           <layout class="QGridLayout" name="grid_paste_actions">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="button_paste_rotate_left">
+              <property name="text">
+               <string>Rotate Left</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="button_paste_rotate_right">
+              <property name="text">
+               <string>Rotate Right</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="button_paste_scale_down">
+              <property name="text">
+               <string>Scale Down</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="button_paste_scale_up">
+              <property name="text">
+               <string>Scale Up</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QPushButton" name="button_paste_reset">
+              <property name="text">
+               <string>Reset Transform</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="2">
+             <widget class="QPushButton" name="button_paste_confirm">
+              <property name="text">
+               <string>Confirm Paste</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_page_paste_transform">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_poisson">
+        <layout class="QVBoxLayout" name="layout_page_poisson">
+         <item>
+          <widget class="QGroupBox" name="group_poisson_state">
+           <property name="title">
+            <string>Poisson</string>
+           </property>
+           <layout class="QFormLayout" name="form_poisson_state">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_poisson_source">
+              <property name="text">
+               <string>Source</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_poisson_source_value">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_poisson_target">
+              <property name="text">
+               <string>Target</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_poisson_target_value">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_poisson_mask">
+              <property name="text">
+               <string>Mask</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_poisson_mask_value">
+              <property name="text">
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_poisson_ready">
+              <property name="text">
+               <string>Ready</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_poisson_ready_value">
+              <property name="text">
+               <string>No</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="group_poisson_options">
+           <property name="title">
+            <string>Options</string>
+           </property>
+           <layout class="QFormLayout" name="form_poisson_options">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_poisson_mode">
+              <property name="text">
+               <string>Mode</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="combo_poisson_mode">
+              <item>
+               <property name="text">
+                <string>Normal</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Mixed</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Monochrome</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_poisson_apply">
+           <property name="text">
+            <string>Apply Poisson</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_page_poisson">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockTools">
+   <property name="minimumSize"><size><width>46</width><height>0</height></size></property>
+   <property name="maximumSize"><size><width>54</width><height>16777215</height></size></property>
+   <property name="features"><set>QDockWidget::NoDockWidgetFeatures</set></property>
+   <property name="allowedAreas"><set>Qt::LeftDockWidgetArea</set></property>
+   <property name="windowTitle"><string>Tools</string></property>
+   <attribute name="dockWidgetArea"><number>1</number></attribute>
+   <widget class="QWidget" name="dockToolsContents">
+    <layout class="QVBoxLayout" name="toolboxLayout">
+     <property name="spacing"><number>2</number></property>
+     <property name="leftMargin"><number>4</number></property><property name="topMargin"><number>6</number></property><property name="rightMargin"><number>4</number></property><property name="bottomMargin"><number>6</number></property>
+     <item><widget class="QToolButton" name="toolboxMove"><property name="toolTip"><string>Move Tool (V)</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxRectangle"><property name="toolTip"><string>Rectangle Select (M)</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxLasso"><property name="toolTip"><string>Lasso Select (L)</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxPolygon"><property name="toolTip"><string>Polygon Select</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxBrush"><property name="toolTip"><string>Brush Tool (B)</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxEraser"><property name="toolTip"><string>Eraser Tool (E)</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxFill"><property name="toolTip"><string>Fill Tool (G)</string></property><property name="text"><string>F</string></property><property name="toolButtonStyle"><enum>Qt::ToolButtonTextOnly</enum></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxEyedropper"><property name="toolTip"><string>Eyedropper Tool (I)</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><widget class="QToolButton" name="toolboxLabel"><property name="toolTip"><string>Label Tool</string></property><property name="iconSize"><size><width>22</width><height>22</height></size></property><property name="minimumSize"><size><width>34</width><height>34</height></size></property></widget></item>
+     <item><spacer name="toolboxSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property></spacer></item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockOptions">
+   <property name="features"><set>QDockWidget::NoDockWidgetFeatures</set></property>
+   <property name="allowedAreas"><set>Qt::TopDockWidgetArea</set></property>
+   <property name="windowTitle"><string>Tool Options</string></property>
+   <attribute name="dockWidgetArea"><number>4</number></attribute>
+   <widget class="QWidget" name="dockOptionsContents">
+    <layout class="QVBoxLayout" name="toolOptionsLayout">
+     <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+     <item><widget class="QStackedWidget" name="toolOptionsStack">
+      <property name="minimumSize"><size><width>0</width><height>46</height></size></property>
+      <property name="maximumSize"><size><width>16777215</width><height>54</height></size></property>
+      <widget class="QWidget" name="pageOptionsNavigate"><layout class="QHBoxLayout" name="layoutOptionsNavigate"><property name="leftMargin"><number>8</number></property><property name="topMargin"><number>4</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>4</number></property><item><widget class="QLabel" name="labelOptionsNavigate"><property name="text"><string>Move</string></property></widget></item><item><widget class="QToolButton" name="optionsZoomOut"/></item><item><widget class="QToolButton" name="optionsZoomIn"/></item><item><widget class="QToolButton" name="optionsFit"/></item><item><spacer name="spacerOptionsNavigate"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item></layout></widget>
+      <widget class="QWidget" name="pageOptionsSelect"><layout class="QHBoxLayout" name="layoutOptionsSelect"><property name="leftMargin"><number>8</number></property><property name="topMargin"><number>4</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>4</number></property><item><widget class="QLabel" name="labelOptionsSelect"><property name="text"><string>Select</string></property></widget></item><item><widget class="QToolButton" name="optionsRectangle"/></item><item><widget class="QToolButton" name="optionsLasso"/></item><item><widget class="QToolButton" name="optionsPolygon"/></item><item><widget class="QComboBox" name="comboOptionsSelectionMode"><item><property name="text"><string>Replace</string></property></item><item><property name="text"><string>Add</string></property></item><item><property name="text"><string>Subtract</string></property></item></widget></item><item><widget class="QToolButton" name="optionsClearSelection"/></item><item><spacer name="spacerOptionsSelect"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item></layout></widget>
+      <widget class="QWidget" name="pageOptionsBrush"><layout class="QHBoxLayout" name="layoutOptionsBrush"><property name="leftMargin"><number>8</number></property><property name="topMargin"><number>4</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>4</number></property><item><widget class="QLabel" name="labelOptionsBrush"><property name="text"><string>Brush</string></property></widget></item><item><widget class="QToolButton" name="optionsBrush"/></item><item><widget class="QToolButton" name="optionsEraser"/></item><item><widget class="QToolButton" name="optionsFill"><property name="text"><string>Fill</string></property><property name="toolButtonStyle"><enum>Qt::ToolButtonTextOnly</enum></property></widget></item><item><widget class="QToolButton" name="optionsEyedropper"/></item><item><widget class="QLabel" name="labelOptionsBrushSize"><property name="text"><string>Size</string></property></widget></item><item><widget class="QSpinBox" name="spinOptionsBrushSize"><property name="minimum"><number>1</number></property><property name="maximum"><number>50</number></property><property name="value"><number>5</number></property><property name="suffix"><string> px</string></property></widget></item><item><widget class="QPushButton" name="buttonOptionsBrushColor"><property name="text"><string>#000000</string></property></widget></item><item><spacer name="spacerOptionsBrush"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item></layout></widget>
+      <widget class="QWidget" name="pageOptionsLabel"><layout class="QHBoxLayout" name="layoutOptionsLabel"><property name="leftMargin"><number>8</number></property><property name="topMargin"><number>4</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>4</number></property><item><widget class="QLabel" name="labelOptionsLabel"><property name="text"><string>Label</string></property></widget></item><item><widget class="QLabel" name="labelOptionsClass"><property name="text"><string>Class</string></property></widget></item><item><widget class="QSpinBox" name="spinOptionsLabelClassId"><property name="maximum"><number>9999</number></property></widget></item><item><widget class="QLineEdit" name="lineOptionsLabelName"><property name="maximumSize"><size><width>180</width><height>16777215</height></size></property><property name="placeholderText"><string>Label name</string></property></widget></item><item><widget class="QPushButton" name="buttonOptionsAddLabel"><property name="text"><string>Add Label</string></property></widget></item><item><widget class="QToolButton" name="optionsShowLabels"><property name="toolButtonStyle"><enum>Qt::ToolButtonTextOnly</enum></property></widget></item><item><spacer name="spacerOptionsLabel"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item></layout></widget>
+      <widget class="QWidget" name="pageOptionsPaste"><layout class="QHBoxLayout" name="layoutOptionsPaste"><property name="leftMargin"><number>8</number></property><property name="topMargin"><number>4</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>4</number></property><item><widget class="QLabel" name="labelOptionsPaste"><property name="text"><string>Paste / Poisson</string></property></widget></item><item><widget class="QToolButton" name="optionsRotateLeft"/></item><item><widget class="QToolButton" name="optionsRotateRight"/></item><item><widget class="QToolButton" name="optionsScaleDown"/></item><item><widget class="QToolButton" name="optionsScaleUp"/></item><item><widget class="QToolButton" name="optionsResetTransform"/></item><item><widget class="QToolButton" name="optionsConfirmPaste"/></item><item><widget class="QLabel" name="labelOptionsPoissonMode"><property name="text"><string>Clone</string></property></widget></item><item><widget class="QComboBox" name="optionsPoissonMode"><item><property name="text"><string>Normal</string></property></item><item><property name="text"><string>Mixed</string></property></item></widget></item><item><widget class="QToolButton" name="optionsApplyPoisson"/></item><item><spacer name="spacerOptionsPaste"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item></layout></widget>
+     </widget></item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockLogs">
+   <property name="features"><set>QDockWidget::NoDockWidgetFeatures</set></property>
+   <property name="allowedAreas"><set>Qt::BottomDockWidgetArea</set></property>
+   <property name="floating"><bool>false</bool></property>
+   <property name="windowTitle"><string>Jobs &amp; Logs</string></property>
+   <attribute name="dockWidgetArea"><number>8</number></attribute>
+   <widget class="QWidget" name="dockLogsContents">
+    <layout class="QVBoxLayout" name="logConsoleLayout">
+     <property name="leftMargin"><number>0</number></property>
+     <property name="topMargin"><number>0</number></property>
+     <property name="rightMargin"><number>0</number></property>
+     <property name="bottomMargin"><number>0</number></property>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_open_image"/>
+    <addaction name="action_open_Images"/>
+    <addaction name="action_open_folder"/>
+    <addaction name="separator"/>
+    <addaction name="action_save"/>
+    <addaction name="action_save_as"/>
+    <addaction name="separator"/>
+    <addaction name="action_export_mask"/>
+    <addaction name="action_export_result"/>
+    <addaction name="separator"/>
+    <addaction name="action_close"/>
+    <addaction name="action_close_all"/>
+    <addaction name="separator"/>
+    <addaction name="action_exit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="action_undo"/>
+    <addaction name="action_redo"/>
+    <addaction name="separator"/>
+    <addaction name="action_cut"/>
+    <addaction name="action_copy"/>
+    <addaction name="action_paste"/>
+    <addaction name="action_delete"/>
+    <addaction name="separator"/>
+    <addaction name="action_select_all"/>
+    <addaction name="action_deselect"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="action_zoom_in"/>
+    <addaction name="action_zoom_out"/>
+    <addaction name="action_actual_size"/>
+    <addaction name="action_fit_to_window"/>
+    <addaction name="separator"/>
+    <addaction name="action_cascade_windows"/>
+    <addaction name="action_tile_windows"/>
+    <addaction name="separator"/>
+    <addaction name="action_fullscreen"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="action_move_tool"/>
+    <addaction name="action_brush_tool"/>
+    <addaction name="action_rectangle_tool"/>
+    <addaction name="action_lasso_tool"/>
+    <addaction name="action_polygon_tool"/>
+    <addaction name="action_eraser_tool"/>
+    <addaction name="action_fill_tool"/>
+    <addaction name="action_eyedropper_tool"/>
+    <addaction name="separator"/>
+    <addaction name="action_point_tool"/>
+   </widget>
+   <widget class="QMenu" name="menuPoisson">
+    <property name="title">
+     <string>Poisson</string>
+    </property>
+    <addaction name="action_rotate_left"/>
+    <addaction name="action_rotate_right"/>
+    <addaction name="separator"/>
+    <addaction name="action_scale_up"/>
+    <addaction name="action_scale_down"/>
+    <addaction name="separator"/>
+    <addaction name="action_reset_transform"/>
+    <addaction name="actionApply_Poisson"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionShortcuts"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuImage">
+    <property name="title"><string>Image</string></property>
+    <addaction name="action_preprocess_options"/>
+    <addaction name="separator"/>
+    <addaction name="action_augment_resize"/>
+    <addaction name="action_augment_flip_horizontal"/>
+    <addaction name="action_augment_flip_vertical"/>
+    <addaction name="separator"/>
+    <addaction name="action_augment_rotate_cw"/>
+    <addaction name="action_augment_rotate_ccw"/>
+    <addaction name="action_augment_rotate_180"/>
+   </widget>
+   <widget class="QMenu" name="menuLabel">
+    <property name="title"><string>Label</string></property>
+    <addaction name="action_labeling_tool"/>
+    <addaction name="action_label_browser"/>
+    <addaction name="action_show_labels"/>
+    <addaction name="separator"/>
+    <addaction name="action_export_yolov8_dataset"/>
+   </widget>
+   <widget class="QMenu" name="menuAugment">
+    <property name="title">
+     <string>Augment</string>
+    </property>
+    <addaction name="action_augment_options"/>
+    <addaction name="action_augment_preview"/>
+    <addaction name="action_auto_ellipse_roi"/>
+    <addaction name="separator"/>
+    <addaction name="action_export_defect_set"/>
+    <addaction name="action_auto_augment"/>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title"><string>Window</string></property>
+    <addaction name="action_toggle_tools"/>
+    <addaction name="action_toggle_project_pannel"/>
+    <addaction name="action_toggle_properties_pannel"/>
+    <addaction name="action_toggle_logs"/>
+    <addaction name="separator"/>
+    <widget class="QMenu" name="menuWorkspace">
+     <property name="title"><string>Workspace</string></property>
+     <addaction name="action_workspace_default"/>
+     <addaction name="action_workspace_labeling"/>
+     <addaction name="action_workspace_augmentation"/>
+     <addaction name="action_workspace_review"/>
+     <addaction name="separator"/>
+     <addaction name="action_workspace_save"/>
+     <addaction name="action_workspace_restore"/>
+     <addaction name="action_workspace_reset"/>
+    </widget>
+    <addaction name="menuWorkspace"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuImage"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuLabel"/>
+   <addaction name="menuAugment"/>
+   <addaction name="menuPoisson"/>
+   <addaction name="menuView"/>
+   <addaction name="menuWindow"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="action_open_image">
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+   <property name="statusTip">
+    <string>Open Image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="action_open_Images">
+   <property name="text">
+    <string>Open Images...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Multiple Images</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+O</string>
+   </property>
+  </action>
+  <action name="action_open_folder">
+   <property name="text">
+    <string>Open Folder...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Dataset Folder</string>
+   </property>
+   <property name="statusTip">
+    <string>Open all images in a folder</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="action_save">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_save_as">
+   <property name="text">
+    <string>Save As...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save As</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="action_export_mask">
+   <property name="text">
+    <string>Export Mask...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_export_result">
+   <property name="text">
+    <string>Export Result...</string>
+   </property>
+  </action>
+  <action name="action_close">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="action_close_all">
+   <property name="text">
+    <string>Close All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+W</string>
+   </property>
+  </action>
+  <action name="action_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="action_undo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="action_redo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="action_cut">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="action_copy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="action_paste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="action_delete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="action_select_all">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="action_deselect">
+   <property name="text">
+    <string>Deselect</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="action_zoom_in">
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
+  </action>
+  <action name="action_zoom_out">
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="action_actual_size">
+   <property name="text">
+    <string>Actual Size</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="action_fit_to_window">
+   <property name="text">
+    <string>Fit to Window</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="action_toggle_project_pannel">
+   <property name="text">
+    <string>Toggle Project Panel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+1</string>
+   </property>
+  </action>
+  <action name="action_toggle_properties_pannel">
+   <property name="text">
+    <string>Toggle Properties Panel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+2</string>
+   </property>
+  </action>
+  <action name="action_cascade_windows">
+   <property name="text">
+    <string>Cascade Windows</string>
+   </property>
+  </action>
+  <action name="action_tile_windows">
+   <property name="text">
+    <string>Tile Windows</string>
+   </property>
+  </action>
+  <action name="action_fullscreen">
+   <property name="text">
+    <string>Fullscreen</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
+  <action name="action_move_tool">
+   <property name="text">
+    <string>Move Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
+   </property>
+  </action>
+  <action name="action_lasso_tool">
+   <property name="text">
+    <string>Lasso</string>
+   </property>
+   <property name="shortcut">
+    <string>L</string>
+   </property>
+  </action>
+  <action name="action_polygon_tool">
+   <property name="text">
+    <string>Polygon Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+L</string>
+   </property>
+  </action>
+  <action name="action_brush_tool">
+   <property name="text">
+    <string>Brush Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>B</string>
+   </property>
+  </action>
+  <action name="action_eraser_tool">
+   <property name="text">
+    <string>Eraser Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>E</string>
+   </property>
+  </action>
+  <action name="action_eyedropper_tool">
+   <property name="text">
+    <string>Eyedropper</string>
+   </property>
+   <property name="toolTip">
+    <string>Pick Brush Color</string>
+   </property>
+   <property name="shortcut">
+    <string>I</string>
+   </property>
+  </action>
+  <action name="action_point_tool">
+   <property name="text">
+    <string>Point Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>T</string>
+   </property>
+  </action>
+  <action name="action_labeling_tool">
+   <property name="text">
+    <string>Labeling</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Labeling Dialog</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="action_rotate_left">
+   <property name="text">
+    <string>Rotate Left</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+[</string>
+   </property>
+  </action>
+  <action name="action_rotate_right">
+   <property name="text">
+    <string>Rotate Right</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+]</string>
+   </property>
+  </action>
+  <action name="action_scale_up">
+   <property name="text">
+    <string>Scale Up</string>
+   </property>
+   <property name="shortcut">
+    <string>]</string>
+   </property>
+  </action>
+  <action name="action_scale_down">
+   <property name="text">
+    <string>Scale Down</string>
+   </property>
+   <property name="shortcut">
+    <string>[</string>
+   </property>
+  </action>
+  <action name="action_reset_transform">
+   <property name="text">
+    <string>Reset Transform</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="action_confirm">
+   <property name="text">
+    <string>Confirm Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Return</string>
+   </property>
+  </action>
+  <action name="actionApply_Poisson">
+   <property name="text">
+    <string>Apply Poisson</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Return</string>
+   </property>
+  </action>
+  <action name="actionShortcuts">
+   <property name="text">
+    <string>Shortcuts</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="action_rectangle_tool">
+   <property name="text">
+    <string>Rectangular Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="action_brush_tool_2">
+   <property name="text">
+    <string>Brush Tool</string>
+   </property>
+  </action>
+  <action name="action_fill_tool">
+   <property name="text">
+    <string>Fill Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
+   </property>
+  </action>
+  <action name="action_augment_resize"><property name="text"><string>Resize</string></property></action>
+  <action name="action_augment_flip_horizontal"><property name="text"><string>Flip H</string></property></action>
+  <action name="action_augment_flip_vertical"><property name="text"><string>Flip Vertical</string></property></action>
+  <action name="action_augment_rotate_cw"><property name="text"><string>Rotate 90</string></property></action>
+  <action name="action_augment_rotate_ccw"><property name="text"><string>Rotate 90 deg Counterclockwise</string></property></action>
+  <action name="action_augment_rotate_180"><property name="text"><string>Rotate 180 deg</string></property></action>
+  <action name="action_auto_ellipse_roi"><property name="text"><string>Auto ROI</string></property></action>
+  <action name="action_export_defect_set"><property name="text"><string>Export Defect...</string></property></action>
+  <action name="action_auto_augment"><property name="text"><string>AutoAugment...</string></property></action>
+  <action name="action_export_yolov8_dataset"><property name="text"><string>Export YOLOv8 Dataset</string></property></action>
+  <action name="action_show_labels">
+   <property name="checkable"><bool>true</bool></property>
+   <property name="checked"><bool>true</bool></property>
+   <property name="text"><string>Show Labels</string></property>
+  </action>
+  <action name="action_label_browser"><property name="text"><string>Label Browser</string></property></action>
+  <action name="action_augment_options"><property name="text"><string>Augmentation Options</string></property></action>
+  <action name="action_augment_preview"><property name="text"><string>Preview</string></property></action>
+  <action name="action_preprocess_options"><property name="text"><string>Preprocessing</string></property></action>
+  <action name="action_toggle_tools"><property name="text"><string>Tools</string></property></action>
+  <action name="action_toggle_logs"><property name="text"><string>Jobs &amp; Logs</string></property></action>
+  <action name="action_workspace_default"><property name="text"><string>Default</string></property></action>
+  <action name="action_workspace_labeling"><property name="text"><string>Labeling</string></property></action>
+  <action name="action_workspace_augmentation"><property name="text"><string>Augmentation</string></property></action>
+  <action name="action_workspace_review"><property name="text"><string>Review</string></property></action>
+  <action name="action_workspace_save"><property name="text"><string>Save Current Workspace</string></property></action>
+  <action name="action_workspace_restore"><property name="text"><string>Restore Saved Workspace</string></property></action>
+  <action name="action_workspace_reset"><property name="text"><string>Reset Workspace</string></property></action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

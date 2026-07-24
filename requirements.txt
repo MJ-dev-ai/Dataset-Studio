@@ -1,0 +1,43 @@
+# Dataset Studio / YOLO training pipeline
+# Python 3.11 venv: py -3.11 -m venv .pyenv
+#
+# Recommended install order on Windows:
+#   .pyenv\Scripts\activate
+#   python -m pip install --upgrade pip setuptools wheel
+#   python -m pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu118
+#   python -m pip install -r requirements.txt
+#
+# Do NOT put the PyTorch --index-url in this file unless torch packages are the only packages here.
+
+# GUI - this project imports PyQt6 in main/ui/workers.
+PyQt6>=6.7.0,<6.9
+
+# PySide6 is included because assets/icons/resources_rc.py imports PySide6.
+# Remove this if you regenerate resources_rc.py for PyQt6.
+PySide6>=6.7.0,<6.9
+
+# Image processing / numerical
+numpy>=1.26.0,<2.3
+opencv-python>=4.9.0
+Pillow>=10.0.0
+scipy>=1.11.0
+
+# Augmentation
+albumentations>=1.4.0
+
+# YOLO / training notebook
+ultralytics>=8.3.0
+PyYAML>=6.0.1
+tqdm>=4.66.0
+pandas>=2.0.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+scikit-learn>=1.4.0
+ipykernel>=6.29.0
+notebook>=7.0.0
+
+# Data / config
+pydantic>=2.7.0
+
+# Development / verification
+pytest>=8.0.0
