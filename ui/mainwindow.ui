@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DatasetStudio</string>
+   <string>Dataset Editor</string>
   </property>
   <property name="iconSize">
    <size>

@@ -1,4 +1,4 @@
-# Dataset Studio / YOLO training pipeline
+# Dataset Editor / YOLO training pipeline
 # Python 3.11 venv: py -3.11 -m venv .pyenv
 #
 # Recommended install order on Windows:

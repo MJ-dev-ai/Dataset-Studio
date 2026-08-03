@@ -1,38 +1,59 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+import threading
+import traceback
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
 
+class WorkerCancelled(RuntimeError):
+    """Raised cooperatively when a feature worker is cancelled."""
+
+
 class BaseWorker(QThread):
-    """Generic function worker for tasks that should not block the UI."""
+    """Common QThread lifecycle for one feature-specific background operation."""
 
-    progress = pyqtSignal(int, str)
-    finished = pyqtSignal(object)
-    failed = pyqtSignal(str)
-    cancelled = pyqtSignal()
+    progress = pyqtSignal(str, int, str)
+    succeeded = pyqtSignal(str, object)
+    failed = pyqtSignal(str, str, str)
+    cancelled = pyqtSignal(str)
 
-    def __init__(self, function: Callable, *args, **kwargs):
-        super().__init__()
-        self.function = function
-        self.args = args
-        self.kwargs = kwargs
-        self._cancel_requested = False
+    def __init__(self, task_id: str, operation: str, payload: object, parent=None):
+        super().__init__(parent)
+        self.task_id = task_id
+        self.operation = operation
+        self.payload = payload
+        self._cancel_event = threading.Event()
 
     def run(self) -> None:
+        """Execute the feature operation and convert failures into Qt signals."""
         try:
-            result = self.function(*self.args, **self.kwargs)
+            result = self.execute()
+            self.check_cancelled()
+        except WorkerCancelled:
+            self.cancelled.emit(self.task_id)
         except Exception as exc:
-            self.failed.emit(str(exc))
-            return
-        if self._cancel_requested:
-            self.cancelled.emit()
-            return
-        self.finished.emit(result)
+            self.failed.emit(self.task_id, str(exc), traceback.format_exc())
+        else:
+            self.succeeded.emit(self.task_id, result)
+
+    def execute(self):
+        """Run the concrete service operation implemented by a feature worker."""
+        raise NotImplementedError
 
     def cancel(self) -> None:
-        self._cancel_requested = True
+        """Request cooperative cancellation without terminating the thread."""
+        self._cancel_event.set()
 
+    @property
     def is_cancelled(self) -> bool:
-        return self._cancel_requested
+        return self._cancel_event.is_set()
+
+    def check_cancelled(self) -> None:
+        """Raise at a safe service boundary after cancellation was requested."""
+        if self.is_cancelled:
+            raise WorkerCancelled
+
+    def report(self, value: int, message: str = "") -> None:
+        """Emit normalized progress for this worker operation."""
+        self.progress.emit(self.task_id, max(0, min(100, int(value))), message)

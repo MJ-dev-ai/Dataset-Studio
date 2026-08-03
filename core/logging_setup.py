@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 
-LOGGER_NAME = "dataset_studio"
+LOGGER_NAME = "dataset_editor"
 _LOG_DIRECTORY: Path | None = None
 
 
@@ -34,7 +34,7 @@ def configure_logging(log_dir: str | os.PathLike) -> logging.Logger:
     directory.mkdir(parents=True, exist_ok=True)
     _LOG_DIRECTORY = directory
     handler = DurableRotatingFileHandler(
-        directory / "dataset_studio.log",
+        directory / "dataset_editor.log",
         maxBytes=10 * 1024 * 1024,
         backupCount=5,
         encoding="utf-8",

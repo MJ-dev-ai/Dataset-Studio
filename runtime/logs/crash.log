@@ -1,0 +1,72 @@
+
+[2026-07-28T03:05:05.159666+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Studio\ui\mainwindow.py", line 204, in eventFilter
+    def eventFilter(self, watched, event) -> bool:
+    
+KeyboardInterrupt
+
+[2026-07-31T05:21:26.571553+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 217, in eventFilter
+    self.undo_edit()
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 1881, in undo_edit
+    self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 3069, in _update_image_property_panel
+    self.label_info_file_value.setText(path.name)
+                                       ^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'name'
+
+[2026-07-31T07:30:24.247771+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\uisetup.py", line 1260, in _delete_for_current_mode
+    self.window.delete_active_selection()
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2320, in delete_active_selection
+    self.delete_selection()
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2307, in delete_selection
+    if not self.apply_mapset_selection_delete():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2052, in apply_mapset_selection_delete
+    result = apply_selection_delete(source, mask)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 362, in apply_selection_delete
+    return apply_selection_fill(image, mask, (0, 0, 0), 1.0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 346, in apply_selection_fill
+    mask_bool = _normalized_mask(mask, image.shape[:2]) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 370, in _normalized_mask
+    raise ValueError("mask size must match image size")
+ValueError: mask size must match image size
+
+[2026-07-31T09:24:36.350473+00:00] Background task failed: MapSet already exists: D:\brakepad\results\result_14-01_ng
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\worker\task_manager.py", line 59, in run
+    result = self.function(self.context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2249, in task
+    return save_mapset_copy(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\project_service.py", line 73, in save_mapset_copy
+    raise FileExistsError(f"MapSet already exists: {destination}")
+FileExistsError: MapSet already exists: D:\brakepad\results\result_14-01_ng
+
+[2026-07-31T09:25:17.995687+00:00] Background task failed: [Errno 13] Permission denied: 'D:\\!$rFYLN\\data.yaml'
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\worker\task_manager.py", line 59, in run
+    result = self.function(self.context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 3146, in task
+    result = self.context.export_api.export_dataset(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\yolo_export_service.py", line 61, in export_dataset
+    self.write_data_yaml(options.output_root / map_key, options.class_names)
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\yolo_export_service.py", line 83, in write_data_yaml
+    (map_root / "data.yaml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+  File "C:\Users\tnsmi\miniconda3\envs\tips\Lib\pathlib.py", line 1078, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\miniconda3\envs\tips\Lib\pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'D:\\!$rFYLN\\data.yaml'

@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from PyQt6.QtCore import QPointF, QTimer, Qt
-from PyQt6.QtGui import QColor, QPainter, QPen, QPixmap
+from PyQt6.QtCore import QPointF
+from PyQt6.QtGui import QColor
 
-from core.qt_image import bgr_to_qpixmap, qimage_to_bgr
-from service.editing_service import HealingStroke, apply_healing_strokes
+from core.geometry import HealingStroke, PaintStroke
 
 
 @dataclass
@@ -18,83 +17,70 @@ class PaintOptions:
     mode: str = "image"
 
 
+@dataclass
+class PaintStrokeFinish:
+    strokes: list[PaintStroke]
+    preview_segment: PaintStroke | None = None
+
+
+@dataclass
+class HealingStrokeFinish:
+    strokes: list[HealingStroke]
+    preview_stroke: HealingStroke | None = None
+
+
 class BasePaintTool:
+    """Track brush stroke geometry in image coordinates."""
+
     show_cursor_circle = True
 
-    def __init__(self, canvas):
-        self.canvas = canvas
+    def __init__(self):
         self.options = PaintOptions()
-        self._last = None
+        self._last: QPointF | None = None
         self._editing = False
-        self._strokes = []
+        self._strokes: list[PaintStroke] = []
 
     @property
     def cursor_radius(self) -> float:
         return max(1.0, float(self.options.size) / 2.0)
 
-    def activate(self) -> None:
-        self.canvas.setCursor(Qt.CursorShape.CrossCursor)
+    @property
+    def is_editing(self) -> bool:
+        return self._editing
 
-    def deactivate(self) -> None:
-        self.canvas.unsetCursor()
-        self._last = None
-        self._strokes = []
-
-    def mouse_press_event(self, event) -> None:
-        if self.canvas.pixmap.isNull():
-            return
-        window = self.canvas.window()
-        if getattr(window, "current_mapset", None) is not None and hasattr(window, "begin_mapset_edit_history"):
-            window.begin_mapset_edit_history()
-        else:
-            self.canvas._push_undo()
-            self.canvas._redo.clear()
-        self._editing = True
-        self._last = self.canvas.to_image_pos(event.position())
-        self._strokes = []
-        self._record_stroke(self._last, self._last)
-
-    def mouse_move_event(self, event) -> None:
-        if not self._editing or not (event.buttons() & Qt.MouseButton.LeftButton):
-            return
-        point = self.canvas.to_image_pos(event.position())
-        self._record_stroke(self._last, point)
-        self._last = point
-
-    def mouse_release_event(self, event) -> None:
-        self.mouse_move_event(event)
+    def reset(self) -> None:
         self._editing = False
         self._last = None
-        self._apply_strokes()
         self._strokes = []
 
-    def _record_stroke(self, start, end) -> None:
-        self._strokes.append(((float(start.x()), float(start.y())), (float(end.x()), float(end.y()))))
-        pixmap = QPixmap(self.canvas.pixmap)
-        painter = QPainter(pixmap)
-        color = QColor(self.options.color)
-        color.setAlphaF(self.options.opacity)
-        painter.setPen(QPen(color, self.options.size, Qt.PenStyle.SolidLine,
-                            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
-        painter.drawLine(start, end)
-        painter.end()
-        self.canvas.pixmap = pixmap
-        self.canvas.image = pixmap.toImage()
-        self.canvas.update()
+    def begin_stroke(self, point: QPointF) -> PaintStroke:
+        self._editing = True
+        self._last = QPointF(point)
+        self._strokes = []
+        return self.record_stroke(self._last, self._last)
 
-    def _apply_strokes(self) -> None:
-        window = self.canvas.window()
-        if hasattr(window, "apply_mapset_paint_strokes"):
-            applied = window.apply_mapset_paint_strokes(
-                list(self._strokes),
-                QColor(self.options.color),
-                self.options.size,
-                self.options.opacity,
-            )
-            if applied:
-                return
-        self.canvas._revision += 1
-        self.canvas.image_changed.emit()
+    def continue_stroke(self, point: QPointF) -> PaintStroke | None:
+        if not self._editing or self._last is None:
+            return None
+        segment = self.record_stroke(self._last, point)
+        self._last = QPointF(point)
+        return segment
+
+    def finish_stroke(self, point: QPointF | None = None) -> PaintStrokeFinish | None:
+        if not self._editing:
+            return None
+        preview_segment = self.continue_stroke(point) if point is not None else None
+        result = PaintStrokeFinish(strokes=list(self._strokes), preview_segment=preview_segment)
+        self.reset()
+        return result
+
+    def record_stroke(self, start: QPointF, end: QPointF) -> PaintStroke:
+        segment: PaintStroke = (
+            (float(start.x()), float(start.y())),
+            (float(end.x()), float(end.y())),
+        )
+        self._strokes.append(segment)
+        return segment
 
 
 class BrushTool(BasePaintTool):
@@ -102,91 +88,58 @@ class BrushTool(BasePaintTool):
 
 
 class HealingBrushTool(BasePaintTool):
-    """Heal target pixels by sampling an Alt-click source aligned to the stroke."""
+    """Track healing source-to-target stroke geometry."""
 
-    def __init__(self, canvas):
-        super().__init__(canvas)
+    def __init__(self):
+        super().__init__()
         self._source_anchor: QPointF | None = None
         self._target_anchor: QPointF | None = None
         self._healing_strokes: list[HealingStroke] = []
-        self._preview_stroke_queue: list[HealingStroke] = []
-        self._preview_source_image = None
-        self._preview_result_image = None
-        self._preview_flush_timer: QTimer | None = None
-        self._preview_flush_interval_ms = 16
 
-    def activate(self) -> None:
-        super().activate()
-        window = self.canvas.window()
-        if self._source_anchor is None and hasattr(window, "set_status"):
-            window.set_status("Healing Brush: Alt+click a clean source area")
+    @property
+    def has_source_anchor(self) -> bool:
+        return self._source_anchor is not None
 
-    def deactivate(self) -> None:
-        super().deactivate()
+    def reset(self) -> None:
+        super().reset()
         self._target_anchor = None
         self._healing_strokes = []
-        self._preview_stroke_queue = []
-        self._preview_source_image = None
-        self._preview_result_image = None
-        if self._preview_flush_timer is not None:
-            self._preview_flush_timer.stop()
 
-    def mouse_press_event(self, event) -> None:
-        if self.canvas.pixmap.isNull() or event.button() != Qt.MouseButton.LeftButton:
-            return
-        point = self.canvas.to_image_pos(event.position())
-        if event.modifiers() & Qt.KeyboardModifier.AltModifier:
-            self._source_anchor = QPointF(point)
-            self._target_anchor = None
-            self._set_status("Healing Brush source set")
-            event.accept()
-            return
+    def clear_source_anchor(self) -> None:
+        self._source_anchor = None
+        self._target_anchor = None
+
+    def set_source_anchor(self, point: QPointF) -> None:
+        self._source_anchor = QPointF(point)
+        self._target_anchor = None
+
+    def begin_healing_stroke(self, point: QPointF) -> HealingStroke | None:
         if self._source_anchor is None:
-            self._set_status("Alt+click a clean source area before healing")
-            event.accept()
-            return
-        window = self.canvas.window()
-        if getattr(window, "current_mapset", None) is not None and hasattr(window, "begin_mapset_edit_history"):
-            window.begin_mapset_edit_history()
-        else:
-            self.canvas._push_undo()
-            self.canvas._redo.clear()
+            return None
         self._editing = True
         self._last = QPointF(point)
         self._target_anchor = QPointF(point)
         self._healing_strokes = []
-        self._preview_stroke_queue = []
-        self._preview_source_image = qimage_to_bgr(self.canvas.pixmap)
-        self._preview_result_image = self._preview_source_image.copy()
-        self._record_stroke(self._last, self._last)
-        event.accept()
+        return self.record_healing_stroke(self._last, self._last)
 
-    def mouse_move_event(self, event) -> None:
-        if not self._editing or not (event.buttons() & Qt.MouseButton.LeftButton):
-            return
-        point = self.canvas.to_image_pos(event.position())
-        self._record_stroke(self._last, point)
+    def continue_healing_stroke(self, point: QPointF) -> HealingStroke | None:
+        if not self._editing or self._last is None:
+            return None
+        stroke = self.record_healing_stroke(self._last, point)
         self._last = QPointF(point)
-        event.accept()
+        return stroke
 
-    def mouse_release_event(self, event) -> None:
+    def finish_healing_stroke(self, point: QPointF | None = None) -> HealingStrokeFinish | None:
         if not self._editing:
-            return
-        self.mouse_move_event(event)
-        self._flush_preview_strokes()
-        self._editing = False
-        self._last = None
-        self._apply_strokes()
-        self._target_anchor = None
-        self._healing_strokes = []
-        self._preview_stroke_queue = []
-        self._preview_source_image = None
-        self._preview_result_image = None
-        event.accept()
+            return None
+        preview_stroke = self.continue_healing_stroke(point) if point is not None else None
+        result = HealingStrokeFinish(strokes=list(self._healing_strokes), preview_stroke=preview_stroke)
+        self.reset()
+        return result
 
-    def _record_stroke(self, start, end) -> None:
+    def record_healing_stroke(self, start: QPointF, end: QPointF) -> HealingStroke | None:
         if self._source_anchor is None or self._target_anchor is None:
-            return
+            return None
         source_start = self._source_for_target(start)
         source_end = self._source_for_target(end)
         stroke: HealingStroke = (
@@ -196,11 +149,9 @@ class HealingBrushTool(BasePaintTool):
             (float(end.x()), float(end.y())),
         )
         self._healing_strokes.append(stroke)
-        self._preview_stroke_queue.append(stroke)
-        self._schedule_preview_flush()
+        return stroke
 
     def _source_for_target(self, target: QPointF) -> QPointF:
-        """Return the source point aligned to the current stroke drag offset."""
         if self._source_anchor is None or self._target_anchor is None:
             return QPointF(target)
         return QPointF(
@@ -208,117 +159,12 @@ class HealingBrushTool(BasePaintTool):
             self._source_anchor.y() + target.y() - self._target_anchor.y(),
         )
 
-    def _schedule_preview_flush(self) -> None:
-        timer = self._ensure_preview_flush_timer()
-        if timer is not None and not timer.isActive():
-            timer.start(self._preview_flush_interval_ms)
-
-    def _ensure_preview_flush_timer(self) -> QTimer | None:
-        if self._preview_flush_timer is not None:
-            return self._preview_flush_timer
-        if not hasattr(self.canvas, "thread"):
-            return None
-        self._preview_flush_timer = QTimer(self.canvas)
-        self._preview_flush_timer.setSingleShot(True)
-        self._preview_flush_timer.timeout.connect(self._flush_preview_strokes)
-        return self._preview_flush_timer
-
-    def _flush_preview_strokes(self) -> None:
-        if self._preview_flush_timer is not None:
-            self._preview_flush_timer.stop()
-        if not self._preview_stroke_queue:
-            return
-        strokes = list(self._preview_stroke_queue)
-        self._preview_stroke_queue = []
-        self._apply_preview_strokes(strokes)
-        if self._preview_stroke_queue:
-            self._schedule_preview_flush()
-
-    def _apply_preview_strokes(self, strokes: list[HealingStroke]) -> None:
-        image = self._preview_result_image
-        if image is None or image.size == 0:
-            return
-        try:
-            result = apply_healing_strokes(
-                image,
-                strokes,
-                self.options.size,
-                self.options.opacity,
-                source_image=self._preview_source_image,
-                inplace=True,
-                fast_preview=True,
-            )
-        except ValueError as exc:
-            self._set_status(f"Healing Brush failed: {exc}")
-            return
-        self._preview_result_image = result
-        pixmap = bgr_to_qpixmap(result)
-        self.canvas.pixmap = pixmap
-        self.canvas.image = pixmap.toImage()
-        self.canvas.update()
-
-    def _apply_strokes(self) -> None:
-        window = self.canvas.window()
-        if hasattr(window, "apply_mapset_healing_strokes"):
-            applied = window.apply_mapset_healing_strokes(
-                list(self._healing_strokes),
-                self.options.size,
-                self.options.opacity,
-            )
-            if applied:
-                return
-        self.canvas._revision += 1
-        self.canvas.image_changed.emit()
-
-    def _set_status(self, message: str) -> None:
-        window = self.canvas.window()
-        if hasattr(window, "set_status"):
-            window.set_status(message)
-
 
 class EraserTool(BasePaintTool):
-    def activate(self) -> None:
-        super().activate()
+    def __init__(self):
+        super().__init__()
         self.options.color = QColor("black")
 
 
 class FillTool(BasePaintTool):
     show_cursor_circle = False
-
-    def mouse_press_event(self, event) -> None:
-        del event
-        if self.canvas.pixmap.isNull():
-            return
-        window = self.canvas.window()
-        if self.canvas.has_selection() and hasattr(window, "apply_mapset_selection_fill"):
-            if window.apply_mapset_selection_fill(self.options.color, self.options.opacity):
-                self._complete_if_possible()
-                return
-        if hasattr(window, "select_all") and hasattr(window, "apply_mapset_selection_fill"):
-            window.select_all()
-            if window.apply_mapset_selection_fill(self.options.color, self.options.opacity):
-                self._complete_if_possible()
-                return
-        self.canvas._push_undo()
-        pixmap = QPixmap(self.canvas.pixmap)
-        painter = QPainter(pixmap)
-        if self.canvas.has_selection():
-            painter.fillPath(self.canvas.selection_path, self.options.color)
-        else:
-            painter.fillRect(pixmap.rect(), self.options.color)
-        painter.end()
-        self.canvas.replace_pixmap(pixmap, record_history=False)
-        self._complete_if_possible()
-
-    def _complete_if_possible(self) -> None:
-        manager = getattr(self.canvas, "current_tool", None)
-        if manager is not self and hasattr(manager, "complete_current_tool"):
-            manager.complete_current_tool()
-
-
-class BlurTool(BasePaintTool):
-    pass
-
-
-class ThresholdTool(BasePaintTool):
-    pass

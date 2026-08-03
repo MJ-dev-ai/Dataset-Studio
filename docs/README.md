@@ -1,6 +1,6 @@
-# DatasetStudio
+# Dataset Editor
 
-**DatasetStudio**는 이미지 기반 데이터셋을 제작하기 위한 통합 GUI 도구입니다.
+**Dataset Editor**는 이미지 기반 데이터셋을 제작하기 위한 통합 GUI 도구입니다.
 이미지 편집, 라벨링, 전처리, Poisson 기반 합성, 자동 증강, YOLO 데이터셋 Export를 하나의 작업 흐름 안에서 수행하는 것을 목표로 합니다.
 
 이 프로젝트는 특정 결함 데이터셋에만 한정되지 않고, 일반적인 Computer Vision 데이터셋 제작 작업에도 사용할 수 있도록 설계되었습니다.
@@ -11,7 +11,7 @@
 
 ### 1. Image Editing
 
-DatasetStudio는 데이터셋 제작 과정에서 필요한 기본 이미지 편집 기능을 제공합니다.
+Dataset Editor는 데이터셋 제작 과정에서 필요한 기본 이미지 편집 기능을 제공합니다.
 
 지원 예정 기능:
 
@@ -189,11 +189,13 @@ dataset_studio/
 │  ├─ preprocessing_service.py
 │  ├─ project_service.py
 │  ├─ roi_service.py
-│  ├─ tool_service.py
 │  └─ yolo_export_service.py
 ├─ worker/
 │  ├─ base_worker.py
-│  └─ augmentation_worker.py
+│  ├─ project_worker.py
+│  ├─ editing_worker.py
+│  ├─ augmentation_worker.py
+│  └─ export_worker.py
 ├─ ui/
 │  ├─ augmentationpage.py
 │  ├─ exportdialog.py
@@ -202,10 +204,10 @@ dataset_studio/
 │  ├─ mainwindow.ui
 │  ├─ preprocess_dialog.py
 │  ├─ themes.py
+│  ├─ tool_controller.py
 │  └─ uisetup.py
 ├─ tools/
 │  ├─ label_tools.py
-│  ├─ navigation_tools.py
 │  ├─ paint_tools.py
 │  ├─ patch_tools.py
 │  └─ selection_tools.py
@@ -227,15 +229,16 @@ dataset_studio/
 
 ## 설계 방향
 
-DatasetStudio는 UI 코드와 알고리즘 코드를 분리하는 방식으로 설계됩니다.
+Dataset Editor는 UI 코드와 알고리즘 코드를 분리하는 방식으로 설계됩니다.
 
 ### UI Layer
 
-`ui/`는 사용자 입력, 화면 표시, 버튼 연결을 담당합니다. `tools/`는 실제 canvas tool 객체를 담고, `service/tool_service.py`의 `ToolMode`와 `ToolManager`가 해당 객체들을 현재 모드 기준으로 등록/전환/이벤트 dispatch합니다.
+`ui/`는 사용자 입력, 화면 표시, 버튼 연결을 담당합니다. `ui/tool_controller.py`의 `ToolMode`와 `ToolController`가 canvas tool 객체들을 현재 모드 기준으로 등록/전환하고 press/move/release 이벤트 흐름을 처리합니다. `tools/`는 selection geometry, brush stroke, patch transform 같은 tool 기능/state만 담고 `mouse_*` 이벤트 함수는 두지 않습니다.
 
 * `mainwindow.py`: 전체 창과 주요 모듈 조립
 * `uisetup.py`: 메뉴, 툴바, 패널, 아이콘 설정
 * `imagecanvas.py`: 이미지 표시, zoom, pan, overlay
+* `tool_controller.py`: Qt 입력 이벤트와 순수 tool 계산 결과를 UI에 연결
 * `augmentationpage.py`: Auto Augmentation 전용 화면
 * `exportdialog.py`: Dataset Export 팝업
 
@@ -244,6 +247,8 @@ DatasetStudio는 UI 코드와 알고리즘 코드를 분리하는 방식으로 �
 `service/`는 UI와 분리된 기능 API를 제공합니다. 편집, 라벨링, 전처리, augmentation, ROI, project 저장/export, YOLO dataset export가 대표 service 단위로 통합되어 있습니다.
 
 UI에서는 각 기능을 직접 구현하지 않고, connect 함수에서 필요한 API를 호출하는 방식으로 개발합니다.
+
+무거운 기능은 `MainWindow`가 operation과 payload 신호를 보내고, app이 `ProjectWorker`, `EditingWorker`, `AugmentationWorker`, `ExportWorker` 중 하나를 생성합니다. 각 worker는 실제 QThread로서 해당 service를 직접 호출합니다.
 
 예시:
 
@@ -349,7 +354,7 @@ UiSetup      → uisetup.py
 ImageCanvas  → imagecanvas.py
 PoissonApi   → poissonapi.py
 YoloApi      → yoloapi.py
-BaseWorker   → baseworker.py
+BaseWorker   → base_worker.py
 ```
 
 클래스명:
@@ -384,7 +389,7 @@ DEFAULT_IMAGE_SIZE = 640
 
 ## 목표
 
-DatasetStudio의 최종 목표는 Computer Vision 데이터셋 제작에 필요한 반복 작업을 하나의 GUI 안에서 처리하는 것입니다.
+Dataset Editor의 최종 목표는 Computer Vision 데이터셋 제작에 필요한 반복 작업을 하나의 GUI 안에서 처리하는 것입니다.
 
 특히 다음 작업을 하나의 흐름으로 연결하는 것을 목표로 합니다.
 
@@ -398,4 +403,4 @@ Dataset Load
 → Model Training
 ```
 
-DatasetStudio는 단순한 이미지 뷰어가 아니라, 학습 데이터 제작을 위한 실용적인 Dataset Authoring Tool을 지향합니다.
+Dataset Editor는 단순한 이미지 뷰어가 아니라, 학습 데이터 제작을 위한 실용적인 Dataset Authoring Tool을 지향합니다.

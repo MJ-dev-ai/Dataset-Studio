@@ -3,6 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
+ImagePoint = tuple[float, float]
+PaintStroke = tuple[ImagePoint, ImagePoint]
+HealingStroke = tuple[ImagePoint, ImagePoint, ImagePoint, ImagePoint]
+
+
 @dataclass(frozen=True)
 class Size:
     width: int

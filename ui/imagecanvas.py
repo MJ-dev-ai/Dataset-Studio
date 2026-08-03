@@ -37,6 +37,7 @@ class ImageCanvas(QWidget):
     tool_error = pyqtSignal(str)
     MIN_ZOOM = 0.02
     MAX_ZOOM = 64.0
+    SELECTION_HANDLE_SIZE = 8
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -44,7 +45,7 @@ class ImageCanvas(QWidget):
         self.pixmap = QPixmap()
         self.zoom = 1.0
         self.pan_offset = QPointF(0.0, 0.0)
-        self.current_tool = None
+        self.tool_controller = None
         self.selection_path = QPainterPath()
         self.annotations: list[CanvasAnnotation] = []
         self.labels_visible = True
@@ -260,6 +261,62 @@ class ImageCanvas(QWidget):
     def selection_bounds(self) -> QRectF:
         return self.selection_path.boundingRect()
 
+    def selection_edit_bounds(self) -> QRectF:
+        """Return the visible image-space bounds used for selection handles."""
+        if not self.has_selection():
+            return QRectF()
+        bounds = self.selection_bounds()
+        if self.pixmap.isNull():
+            return bounds
+        return bounds.intersected(QRectF(self.pixmap.rect()))
+
+    def selection_handle_rects(self) -> dict[str, QRectF]:
+        bounds = self.selection_edit_bounds()
+        if bounds.isNull() or bounds.width() < 1.0 or bounds.height() < 1.0:
+            return {}
+        size = max(float(self.SELECTION_HANDLE_SIZE) / max(self.zoom, 1e-6), 1.0)
+        half = size / 2.0
+        center = bounds.center()
+        points = {
+            "top_left": bounds.topLeft(),
+            "top": QPointF(center.x(), bounds.top()),
+            "top_right": bounds.topRight(),
+            "right": QPointF(bounds.right(), center.y()),
+            "bottom_right": bounds.bottomRight(),
+            "bottom": QPointF(center.x(), bounds.bottom()),
+            "bottom_left": bounds.bottomLeft(),
+            "left": QPointF(bounds.left(), center.y()),
+        }
+        return {
+            name: QRectF(point.x() - half, point.y() - half, size, size)
+            for name, point in points.items()
+        }
+
+    def selection_handle_at(self, image_point: QPointF) -> str | None:
+        """Return the active resize/move handle under an image-space point."""
+        for name, rect in self.selection_handle_rects().items():
+            if rect.contains(image_point):
+                return name
+        bounds = self.selection_edit_bounds()
+        if not bounds.isNull() and bounds.contains(image_point):
+            return "move"
+        return None
+
+    @staticmethod
+    def cursor_for_selection_handle(handle: str | None) -> Qt.CursorShape:
+        cursors = {
+            "top_left": Qt.CursorShape.SizeFDiagCursor,
+            "bottom_right": Qt.CursorShape.SizeFDiagCursor,
+            "top_right": Qt.CursorShape.SizeBDiagCursor,
+            "bottom_left": Qt.CursorShape.SizeBDiagCursor,
+            "left": Qt.CursorShape.SizeHorCursor,
+            "right": Qt.CursorShape.SizeHorCursor,
+            "top": Qt.CursorShape.SizeVerCursor,
+            "bottom": Qt.CursorShape.SizeVerCursor,
+            "move": Qt.CursorShape.SizeAllCursor,
+        }
+        return cursors.get(handle, Qt.CursorShape.CrossCursor)
+
     def selection_mask(self, bounds: QRect | None = None) -> QImage:
         """Rasterize the active selection into a grayscale image-space mask."""
         if self.pixmap.isNull():
@@ -285,6 +342,33 @@ class ImageCanvas(QWidget):
         self.annotations.append(CanvasAnnotation(class_id, bounds, class_name))
         self.selected_annotation_index = len(self.annotations) - 1
         self.annotations_changed.emit()
+        self.update()
+        return True
+
+    def set_annotation_bounds(
+        self,
+        index: int,
+        bounds: QRectF,
+        notify: bool = True,
+        sync_selection: bool = True,
+    ) -> bool:
+        """Update one annotation rectangle while preserving its class metadata."""
+        if index < 0 or index >= len(self.annotations):
+            return False
+        rect = QRectF(bounds).normalized()
+        if not self.pixmap.isNull():
+            rect = rect.intersected(QRectF(self.pixmap.rect()))
+        if rect.isNull() or rect.width() <= 0.0 or rect.height() <= 0.0:
+            return False
+        annotation = self.annotations[index]
+        self.annotations[index] = CanvasAnnotation(annotation.class_id, rect, annotation.class_name)
+        if sync_selection and self.selected_annotation_index == index:
+            path = QPainterPath()
+            path.addRect(rect)
+            self.selection_path = path
+            self.selection_changed.emit(True)
+        if notify:
+            self.annotations_changed.emit()
         self.update()
         return True
 
@@ -362,6 +446,8 @@ class ImageCanvas(QWidget):
             painter.fillPath(self.selection_path, QColor(37, 99, 235, 35))
             painter.setPen(QPen(QColor("white"), max(1.0 / self.zoom, 0.5), Qt.PenStyle.DashLine))
             painter.drawPath(self.selection_path)
+            if self.tool_controller is not None and self.tool_controller.show_selection_handles:
+                self._draw_selection_handles(painter)
         pen = QPen(QColor("#ff4040"), max(2.0 / self.zoom, 1.0))
         painter.setPen(pen)
         if not self.labels_visible:
@@ -377,15 +463,25 @@ class ImageCanvas(QWidget):
             painter.drawRect(annotation.bounds)
             painter.drawText(annotation.bounds.topLeft() + QPointF(2, 14), annotation.class_name or str(annotation.class_id))
 
+    def _draw_selection_handles(self, painter: QPainter) -> None:
+        handles = self.selection_handle_rects()
+        if not handles:
+            return
+        painter.save()
+        painter.setPen(QPen(QColor(37, 99, 235), max(1.0 / self.zoom, 0.5)))
+        painter.setBrush(QColor(255, 255, 255))
+        for rect in handles.values():
+            painter.drawRect(rect)
+        painter.restore()
+
     def draw_tool_cursor(self, painter: QPainter) -> None:
-        active_tool = getattr(self.current_tool, "current_tool", self.current_tool)
-        if active_tool is None or not getattr(active_tool, "show_cursor_circle", False):
+        if self.tool_controller is None or not self.tool_controller.show_cursor_circle:
             return
         if self._tool_cursor_pos is None or self.pixmap.isNull():
             return
         if not QRectF(self.pixmap.rect()).contains(self._tool_cursor_pos):
             return
-        radius = float(getattr(active_tool, "cursor_radius", 0.0))
+        radius = float(self.tool_controller.cursor_radius)
         if radius <= 0:
             return
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
@@ -415,8 +511,8 @@ class ImageCanvas(QWidget):
             self.begin_pan(event.position())
             event.accept()
             return
-        if self.current_tool is not None:
-            self._dispatch_tool_event("mouse_press_event", event)
+        if self.tool_controller is not None:
+            self._run_tool_event("mouse_press_event", self.tool_controller.mouse_press_event, event)
 
     def mouseMoveEvent(self, event):
         self._tool_cursor_pos = self.to_image_pos(event.position())
@@ -425,20 +521,20 @@ class ImageCanvas(QWidget):
             self.update_pan(event.position())
             event.accept()
             return
-        if self.current_tool is not None:
-            self._dispatch_tool_event("mouse_move_event", event)
+        if self.tool_controller is not None:
+            self._run_tool_event("mouse_move_event", self.tool_controller.mouse_move_event, event)
 
     def mouseReleaseEvent(self, event):
         self._tool_cursor_pos = self.to_image_pos(event.position())
         self.update()
         if self._pan_active and event.button() == Qt.MouseButton.MiddleButton:
             self.end_pan()
-            if self.current_tool is not None and hasattr(self.current_tool, "activate"):
-                self.current_tool.activate()
+            if self.tool_controller is not None:
+                self.tool_controller.activate()
             event.accept()
             return
-        if self.current_tool is not None:
-            self._dispatch_tool_event("mouse_release_event", event)
+        if self.tool_controller is not None:
+            self._run_tool_event("mouse_release_event", self.tool_controller.mouse_release_event, event)
 
     def wheelEvent(self, event):
         delta = event.angleDelta().y()
@@ -478,22 +574,23 @@ class ImageCanvas(QWidget):
         event.acceptProposedAction()
 
     def mouseDoubleClickEvent(self, event):
-        if self.current_tool is not None and hasattr(self.current_tool, "mouse_double_click_event"):
-            self._dispatch_tool_event("mouse_double_click_event", event)
+        if self.tool_controller is not None:
+            self._run_tool_event(
+                "mouse_double_click_event",
+                self.tool_controller.mouse_double_click_event,
+                event,
+            )
 
-    def _dispatch_tool_event(self, method_name: str, event) -> None:
+    def _run_tool_event(self, event_name: str, handler, event) -> None:
         """Keep recoverable tool failures from terminating the entire Qt process."""
-        method = getattr(self.current_tool, method_name, None)
-        if method is None:
-            return
         try:
-            method(event)
+            handler(event)
         except Exception as exc:  # Qt event-handler boundary.
-            get_logger().exception("Canvas tool event failed: %s", method_name)
+            get_logger().exception("Canvas tool event failed: %s", event_name)
             self.tool_error.emit(str(exc))
 
-    def set_tool(self, tool) -> None:
-        self.current_tool = tool
+    def set_tool_controller(self, controller) -> None:
+        self.tool_controller = controller
 
     def fit_to_window(self) -> None:
         if self.pixmap.isNull() or self.width() <= 0 or self.height() <= 0:

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from pathlib import Path
 from typing import Callable
@@ -18,12 +18,12 @@ from PyQt6.QtWidgets import (
 )
 
 from service.editing_service import clone_mode_from_text
-from service.tool_service import ToolMode
+from ui.tool_controller import ToolMode
 from ui.themes import theme_colors
 
 
 class UiSetup:
-    """Binds loaded Qt Designer UI widgets to DatasetStudio actions."""
+    """Binds loaded Qt Designer UI widgets to Dataset Editor actions."""
 
     def __init__(self, window):
         self.window = window
@@ -54,7 +54,7 @@ class UiSetup:
         }
 
     def setup(self) -> None:
-        self.window.tool_manager.mode_changed = self.update_tool_ui
+        self.window.tool_controller.mode_changed = self.update_tool_ui
         self._setup_action_texts()
         self._setup_file_menu()
         self._setup_edit_menu()
@@ -113,24 +113,31 @@ class UiSetup:
             )
             layout.insertWidget(max(0, layout.count() - 1), self.window.buttonSavePoissonMapSet)
 
-        tool = self.window.tool_manager.tool(ToolMode.PATCH)
-        if tool is None:
-            return
-        tool.state_changed = self._sync_manual_poisson_controls
+        self.window.tool_controller.patch_state_changed = self._sync_manual_poisson_controls
 
         spin_x = getattr(self.window, "spin_paste_x", None)
         spin_y = getattr(self.window, "spin_paste_y", None)
         rotation = getattr(self.window, "double_paste_rotation", None)
         scale = getattr(self.window, "double_paste_scale", None)
         if spin_x is not None:
-            spin_x.valueChanged.connect(lambda value: tool.set_position(value, tool.state.y_pos))
+            spin_x.valueChanged.connect(
+                lambda value: self.window.tool_controller.set_patch_position(
+                    value,
+                    self.window.tool_controller.patch_state.y_pos,
+                )
+            )
         if spin_y is not None:
-            spin_y.valueChanged.connect(lambda value: tool.set_position(tool.state.x_pos, value))
+            spin_y.valueChanged.connect(
+                lambda value: self.window.tool_controller.set_patch_position(
+                    self.window.tool_controller.patch_state.x_pos,
+                    value,
+                )
+            )
         if rotation is not None:
-            rotation.valueChanged.connect(tool.set_rotation)
+            rotation.valueChanged.connect(self.window.tool_controller.set_patch_rotation)
         if scale is not None:
-            scale.valueChanged.connect(tool.set_scale)
-        self._sync_manual_poisson_controls(tool.state)
+            scale.valueChanged.connect(self.window.tool_controller.set_patch_scale)
+        self._sync_manual_poisson_controls(self.window.tool_controller.patch_state)
 
     def _sync_manual_poisson_controls(self, state) -> None:
         """Reflect PatchTool state without feeding values back through Qt signals."""
@@ -189,9 +196,7 @@ class UiSetup:
             if widget is not None:
                 widget.setEnabled(not running)
         if not running:
-            tool = self.window.tool_manager.tool(ToolMode.PATCH)
-            if tool is not None:
-                self._sync_manual_poisson_controls(tool.state)
+            self._sync_manual_poisson_controls(self.window.tool_controller.patch_state)
 
 
 
@@ -286,7 +291,7 @@ class UiSetup:
         fullscreen = getattr(self.window, "action_fullscreen", None)
         if isinstance(fullscreen, QAction):
             fullscreen.setShortcut("F11")
-        self._set_action_text("actionAbout", "About DatasetStudio")
+        self._set_action_text("actionAbout", "About Dataset Editor")
         button = getattr(self.window, "button_label_popup", None)
         if isinstance(button, QAbstractButton):
             button.setText("Manage Label Classes")
@@ -684,7 +689,7 @@ class UiSetup:
             "action_toggle_properties_pannel": "question.svg",
             "action_toggle_logs": "about.png",
 
-            # Extra DatasetStudio tool icons. These actions/buttons are applied only if the .ui file contains them.
+            # Extra Dataset Editor tool icons. These actions/buttons are applied only if the .ui file contains them.
             "action_fill_bucket": "fill_bucket.svg",
             "action_blur_tool": "blur.svg",
             "action_threshold_tool": "threshold.svg",
@@ -734,7 +739,7 @@ class UiSetup:
             "optionsConfirmPaste": "apply.png",
             "optionsApplyPoisson": "blend_poisson.svg",
 
-            # Extra DatasetStudio buttons. These are ignored if not present in the loaded .ui file.
+            # Extra Dataset Editor buttons. These are ignored if not present in the loaded .ui file.
             "button_preprocess_apply": "preprocessing_sliders.svg",
             "button_threshold_apply": "threshold.svg",
             "button_blur_apply": "blur.svg",
@@ -869,7 +874,7 @@ class UiSetup:
             self._set_brush_opacity(opacity_spin.value())
         size_spin = getattr(self.window, "spinOptionsBrushSize", None)
         if size_spin is not None:
-            self._set_brush_size(size_spin.value())
+            self.window.tool_controller.set_paint_size(size_spin.value())
 
     def _setup_top_selection_options(self) -> None:
         layout = getattr(self.window, "layoutOptionsSelect", None)
@@ -1019,12 +1024,12 @@ class UiSetup:
             dock_logs.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures)
             self.window.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock_logs)
 
-        self.window.queue_layout_ratio_update()
+        self.window._queue_panel_ratio_update()
 
     def _setup_initial_panel_state(self) -> None:
         self.update_tool_ui(ToolMode.MOVE)
         if hasattr(self.window, "label_property_title"):
-            self.window.label_property_title.setText("DatasetStudio")
+            self.window.label_property_title.setText("Dataset Editor")
         if hasattr(self.window, "label_property_subtitle"):
             self.window.label_property_subtitle.setText("Ready")
 
@@ -1044,18 +1049,18 @@ class UiSetup:
         self._connect_action("action_open_Images", self.window.open_images)
         self._connect_action("action_save_project", self.window.save_project)
         self._connect_action("action_save_project_as", self.window.save_project_as)
-        self._connect_action("action_save", self.window.save_current_image)
+        self._connect_action("action_save", self.window.save_current_mapset)
         self._connect_action("action_save_all", self.window.save_all)
-        self._connect_action("action_save_as", self.window.save_current_image_as)
+        self._connect_action("action_save_as", self.window.save_current_as_new_mapset)
         self._connect_action("action_save_labels", self.window.save_current_yolo_labels)
         self._connect_action("action_export_yolov8_dataset", self.window.export_yolo_dataset)
         self._connect_action("action_export_result", self.window.export_yolo_dataset)
         self._connect_action("action_exit", self.window.close)
 
     def _connect_view_actions(self) -> None:
-        self._connect_action("action_zoom_in", lambda: self._adjust_zoom(1.25))
-        self._connect_action("action_zoom_out", lambda: self._adjust_zoom(0.8))
-        self._connect_action("action_actual_size", lambda: self._set_zoom(1.0))
+        self._connect_action("action_zoom_in", lambda: self.window.canvas.zoom_by(1.25))
+        self._connect_action("action_zoom_out", lambda: self.window.canvas.zoom_by(0.8))
+        self._connect_action("action_actual_size", self.window.canvas.actual_size)
         self._connect_action("action_fit_to_window", self.window.canvas.fit_to_window)
         self._connect_button("optionsZoomIn", lambda: self.window.canvas.zoom_by(1.25))
         self._connect_button("optionsZoomOut", lambda: self.window.canvas.zoom_by(0.8))
@@ -1075,8 +1080,8 @@ class UiSetup:
         self._connect_action("action_redo", self.window.redo_edit)
         self._connect_action("action_copy", self._copy_for_current_mode)
         self._connect_action("action_copy_patch", self._copy_for_current_mode)
-        self._connect_action("action_paste", self._paste_for_current_mode)
-        self._connect_action("action_paste_patch", self._paste_for_current_mode)
+        self._connect_action("action_paste", self.window.place_clipboard_patch)
+        self._connect_action("action_paste_patch", self.window.place_clipboard_patch)
         self._connect_action("action_delete", self._delete_for_current_mode)
         self._connect_action("action_select_all", self.window.select_all)
         self._connect_action("action_deselect", self.window.clear_active_selection_state)
@@ -1097,7 +1102,7 @@ class UiSetup:
         self._connect_action("action_remove_active_label", self.window.remove_active_annotation)
         self._connect_action("action_reload_labels", self.window.reload_current_yolo_labels)
         self._connect_action("action_show_labels", self.window.set_labels_visible)
-        self._connect_action("actionAbout", lambda: self.window.set_status("DatasetStudio"))
+        self._connect_action("actionAbout", lambda: self.window.set_status("Dataset Editor"))
 
 
     def _connect_transform_actions(self) -> None:
@@ -1182,20 +1187,17 @@ class UiSetup:
         self._connect_button("button_brush_color", self._choose_brush_color)
         spin = getattr(self.window, "spinOptionsBrushSize", None)
         if spin is not None:
-            spin.valueChanged.connect(self._set_brush_size)
+            spin.valueChanged.connect(self.window.tool_controller.set_paint_size)
 
     def _finish_polygon(self) -> None:
-        if self.window.tool_manager.current_mode != ToolMode.POLYGON:
+        if self.window.tool_controller.current_mode != ToolMode.POLYGON:
             self.window.set_status("Polygon finish is available in polygon mode")
             return
-        tool = self.window.tool_manager.current_tool
-        if hasattr(tool, "finish_polygon"):
-            tool.finish_polygon()
+        self.window.tool_controller.finish_polygon_selection()
 
     def _apply_poisson(self) -> None:
         if not self._require_mode(ToolMode.PATCH, "Poisson blend"):
             return
-        tool = self.window.tool_manager.tool(ToolMode.PATCH)
         mode_combo = getattr(self.window, "optionsPoissonMode", None)
         if mode_combo is None:
             mode_combo = getattr(self.window, "combo_poisson_mode", None)
@@ -1211,47 +1213,43 @@ class UiSetup:
         except (ValueError, RuntimeError) as exc:
             self.window.set_status(f"Poisson failed: {exc}")
             return
-        if not applied and not tool.paste_preview():
+        if not applied and not self.window.tool_controller.has_patch_preview():
             self.window.set_status("Copy a selection first")
 
     def _apply_hard_paste(self) -> None:
         if not self._require_mode(ToolMode.PATCH, "Hard paste"):
             return
-        tool = self.window.tool_manager.tool(ToolMode.PATCH)
         try:
             applied = self.window.start_manual_poisson(mode="hard_paste", mode_name="Hard Paste")
         except (ValueError, RuntimeError) as exc:
             self.window.set_status(f"Patch failed: {exc}")
             return
-        if not applied and not tool.paste_preview():
+        if not applied and not self.window.tool_controller.has_patch_preview():
             self.window.set_status("Copy a selection first")
 
     def _patch_transform(self, operation: str, value: float) -> None:
         if not self._require_mode(ToolMode.PATCH, "Patch transform"):
             return
-        tool = self.window.tool_manager.tool(ToolMode.PATCH)
-        if tool is None or not tool.paste_preview():
+        if not self.window.tool_controller.has_patch_preview():
             self.window.set_status("Paste a patch before transforming it")
             return
         if operation == "reset":
-            tool.reset_transform()
-        else:
-            getattr(tool, operation)(value)
+            self.window.tool_controller.reset_patch_transform()
+        elif operation == "rotate":
+            self.window.tool_controller.rotate_patch(value)
+        elif operation == "scale":
+            self.window.tool_controller.scale_patch(value)
 
     def _copy_for_current_mode(self) -> None:
-        if self.window.tool_manager.current_mode == ToolMode.PATCH:
+        if self.window.tool_controller.current_mode == ToolMode.PATCH:
             self.window.set_status("Switch to a selection mode before copying a patch")
             return
         self.window.copy_selection_to_patch()
 
-    def _paste_for_current_mode(self) -> None:
-        self.window.place_clipboard_patch()
-
     def _delete_for_current_mode(self) -> None:
-        if self.window.tool_manager.current_mode == ToolMode.PATCH:
-            tool = self.window.tool_manager.tool(ToolMode.PATCH)
-            if tool is not None and tool.paste_preview():
-                self.window.tool_manager.cancel_current_tool(
+        if self.window.tool_controller.current_mode == ToolMode.PATCH:
+            if self.window.tool_controller.has_patch_preview():
+                self.window.tool_controller.cancel_current_tool(
                     clear_canvas=False,
                     fallback_mode=ToolMode.MOVE,
                 )
@@ -1260,38 +1258,20 @@ class UiSetup:
         self.window.delete_active_selection()
 
     def _require_mode(self, mode: ToolMode, command_name: str) -> bool:
-        if self.window.tool_manager.current_mode == mode:
+        if self.window.tool_controller.current_mode == mode:
             return True
         self.window.set_status(f"{command_name} is available in {mode.value} mode")
         return False
 
-    def _set_brush_size(self, value: int) -> None:
-        for mode in (ToolMode.BRUSH, ToolMode.HEALING_BRUSH, ToolMode.ERASER, ToolMode.FILL):
-            tool = self.window.tool_manager.tool(mode)
-            if hasattr(tool, "options"):
-                tool.options.size = value
-        self.window.canvas.update()
-
     def _set_brush_opacity(self, value: int) -> None:
-        opacity = max(0.0, min(1.0, float(value) / 100.0))
-        for mode in (ToolMode.BRUSH, ToolMode.HEALING_BRUSH, ToolMode.ERASER, ToolMode.FILL):
-            tool = self.window.tool_manager.tool(mode)
-            if hasattr(tool, "options"):
-                tool.options.opacity = opacity
+        self.window.tool_controller.set_paint_opacity(float(value) / 100.0)
 
     def _choose_brush_color(self) -> None:
-        tool = self.window.tool_manager.tool(ToolMode.BRUSH)
-        current = getattr(getattr(tool, "options", None), "color", QColor(255, 255, 255))
+        current = self.window.tool_controller.brush_color()
         color = QColorDialog.getColor(current, self.window, "Brush Color")
         if not color.isValid():
             return
-        self._set_brush_color(color)
-
-    def _set_brush_color(self, color: QColor) -> None:
-        for mode in (ToolMode.BRUSH, ToolMode.HEALING_BRUSH, ToolMode.FILL):
-            tool = self.window.tool_manager.tool(mode)
-            if hasattr(tool, "options"):
-                tool.options.color = QColor(color)
+        self.window.tool_controller.set_brush_color(color)
         text = color.name().upper()
         for name in ("buttonOptionsBrushColor", "button_brush_color"):
             button = getattr(self.window, name, None)
@@ -1301,7 +1281,7 @@ class UiSetup:
 
     def activate_tool(self, mode: ToolMode | str) -> None:
         tool_mode = ToolMode.from_value(mode)
-        self.window.tool_manager.activate(tool_mode)
+        self.window.tool_controller.activate(tool_mode)
         self.window.set_status(f"Tool: {tool_mode.value}")
 
     def update_tool_ui(self, mode: ToolMode | str) -> None:
@@ -1351,9 +1331,8 @@ class UiSetup:
                 action.setChecked(mapped_tool == tool_mode)
 
     def _update_patch_action_availability(self) -> None:
-        patch_mode = self.window.tool_manager.current_mode == ToolMode.PATCH
-        tool = self.window.tool_manager.tool(ToolMode.PATCH)
-        ready = patch_mode and tool is not None and tool.paste_preview()
+        patch_mode = self.window.tool_controller.current_mode == ToolMode.PATCH
+        ready = patch_mode and self.window.tool_controller.has_patch_preview()
         for action_name in (
             "action_rotate_left",
             "action_rotate_right",
@@ -1377,17 +1356,11 @@ class UiSetup:
         if stack is not None and page is not None:
             stack.setCurrentWidget(page)
 
-    def _adjust_zoom(self, factor: float) -> None:
-        self.window.canvas.zoom_by(factor)
-
-    def _set_zoom(self, zoom: float) -> None:
-        self.window.canvas.set_zoom(zoom)
-
     def _toggle_dock(self, dock_name: str) -> None:
         dock = getattr(self.window, dock_name, None)
         if dock is not None:
             dock.setVisible(not dock.isVisible())
-            self.window.queue_layout_ratio_update()
+            self.window._queue_panel_ratio_update()
 
     def _toggle_fullscreen(self) -> None:
         if self.window.isFullScreen():

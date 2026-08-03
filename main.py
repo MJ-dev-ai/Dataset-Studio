@@ -7,8 +7,8 @@ import traceback
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import QApplication
 
+from app import DatasetEditorApp
 from core.logging_setup import append_crash_report, append_pending_crash, configure_logging, flush_logs
-from ui.mainwindow import MainWindow
 from ui.themes import theme_stylesheet
 
 
@@ -17,10 +17,10 @@ class FatalShutdownController(QObject):
 
     fatal = pyqtSignal(str)
 
-    def __init__(self, app: QApplication, window: MainWindow, logger):
+    def __init__(self, app: QApplication, editor: DatasetEditorApp, logger):
         super().__init__()
         self.app = app
-        self.window = window
+        self.editor = editor
         self.logger = logger
         self.fatal.connect(self._shutdown)
 
@@ -35,7 +35,7 @@ class FatalShutdownController(QObject):
     @pyqtSlot(str)
     def _shutdown(self, traceback_text: str) -> None:
         del traceback_text
-        if self.window.shutdown_workers(timeout_ms=30000):
+        if self.editor.shutdown(timeout_ms=30000):
             flush_logs(durable=True)
             self.app.exit(1)
         else:
@@ -47,17 +47,17 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setStyleSheet(theme_stylesheet("dark"))
     logger = configure_logging("runtime/logs")
-    window = MainWindow()
-    controller = FatalShutdownController(app, window, logger)
+    editor = DatasetEditorApp(app, logger)
+    controller = FatalShutdownController(app, editor, logger)
     sys.excepthook = controller.handle
 
     def thread_exception(args):
         controller.handle(args.exc_type, args.exc_value, args.exc_traceback)
 
     threading.excepthook = thread_exception
-    window.show()
+    editor.window.show()
     exit_code = app.exec()
-    window.shutdown_workers(timeout_ms=30000)
+    editor.shutdown(timeout_ms=30000)
     flush_logs(durable=True)
     return exit_code
 

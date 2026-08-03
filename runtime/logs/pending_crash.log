@@ -1,0 +1,40 @@
+
+[2026-07-28T03:05:05.157662+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Studio\ui\mainwindow.py", line 204, in eventFilter
+    def eventFilter(self, watched, event) -> bool:
+    
+KeyboardInterrupt
+
+[2026-07-31T05:21:26.570554+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 217, in eventFilter
+    self.undo_edit()
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 1881, in undo_edit
+    self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 3069, in _update_image_property_panel
+    self.label_info_file_value.setText(path.name)
+                                       ^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'name'
+
+[2026-07-31T07:30:24.246771+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\uisetup.py", line 1260, in _delete_for_current_mode
+    self.window.delete_active_selection()
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2320, in delete_active_selection
+    self.delete_selection()
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2307, in delete_selection
+    if not self.apply_mapset_selection_delete():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\ui\mainwindow.py", line 2052, in apply_mapset_selection_delete
+    result = apply_selection_delete(source, mask)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 362, in apply_selection_delete
+    return apply_selection_fill(image, mask, (0, 0, 0), 1.0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 346, in apply_selection_fill
+    mask_bool = _normalized_mask(mask, image.shape[:2]) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 370, in _normalized_mask
+    raise ValueError("mask size must match image size")
+ValueError: mask size must match image size

@@ -5,57 +5,8 @@ from collections.abc import Callable, Mapping
 import cv2
 import numpy as np
 
+from core.geometry import HealingStroke, PaintStroke
 from core.mask_ops import make_nonzero_mask
-
-
-def make_patch_mask(patch: np.ndarray) -> np.ndarray:
-	"""Create a binary mask from non-black patch pixels."""
-	return make_nonzero_mask(patch)
-
-
-def transform_patch(image: np.ndarray, scale: float, angle: float, mask: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
-	"""Scale and rotate a patch while preserving its selection mask."""
-	height, width = image.shape[:2]
-	size = (max(1, int(round(width * scale))), max(1, int(round(height * scale))))
-	scaled = cv2.resize(image, size, interpolation=cv2.INTER_LINEAR)
-	if mask is None:
-		scaled_mask = make_patch_mask(scaled)
-	else:
-		scaled_mask = cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
-	rotated = rotate_bound(scaled, angle, interpolation=cv2.INTER_LINEAR)
-	rotated_mask = rotate_bound(scaled_mask, angle, interpolation=cv2.INTER_NEAREST)
-	if rotated_mask.ndim == 3:
-		rotated_mask = np.max(rotated_mask[:, :, :3], axis=2)
-	rotated_mask = np.where(rotated_mask > 0, 255, 0).astype(np.uint8)
-	return rotated, rotated_mask
-
-
-def rotate_bound(
-	image: np.ndarray,
-	angle: float,
-	*,
-	interpolation: int = cv2.INTER_LINEAR,
-) -> np.ndarray:
-	"""Rotate an image without clipping and preserve caller-selected sampling."""
-	height, width = image.shape[:2]
-	if angle % 360 == 0:
-		return image.copy()
-	center = (width / 2.0, height / 2.0)
-	matrix = cv2.getRotationMatrix2D(center, -angle, 1.0)
-	cos_v = abs(matrix[0, 0])
-	sin_v = abs(matrix[0, 1])
-	new_width = max(1, int((height * sin_v) + (width * cos_v)))
-	new_height = max(1, int((height * cos_v) + (width * sin_v)))
-	matrix[0, 2] += (new_width / 2.0) - center[0]
-	matrix[1, 2] += (new_height / 2.0) - center[1]
-	return cv2.warpAffine(
-		image,
-		matrix,
-		(new_width, new_height),
-		flags=interpolation,
-		borderMode=cv2.BORDER_CONSTANT,
-		borderValue=0,
-	)
 
 
 def clone_mode_from_text(value: str) -> int:
@@ -70,7 +21,7 @@ def clone_mode_from_text(value: str) -> int:
 
 def apply_paint_strokes(
 	image: np.ndarray,
-	strokes: list[tuple[tuple[float, float], tuple[float, float]]],
+	strokes: list[PaintStroke],
 	color: tuple[int, int, int],
 	size: int,
 	opacity: float = 1.0,
@@ -89,20 +40,12 @@ def apply_paint_strokes(
 			(int(round(end[0])), int(round(end[1]))),
 			bgr,
 			thickness=thickness,
-			lineType=cv2.LINE_AA,
+			lineType=cv2.LINE_8,
 		)
 	alpha = float(np.clip(opacity, 0.0, 1.0))
 	if alpha >= 1.0:
 		return overlay
 	return cv2.addWeighted(overlay, alpha, result, 1.0 - alpha, 0.0)
-
-
-HealingStroke = tuple[
-	tuple[float, float],
-	tuple[float, float],
-	tuple[float, float],
-	tuple[float, float],
-]
 
 
 def apply_healing_strokes(
@@ -326,8 +269,10 @@ def _healing_alpha_mask(
 	size = radius * 2 + 1
 	y_grid, x_grid = np.ogrid[:size, :size]
 	distance = np.sqrt((x_grid - radius) ** 2 + (y_grid - radius) ** 2)
-	mask = np.where(distance <= radius, 1.0, 0.0).astype(np.float32)
+	circle = distance <= radius
+	mask = np.where(circle, 1.0, 0.0).astype(np.float32)
 	mask = cv2.GaussianBlur(mask, (0, 0), max(0.5, radius * 0.25))
+	mask[~circle] = 0.0
 	cropped = mask[top:top + height, left:left + width]
 	return np.clip(cropped * opacity, 0.0, 1.0)
 

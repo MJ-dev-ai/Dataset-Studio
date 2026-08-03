@@ -1,13 +1,14 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
+import uuid
 from dataclasses import replace
 
 import numpy as np
 from pathlib import Path
 
 from PyQt6 import uic
-from PyQt6.QtCore import QEvent, QRect, QRectF, QSettings, Qt, QTimer
+from PyQt6.QtCore import QEvent, QRect, QRectF, QSettings, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QColor, QIcon, QImage, QKeySequence, QPainter, QPainterPath, QPixmap, QShortcut
 from PyQt6.QtWidgets import (
     QApplication,
@@ -26,26 +27,23 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from app import create_app_context
 from config.default_presets import IMAGE_EXTENSIONS, MAP_SPECS
-from service.project_service import export_defect_maps, safe_defect_name
+from core.geometry import HealingStroke
+from service.project_service import safe_defect_name
 from core.mapset import MapSet, ROI_CONTOUR_KEY, discover_map_sets, mapset_from_image_path
 from service.project_service import (
     MapSetSaveRequest,
     MapSetUpdateRequest,
-    save_mapset_copy,
-    save_mapset_in_place,
 )
-from core.patch_clipboard import PatchClipboard, read_defect_pool
+from core.patch_clipboard import PatchClipboard
 from core.pixmap_cache import PixmapCache
 from core.image_io import read_image
 from core.logging_setup import append_crash_report, get_logger
-from core.project import DatasetProject
+from core.project import DatasetProject, PROJECT_MANIFEST
 from service.labeling_service import move_in_catalog, normalize_catalog, remove_from_catalog, update_catalog
-from service.tool_service import ToolManager, ToolMode
+from ui.tool_controller import ToolController, ToolMode
 from tools.selection_tools import normalize_selection_combine_mode
 from service.editing_service import (
-    HealingStroke,
     apply_paint_strokes,
     apply_selection_delete,
     apply_selection_fill,
@@ -70,20 +68,23 @@ from ui.preprocess_dialog import (
 from ui.patch_clipboard_widget import PatchClipboardWidget
 from ui.uisetup import UiSetup
 from ui.themes import THEME_NAMES, theme_colors, theme_stylesheet
-from app import TaskManager
 from service.preprocessing_service import PreprocessOptions
 from service.roi_service import roi_contour
 from core.qt_image import bgr_to_qpixmap, qimage_to_bgr
-from worker.healing_worker import run_mapset_healing
 
 
 UI_PATH = Path(__file__).with_name("mainwindow.ui")
+APP_NAME = "Dataset Editor"
 IMAGE_FILTER = "Images (*.png *.jpg *.jpeg *.bmp *.tif *.tiff);;All Files (*)"
-PROJECT_FILTER = "DatasetStudio Project (*.datasetstudio.json);;JSON Files (*.json);;All Files (*)"
+PROJECT_FILTER = f"{APP_NAME} Project (*{PROJECT_MANIFEST});;JSON Files (*.json);;All Files (*)"
 
 
 class MainWindow(QMainWindow):
-    """Main application window for DatasetStudio."""
+    """Main application window for Dataset Editor."""
+
+    task_requested = pyqtSignal(str, str, object)
+    task_cancel_requested = pyqtSignal(str)
+    shutdown_requested = pyqtSignal(int)
 
     MAPSET_ROLE = int(Qt.ItemDataRole.UserRole) + 100
     PATH_ROLE = int(Qt.ItemDataRole.UserRole) + 101
@@ -92,9 +93,9 @@ class MainWindow(QMainWindow):
     DATASET_MAP_SPECS = MAP_SPECS
     IMAGE_EXTENSIONS = IMAGE_EXTENSIONS
 
-    def __init__(self):
+    def __init__(self, context):
         super().__init__()
-        self.context = create_app_context()
+        self.context = context
         self.project = None
         self.current_mapset: MapSet | None = None
         self.current_image_path: Path | None = None
@@ -104,7 +105,8 @@ class MainWindow(QMainWindow):
         self._project_root_item: QTreeWidgetItem | None = None
         self._panel_ratio_pending = False
         self.pixmap_cache = PixmapCache(max_bytes=384 * 1024 * 1024)
-        self.task_manager = TaskManager(self)
+        self._active_task_ids: set[str] = set()
+        self._shutdown_succeeded = False
         self._task_handlers: dict[str, callable] = {}
         self._auto_augment_task_id: str | None = None
         self._manual_poisson_task_id: str | None = None
@@ -138,16 +140,28 @@ class MainWindow(QMainWindow):
         self._setup_selection_actions()
         self._setup_log_console()
 
-        self.tool_manager = ToolManager(self.canvas)
+        self.tool_controller = ToolController(self)
         self.ui_setup = UiSetup(self)
         self.ui_setup.setup()
         self._setup_transform_properties_panel()
         self._setup_shortcuts()
-        self.tool_manager.activate(ToolMode.MOVE)
+        self.tool_controller.activate(ToolMode.MOVE)
         self.apply_theme(self.current_theme, persist=False)
         self._connect_signals()
         self._queue_panel_ratio_update()
 
+    def _request_worker(self, operation: str, payload: object) -> str:
+        """Request one feature worker and return its correlation identifier."""
+        task_id = uuid.uuid4().hex
+        self._active_task_ids.add(task_id)
+        self.task_requested.emit(task_id, operation, payload)
+        return task_id
+
+    def complete_shutdown(self, succeeded: bool) -> None:
+        """Receive the synchronous app-owned worker shutdown result."""
+        self._shutdown_succeeded = bool(succeeded)
+        if self._shutdown_succeeded:
+            self.pixmap_cache.clear()
 
 
     def _setup_log_console(self) -> None:
@@ -199,7 +213,7 @@ class MainWindow(QMainWindow):
         self.escape_shortcut.activated.connect(self._activate_move_from_edit_tool)
 
     def _activate_move_from_edit_tool(self) -> None:
-        self.tool_manager.cancel_current_tool(clear_canvas=True, fallback_mode=ToolMode.MOVE)
+        self.tool_controller.cancel_current_tool(clear_canvas=True, fallback_mode=ToolMode.MOVE)
 
     def eventFilter(self, watched, event) -> bool:
         if event.type() == QEvent.Type.KeyPress:
@@ -229,8 +243,8 @@ class MainWindow(QMainWindow):
 
     def clear_active_selection_state(self) -> None:
         """Clear selection geometry and temporary points from the active selection tool."""
-        if hasattr(self, "tool_manager"):
-            self.tool_manager.cancel_active_selection(clear_canvas=True)
+        if hasattr(self, "tool_controller"):
+            self.tool_controller.cancel_current_tool(clear_canvas=True, fallback_mode=None)
         else:
             self.canvas.clear_selection()
         self.canvas.clear_annotation_selection()
@@ -239,20 +253,17 @@ class MainWindow(QMainWindow):
         """Apply the default replace/add/subtract mode to every selection tool."""
         normalized = normalize_selection_combine_mode(mode)
         self._selection_combine_mode = normalized
-        if not hasattr(self, "tool_manager"):
+        if not hasattr(self, "tool_controller"):
             return
-        for tool_mode in (ToolMode.RECT, ToolMode.POLYGON, ToolMode.LASSO):
-            tool = self.tool_manager.tool(tool_mode)
-            if hasattr(tool, "set_combine_mode"):
-                tool.set_combine_mode(normalized)
+        self.tool_controller.set_selection_combine_mode(normalized)
 
     def _load_ui(self) -> None:
         uic.loadUi(str(UI_PATH), self)
-        self.setWindowTitle("DatasetStudio")
+        self.setWindowTitle(APP_NAME)
 
     def _setup_theme_actions(self) -> None:
         """Create persistent Dark/Light theme actions in the View menu."""
-        settings = QSettings("TNSAI", "DatasetStudio")
+        settings = QSettings("TNSAI", APP_NAME)
         current = str(settings.value("appearance/theme", "dark"))
         if current not in THEME_NAMES:
             current = "dark"
@@ -295,7 +306,7 @@ class MainWindow(QMainWindow):
         if action is not None:
             action.setChecked(True)
         if persist:
-            QSettings("TNSAI", "DatasetStudio").setValue("appearance/theme", theme)
+            QSettings("TNSAI", APP_NAME).setValue("appearance/theme", theme)
 
     def _setup_pages(self) -> None:
         self.canvas = ImageCanvas(self)
@@ -364,13 +375,7 @@ class MainWindow(QMainWindow):
         if not root:
             return
 
-        def task(context):
-            context.report(0, "Reading Defect Pool")
-            payloads = read_defect_pool(Path(root))
-            context.report(100, f"Loaded {len(payloads)} defects")
-            return payloads
-
-        task_id = self.task_manager.start("Import Defect Pool", task)
+        task_id = self._request_worker("import_defect_pool", {"root": Path(root)})
 
         def apply_result(payloads):
             last_id = None
@@ -387,15 +392,14 @@ class MainWindow(QMainWindow):
 
     def _on_patch_clipboard_changed(self) -> None:
         """Cancel placement if its backing clipboard clip was removed."""
-        tool = getattr(self, "tool_manager", None)
-        patch_tool = tool.tool(ToolMode.PATCH) if tool is not None else None
-        if patch_tool is None or not patch_tool.state.clip_id:
+        tool = getattr(self, "tool_controller", None)
+        if tool is None or not tool.patch_state.clip_id:
             return
-        if self.patch_clipboard.get(patch_tool.state.clip_id) is None:
+        if self.patch_clipboard.get(tool.patch_state.clip_id) is None:
             if tool.current_mode == ToolMode.PATCH:
                 tool.cancel_current_tool(clear_canvas=False, fallback_mode=ToolMode.MOVE)
             else:
-                patch_tool.clear_active_patch()
+                tool.clear_active_patch()
 
     def _apply_project_tree_branch_style(self, theme: str) -> None:
         """Refresh project-tree branch assets supplied by the application stylesheet."""
@@ -448,11 +452,6 @@ class MainWindow(QMainWindow):
         self.canvas.view_changed.connect(self._on_canvas_view_changed)
         self.canvas.annotations_changed.connect(self._on_annotations_changed)
         self.canvas.tool_error.connect(lambda message: self.set_status(f"Tool error: {message}"))
-        self.task_manager.task_succeeded.connect(self._on_task_succeeded)
-        self.task_manager.task_failed.connect(self._on_task_failed)
-        self.task_manager.task_progress.connect(self._on_task_progress)
-        self.task_manager.task_cancelled.connect(self._on_task_cancelled)
-        self.task_manager.task_finished.connect(self._on_task_finished)
 
     def _on_selection_changed(self, available: bool) -> None:
         for name in (
@@ -484,6 +483,7 @@ class MainWindow(QMainWindow):
             self.buttonSelectReloadLabels.setEnabled(self.current_mapset is not None)
         if hasattr(self, "buttonSelectClearPlacementMask"):
             self.buttonSelectClearPlacementMask.setEnabled(self.current_image_path is not None)
+        self._refresh_current_project_tree_item()
         self._refresh_transform_properties()
 
     def resizeEvent(self, event):
@@ -540,10 +540,6 @@ class MainWindow(QMainWindow):
         if vertical_docks:
             self.resizeDocks(vertical_docks, vertical_sizes, Qt.Orientation.Vertical)
 
-    def queue_layout_ratio_update(self) -> None:
-        """Public alias used by UiSetup when panels are toggled."""
-        self._queue_panel_ratio_update()
-
     def show_main_page(self) -> None:
         if hasattr(self, "augmentation_page"):
             self.augmentation_page.close()
@@ -567,9 +563,6 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(message)
         get_logger().info(message)
 
-    def update_tool_ui(self, tool_name: str) -> None:
-        self.ui_setup.update_tool_ui(tool_name)
-
     def open_dataset_folder(self) -> None:
         folder = QFileDialog.getExistingDirectory(self, "Open Dataset Folder", "")
         if not folder:
@@ -588,16 +581,14 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Open Dataset Folder", f"Folder not found:\n{folder}")
             return
 
-        def task(context):
-            return discover_map_sets(
-                root=folder,
-                map_specs=self.DATASET_MAP_SPECS,
-                image_extensions=self.IMAGE_EXTENSIONS,
-                cancelled=lambda: context.is_cancelled,
-                progress=lambda count, path: context.report(min(99, count), path),
-            )
-
-        task_id = self.task_manager.start("Scan dataset", task)
+        task_id = self._request_worker(
+            "scan_dataset",
+            {
+                "folder": folder,
+                "map_specs": self.DATASET_MAP_SPECS,
+                "image_extensions": self.IMAGE_EXTENSIONS,
+            },
+        )
 
         def apply(map_sets):
             if project_payload is not None:
@@ -609,7 +600,7 @@ class MainWindow(QMainWindow):
                     self.set_status("Dataset load cancelled")
                     return
             self.project_root_folder = folder
-            self.project_path = project_path or folder / ".datasetstudio.json"
+            self.project_path = project_path or folder / PROJECT_MANIFEST
             self.current_mapset = None
             self.current_image_path = None
             self._map_edit_states.clear()
@@ -642,26 +633,18 @@ class MainWindow(QMainWindow):
             return
         self.start_dataset_scan(Path(root), project_path=source, project_payload=payload)
 
-    def save_current_image(self) -> None:
-        """Compatibility action that now saves the complete current MapSet."""
-        self.save_current_mapset()
-
-    def save_current_image_as(self) -> None:
-        """Compatibility action that now saves a complete new MapSet."""
-        self.save_current_as_new_mapset()
-
     def save_current_mapset(self) -> bool:
         """Persist all current MapSet maps and labels through one staged transaction."""
         if self.current_mapset is None or self.current_image_path is None:
             QMessageBox.warning(self, "Save MapSet", "Open a MapSet first.")
             return False
-        if self._mapset_update_task_id in self.task_manager.active_task_ids:
+        if self._mapset_update_task_id in self._active_task_ids:
             self.set_status("Current MapSet is already being saved")
             return False
-        if self._save_all_task_id in self.task_manager.active_task_ids:
+        if self._save_all_task_id in self._active_task_ids:
             self.set_status("Wait for Save All to finish")
             return False
-        if self._mapset_save_task_id in self.task_manager.active_task_ids:
+        if self._mapset_save_task_id in self._active_task_ids:
             self.set_status("Wait for Save as New MapSet to finish")
             return False
         mapset = self.current_mapset
@@ -682,17 +665,10 @@ class MainWindow(QMainWindow):
             label_path=label_path,
             label_text="\n".join(label_lines) + ("\n" if label_lines else ""),
         )
-        def task(context):
-            save_mapset_in_place(
-                request,
-                cancelled=lambda: (context.check_cancelled() or False),
-                progress=lambda completed, total, message: context.report(
-                    round(completed / max(1, total) * 100), message
-                ),
-            )
-            return label_path
-
-        task_id = self.task_manager.start("Save current MapSet", task)
+        task_id = self._request_worker(
+            "save_mapset",
+            {"request": request, "label_path": label_path},
+        )
         self._mapset_update_task_id = task_id
         self.set_status(f"Saving MapSet: {mapset.name}")
 
@@ -705,6 +681,8 @@ class MainWindow(QMainWindow):
             self._loaded_label_path = Path(saved_label_path)
             self._loaded_label_snapshot = self._label_file_snapshot(Path(saved_label_path))
             self.current_mapset = self._update_mapset_label_path(mapset, Path(saved_label_path))
+            self._replace_project_tree_mapset(self.current_mapset)
+            self._update_mapset_property_panel(self.current_mapset)
             if self.project_path is not None:
                 self._write_project_manifest(self.project_path, quiet=True)
             self._refresh_transform_properties()
@@ -718,13 +696,13 @@ class MainWindow(QMainWindow):
         if not self.map_sets:
             QMessageBox.warning(self, "Save All", "Open a dataset or MapSet first.")
             return False
-        if self._save_all_task_id in self.task_manager.active_task_ids:
+        if self._save_all_task_id in self._active_task_ids:
             self.set_status("Save All is already running")
             return False
-        if self._mapset_update_task_id in self.task_manager.active_task_ids:
+        if self._mapset_update_task_id in self._active_task_ids:
             self.set_status("Wait for the current MapSet save to finish")
             return False
-        if self._mapset_save_task_id in self.task_manager.active_task_ids:
+        if self._mapset_save_task_id in self._active_task_ids:
             self.set_status("Wait for Save as New MapSet to finish")
             return False
 
@@ -741,26 +719,10 @@ class MainWindow(QMainWindow):
 
         total_units = sum(len(request.maps) + 1 for _mapset, request in targets)
 
-        def task(context):
-            completed_units = 0
-            saved: list[tuple[str, str]] = []
-            for mapset, request in targets:
-                context.check_cancelled()
-
-                def report(completed: int, total: int, message: str, mapset_name=mapset.name) -> None:
-                    value = round((completed_units + completed) / max(1, total_units) * 100)
-                    context.report(value, f"{mapset_name}: {message}")
-
-                save_mapset_in_place(
-                    request,
-                    cancelled=lambda: (context.check_cancelled() or False),
-                    progress=report,
-                )
-                completed_units += len(request.maps) + 1
-                saved.append((str(mapset.folder.resolve()), str(request.label_path)))
-            return saved
-
-        task_id = self.task_manager.start("Save All", task)
+        task_id = self._request_worker(
+            "save_all",
+            {"targets": targets, "total_units": total_units},
+        )
         self._save_all_task_id = task_id
         self.set_status(f"Saving {len(targets)} modified MapSet(s)...")
 
@@ -928,13 +890,13 @@ class MainWindow(QMainWindow):
     def save_project_as(self) -> None:
         initial = ""
         if self.project_root_folder is not None:
-            initial = str(self.project_root_folder / ".datasetstudio.json")
+            initial = str(self.project_root_folder / PROJECT_MANIFEST)
         path, _ = QFileDialog.getSaveFileName(self, "Save Project As", initial, PROJECT_FILTER)
         if not path:
             return
         destination = Path(path)
-        if destination.suffix != ".json" and not destination.name.endswith(".datasetstudio.json"):
-            destination = destination.with_suffix(".datasetstudio.json")
+        if destination.suffix != ".json" and not destination.name.endswith(PROJECT_MANIFEST):
+            destination = destination.with_suffix(PROJECT_MANIFEST)
         self._write_project_manifest(destination)
 
     def open_image(self) -> None:
@@ -973,7 +935,7 @@ class MainWindow(QMainWindow):
 
         if self.project_root_folder is None:
             self.project_root_folder = created[0].folder.parent
-            self.project_path = self.project_root_folder / ".datasetstudio.json"
+            self.project_path = self.project_root_folder / PROJECT_MANIFEST
             self._load_label_catalog(self.project_root_folder)
 
         self.map_sets = sorted(
@@ -1004,7 +966,7 @@ class MainWindow(QMainWindow):
             return False
 
         self.project_root_folder = folder
-        self.project_path = folder / ".datasetstudio.json"
+        self.project_path = folder / PROJECT_MANIFEST
         self.current_mapset = None
         self.current_image_path = None
         self._map_edit_states.clear()
@@ -1056,7 +1018,7 @@ class MainWindow(QMainWindow):
             return
 
         payload = {
-            "project_type": "DatasetStudio",
+            "project_type": "Dataset Editor",
             "root_folder": str(self.project_root_folder),
             "current_mapset": str(self.current_mapset.folder) if self.current_mapset is not None else None,
             "current_image": str(self.current_image_path) if self.current_image_path is not None else None,
@@ -1152,7 +1114,7 @@ class MainWindow(QMainWindow):
         return item
 
     def _create_mapset_item(self, map_set: MapSet) -> QTreeWidgetItem:
-        label_count = self._count_label_lines(map_set.label_path)
+        label_count = self._mapset_label_count(map_set)
         map_count = len(map_set.maps)
         suffix = f"  [{map_count} map(s)"
         if label_count:
@@ -1192,6 +1154,18 @@ class MainWindow(QMainWindow):
             return sum(1 for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
         except OSError:
             return 0
+
+    def _mapset_label_count(self, map_set: MapSet) -> int:
+        """Return the label count visible to the user, including unsaved edits."""
+        if self.current_mapset is not None and self.current_mapset.folder == map_set.folder:
+            return len(self.canvas.annotations)
+
+        state = self._label_edit_states.get(self._mapset_state_key(map_set))
+        annotations = state.get("annotations") if state is not None and state.get("modified") else None
+        if isinstance(annotations, list):
+            return len(annotations)
+
+        return self._count_label_lines(map_set.label_path)
 
     def _on_project_item_selected(
         self,
@@ -1309,9 +1283,8 @@ class MainWindow(QMainWindow):
         else:
             self.canvas.set_map_image(pixmap, modified=stored is not None)
             self.canvas.fit_to_window()
-        patch_tool = self.tool_manager.tool(ToolMode.PATCH) if hasattr(self, "tool_manager") else None
-        if patch_tool is not None and patch_tool.state.placement_active:
-            patch_tool.set_active_map_key(_map_key)
+        if hasattr(self, "tool_controller") and self.tool_controller.patch_state.placement_active:
+            self.tool_controller.set_patch_active_map_key(_map_key)
         self._update_image_property_panel(path, pixmap)
         self.set_status(f"Map: {self.map_switch_tabs.tabText(index)}")
 
@@ -1490,22 +1463,16 @@ class MainWindow(QMainWindow):
         self.set_status(f"Added annotation: [{class_id}] {class_name}")
         return True
 
-    def select_annotation(self, index: int) -> None:
-        self.canvas.select_annotation(index)
-
     def remove_annotation(self, index: int) -> bool:
         removed = self.canvas.remove_annotation(index)
         if removed:
             self.set_status("Annotation removed")
         return removed
 
-    def remove_selected_annotation(self) -> bool:
-        return self.remove_annotation(self.canvas.selected_annotation_index)
-
     def remove_active_annotation(self) -> bool:
         """Remove the selected label or the topmost label overlapping the active selection."""
         if self.canvas.selected_annotation_index >= 0:
-            return self.remove_selected_annotation()
+            return self.remove_annotation(self.canvas.selected_annotation_index)
         index = self._annotation_index_from_selection()
         if index >= 0:
             return self.remove_annotation(index)
@@ -1704,14 +1671,16 @@ class MainWindow(QMainWindow):
         if self.current_mapset is None or self.current_image_path is None:
             self.set_status("Open a MapSet before copying a patch")
             return False
-        tool = self.tool_manager.tool(ToolMode.PATCH)
         source_name = self.current_image_path.name if self.current_image_path is not None else "Current image"
         bounds = self.canvas.selection_bounds().toAlignedRect().intersected(self.canvas.pixmap.rect())
-        if tool is None or not tool.copy_from_selection(source_name):
+        if not self.tool_controller.copy_selection_to_patch(source_name):
             self.set_status("Select an area before copying a patch")
             return False
         try:
             source_images = self._mapset_image_snapshots(self.current_mapset)
+            mask = self.tool_controller.patch_state.mask
+            if mask is None:
+                raise ValueError("Selection mask is empty")
             map_patches = {
                 map_key: image[
                     bounds.top():bounds.bottom() + 1,
@@ -1721,16 +1690,16 @@ class MainWindow(QMainWindow):
             }
             clip = self.patch_clipboard.add_mapset(
                 map_patches,
-                tool.state.mask,
+                mask,
                 "",
                 self.current_mapset.folder,
                 preview_key=self._current_map_key() or "",
             )
         except (OSError, ValueError) as exc:
-            tool.clear_active_patch()
+            self.tool_controller.clear_active_patch()
             self.set_status(f"Failed to copy MapSet patch: {exc}")
             return False
-        tool.clear_active_patch()
+        self.tool_controller.clear_active_patch()
         self.listMasks.refresh(select_id=clip.clip_id)
         self.canvas.clear_selection()
         self.set_status(
@@ -1941,7 +1910,7 @@ class MainWindow(QMainWindow):
         """Start a worker that applies one healing gesture to every MapSet map."""
         if self.current_mapset is None or not strokes:
             return False
-        if self._healing_task_id in self.task_manager.active_task_ids:
+        if self._healing_task_id in self._active_task_ids:
             self.set_status("Healing Brush is already running")
             return False
         target_mapset = self.current_mapset
@@ -1959,9 +1928,15 @@ class MainWindow(QMainWindow):
             return False
 
         self._healing_restore_images = history_before
-        task_id = self.task_manager.start(
-            "Healing Brush",
-            lambda context: run_mapset_healing(context, images, list(strokes), size, opacity),
+
+        task_id = self._request_worker(
+            "healing",
+            {
+                "images": images,
+                "strokes": list(strokes),
+                "size": size,
+                "opacity": opacity,
+            },
         )
         self._healing_task_id = task_id
         self.set_status(f"Applying Healing Brush to {len(images)} MapSet maps...")
@@ -2063,7 +2038,7 @@ class MainWindow(QMainWindow):
         center_y: float | None = None,
     ) -> bool:
         """Load a stored clip into PatchTool at a target-image position."""
-        if self._manual_poisson_task_id in self.task_manager.active_task_ids:
+        if self._manual_poisson_task_id in self._active_task_ids:
             self.set_status("Wait for the current Poisson operation to finish")
             return False
         clip_id = clip_id or self.listMasks.selected_clip_id()
@@ -2087,8 +2062,7 @@ class MainWindow(QMainWindow):
         if missing:
             self.set_status(f"Clipboard MapSet patch is missing map keys: {', '.join(missing)}")
             return False
-        tool = self.tool_manager.tool(ToolMode.PATCH)
-        if tool is None or not tool.load_clip(clip, center_x, center_y, map_key):
+        if not self.tool_controller.load_patch_clip(clip, center_x, center_y, map_key):
             self.set_status("Failed to load clipboard patch")
             return False
         self.ui_setup.activate_tool(ToolMode.PATCH)
@@ -2097,11 +2071,10 @@ class MainWindow(QMainWindow):
 
     def start_manual_poisson(self, mode: int | str | None, mode_name: str = "Normal") -> bool:
         """Compose the current manual patch on a worker and commit it if still current."""
-        if self._manual_poisson_task_id in self.task_manager.active_task_ids:
+        if self._manual_poisson_task_id in self._active_task_ids:
             self.set_status("Manual Poisson is already running")
             return False
-        tool = self.tool_manager.tool(ToolMode.PATCH)
-        if tool is None or not tool.paste_preview():
+        if not self.tool_controller.has_patch_preview():
             self.set_status("Copy a selection first")
             return False
         target_mapset = self.current_mapset
@@ -2110,7 +2083,7 @@ class MainWindow(QMainWindow):
             return False
         try:
             target_images = self._mapset_image_snapshots(target_mapset)
-            composition_inputs = tool.mapset_composition_inputs(target_images)
+            composition_inputs = self.tool_controller.patch_mapset_composition_inputs(target_images)
             history_before = self._mapset_edit_snapshot(target_mapset)
         except (OSError, ValueError, RuntimeError) as exc:
             self.set_status(f"Poisson failed: {exc}")
@@ -2118,41 +2091,10 @@ class MainWindow(QMainWindow):
 
         target_folder = str(target_mapset.folder.resolve())
 
-        def task(context):
-            results = {}
-            total = len(composition_inputs)
-            for index, (map_key, values) in enumerate(composition_inputs.items(), start=1):
-                context.check_cancelled()
-                target, patch, mask, x_pos, y_pos = values
-                context.report(
-                    round((index - 1) / max(1, total) * 100),
-                    f"Applying Poisson to {map_key}",
-                )
-                if mode == "boundary_mixed":
-                    results[map_key] = self.context.poisson_api.boundary_mixed_blend(
-                        target, patch, mask, x_pos, y_pos
-                    )
-                elif mode == "hard_paste":
-                    results[map_key] = self.context.poisson_api.hard_paste(
-                        target, patch, mask, x_pos, y_pos
-                    )
-                elif mode is None:
-                    results[map_key] = self.context.poisson_api.detail_preserve_blend(
-                        target,
-                        patch,
-                        mask,
-                        x_pos,
-                        y_pos,
-                        adapt_color="normal" not in map_key.casefold(),
-                    )
-                else:
-                    results[map_key] = self.context.poisson_api.compose_patch(
-                        target, patch, mask, x_pos, y_pos, mode=mode, fallback=False
-                    )
-            context.report(100, "Manual Poisson complete")
-            return results
-
-        task_id = self.task_manager.start("Manual Poisson", task)
+        task_id = self._request_worker(
+            "manual_poisson",
+            {"composition_inputs": composition_inputs, "mode": mode},
+        )
         self._manual_poisson_task_id = task_id
         self.ui_setup.set_manual_poisson_running(True)
         self.set_status(f"Applying Poisson ({mode_name})...")
@@ -2177,7 +2119,7 @@ class MainWindow(QMainWindow):
                     self.canvas.set_map_image(current_image, modified=True)
                     self.canvas.apply_view_state(*view_state)
                     self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
-            self.tool_manager.complete_current_tool(ToolMode.MOVE)
+            self.tool_controller.complete_current_tool(ToolMode.MOVE)
             self._save_current_map_edit()
             self.set_status(f"Poisson applied to {len(results)} MapSet maps ({mode_name})")
 
@@ -2189,13 +2131,13 @@ class MainWindow(QMainWindow):
         if self.project_root_folder is None or self.current_mapset is None:
             QMessageBox.warning(self, "Save MapSet", "Open a folder-backed MapSet first.")
             return False
-        if self._mapset_save_task_id in self.task_manager.active_task_ids:
+        if self._mapset_save_task_id in self._active_task_ids:
             self.set_status("A MapSet save is already running")
             return False
-        if self._save_all_task_id in self.task_manager.active_task_ids:
+        if self._save_all_task_id in self._active_task_ids:
             self.set_status("Wait for Save All to finish")
             return False
-        if self._mapset_update_task_id in self.task_manager.active_task_ids:
+        if self._mapset_update_task_id in self._active_task_ids:
             self.set_status("Wait for the current MapSet save to finish")
             return False
 
@@ -2236,16 +2178,7 @@ class MainWindow(QMainWindow):
             label_text=label_text,
         )
 
-        def task(context):
-            return save_mapset_copy(
-                request,
-                cancelled=lambda: (context.check_cancelled() or False),
-                progress=lambda completed, total, message: context.report(
-                    round(completed / max(1, total) * 100), message
-                ),
-            )
-
-        task_id = self.task_manager.start("Save MapSet copy", task)
+        task_id = self._request_worker("save_mapset_copy", {"request": request})
         self._mapset_save_task_id = task_id
         self.buttonSavePoissonMapSet.setEnabled(False)
         self.set_status(f"Saving new MapSet: {name}")
@@ -2299,7 +2232,7 @@ class MainWindow(QMainWindow):
     def delete_active_selection(self) -> None:
         """Delete a selected annotation first, otherwise delete selected pixels."""
         if self.canvas.selected_annotation_index >= 0:
-            self.remove_selected_annotation()
+            self.remove_annotation(self.canvas.selected_annotation_index)
         else:
             self.delete_selection()
 
@@ -2755,6 +2688,10 @@ class MainWindow(QMainWindow):
         self._update_mapset_property_panel(updated)
         return updated
 
+    def _refresh_current_project_tree_item(self) -> None:
+        if self.current_mapset is not None:
+            self._replace_project_tree_mapset(self.current_mapset)
+
     def _replace_project_tree_mapset(self, updated: MapSet) -> None:
         tree = getattr(self, "treeProject", None)
         if not isinstance(tree, QTreeWidget):
@@ -2766,10 +2703,70 @@ class MainWindow(QMainWindow):
                 continue
             value = item.data(0, self.MAPSET_ROLE)
             if isinstance(value, MapSet) and value.folder == updated.folder:
-                item.setData(0, self.MAPSET_ROLE, updated)
-                item.setToolTip(0, self._mapset_tooltip(updated))
+                self._replace_project_tree_item(item, updated)
                 return
             stack.extend(item.child(index) for index in range(item.childCount()))
+
+    def _replace_project_tree_item(self, item: QTreeWidgetItem, updated: MapSet) -> None:
+        tree = getattr(self, "treeProject", None)
+        if not isinstance(tree, QTreeWidget):
+            return
+
+        selected_item = tree.currentItem()
+        selected_path = self._project_tree_item_path(selected_item)
+        selected_in_mapset = self._project_tree_item_belongs_to_mapset(selected_item, updated)
+        replacement = self._create_mapset_item(updated)
+        replacement.setExpanded(item.isExpanded())
+
+        parent = item.parent()
+        if parent is not None:
+            index = parent.indexOfChild(item)
+            parent.takeChild(index)
+            parent.insertChild(index, replacement)
+        else:
+            index = tree.indexOfTopLevelItem(item)
+            tree.takeTopLevelItem(index)
+            tree.insertTopLevelItem(index, replacement)
+
+        if selected_in_mapset:
+            tree.setCurrentItem(
+                self._find_project_tree_item_by_path(replacement, selected_path) or replacement
+            )
+        tree.resizeColumnToContents(0)
+
+    def _project_tree_item_path(self, item: QTreeWidgetItem | None) -> str | None:
+        if item is None:
+            return None
+        path = item.data(0, self.PATH_ROLE)
+        return str(path) if path else None
+
+    def _project_tree_item_belongs_to_mapset(
+        self,
+        item: QTreeWidgetItem | None,
+        map_set: MapSet,
+    ) -> bool:
+        current = item
+        while current is not None:
+            value = current.data(0, self.MAPSET_ROLE)
+            if isinstance(value, MapSet) and value.folder == map_set.folder:
+                return True
+            current = current.parent()
+        return False
+
+    def _find_project_tree_item_by_path(
+        self,
+        root: QTreeWidgetItem,
+        path: str | None,
+    ) -> QTreeWidgetItem | None:
+        if path is None:
+            return None
+        if self._project_tree_item_path(root) == path:
+            return root
+        for index in range(root.childCount()):
+            found = self._find_project_tree_item_by_path(root.child(index), path)
+            if found is not None:
+                return found
+        return None
 
     def _mapset_roi_contours_payload(self, map_set: MapSet) -> dict:
         return {
@@ -2883,20 +2880,16 @@ class MainWindow(QMainWindow):
         bounds = selection.boundingRect().toAlignedRect()
         output_root = (self.project_root_folder or Path.cwd()) / "exports" / "defects"
 
-        def task(context):
-            return export_defect_maps(
-                map_paths,
-                output_root,
-                defect_name,
-                selection,
-                QRect(bounds),
-                cancelled=lambda: context.is_cancelled,
-                progress=lambda value, message: context.report(
-                    round(value / max(1, len(map_paths)) * 100), message
-                ),
-            )
-
-        task_id = self.task_manager.start(f"Export defect: {defect_name}", task)
+        task_id = self._request_worker(
+            "export_defect",
+            {
+                "map_paths": map_paths,
+                "output_root": output_root,
+                "defect_name": defect_name,
+                "selection": selection,
+                "bounds": QRect(bounds),
+            },
+        )
         self._task_handlers[task_id] = lambda result: QMessageBox.information(
             self, "Export Defect", f"Saved to:\n{result}"
         )
@@ -2942,6 +2935,7 @@ class MainWindow(QMainWindow):
 
     def _on_task_finished(self, task_id: str) -> None:
         """Release shared task state after Qt confirms task shutdown."""
+        self._active_task_ids.discard(task_id)
         get_logger().info("Task finished: %s", task_id)
         if task_id == self._auto_augment_task_id:
             self._auto_augment_task_id = None
@@ -3005,7 +2999,7 @@ class MainWindow(QMainWindow):
             self.label_property_title.setText(map_set.name)
         if hasattr(self, "label_property_subtitle"):
             self.label_property_subtitle.setText(
-                f"{len(map_set.maps)} map(s), {self._count_label_lines(map_set.label_path)} label(s)"
+                f"{len(map_set.maps)} map(s), {self._mapset_label_count(map_set)} label(s)"
             )
         if hasattr(self, "label_info_file_value"):
             self.label_info_file_value.setText(map_set.name)
@@ -3065,19 +3059,10 @@ class MainWindow(QMainWindow):
         if not self._save_current_yolo_labels_if_needed():
             return
 
-        def task(context):
-            def progress(completed, total, message):
-                context.check_cancelled()
-                context.report(round(completed / max(1, total) * 100), message)
-
-            result = self.context.export_api.export_dataset(
-                self.project.mapsets, options, progress_callback=progress
-            )
-            if not self.context.export_api.validate_export(options.output_root):
-                raise RuntimeError("Export validation failed: image/label pairs are incomplete")
-            return result
-
-        task_id = self.task_manager.start("Export YOLO dataset", task)
+        task_id = self._request_worker(
+            "yolo_export",
+            {"mapsets": self.project.mapsets, "options": options},
+        )
         self._task_handlers[task_id] = lambda result: QMessageBox.information(
             self,
             "Export Complete",
@@ -3099,15 +3084,10 @@ class MainWindow(QMainWindow):
             for index in range(options.preview_count)
         ]
 
-        def task(context):
-            context.report(5, "Creating previews")
-            previews = self.context.augmentation_api.create_preview_samples(
-                [pair[0] for pair in pairs], [pair[1] for pair in pairs], options
-            )
-            context.report(100, "Preview complete")
-            return previews
-
-        task_id = self.task_manager.start("Augmentation preview", task)
+        task_id = self._request_worker(
+            "augmentation_preview",
+            {"pairs": pairs, "options": options},
+        )
 
         def show(previews):
             if previews:
@@ -3116,19 +3096,19 @@ class MainWindow(QMainWindow):
         self._task_handlers[task_id] = show
 
     def is_auto_augmentation_running(self) -> bool:
-        """Return whether an AutoAugment worker is still owned by TaskManager."""
-        return self._auto_augment_task_id in self.task_manager.active_task_ids
+        """Return whether the app still owns the AutoAugment worker."""
+        return self._auto_augment_task_id in self._active_task_ids
 
     def cancel_auto_augmentation(self) -> None:
         """Request cancellation for the active AutoAugment worker."""
         task_id = self._auto_augment_task_id
-        if task_id is None or task_id not in self.task_manager.active_task_ids:
+        if task_id is None or task_id not in self._active_task_ids:
             return
-        if self.task_manager.cancel(task_id):
-            self._append_log("AutoAugment cancellation requested")
-            self.set_status("AutoAugment cancellation requested")
-            if hasattr(self, "augmentation_page"):
-                self.augmentation_page.show_autoaugment_cancelling()
+        self.task_cancel_requested.emit(task_id)
+        self._append_log("AutoAugment cancellation requested")
+        self.set_status("AutoAugment cancellation requested")
+        if hasattr(self, "augmentation_page"):
+            self.augmentation_page.show_autoaugment_cancelling()
 
     def start_auto_augmentation(self, options) -> None:
         """Run selected-map AutoAugment in a background worker."""
@@ -3143,17 +3123,10 @@ class MainWindow(QMainWindow):
         self._append_log("0% AutoAugment queued")
         self.augmentation_page.begin_autoaugment_progress(options.output_root)
 
-        def task(context):
-            return self.context.augmentation_api.run_auto_yolo_augmentation(
-                self.project,
-                options,
-                progress_callback=lambda completed, total, message: (
-                    context.check_cancelled(),
-                    context.report(round(completed / max(1, total) * 100), message),
-                ),
-            )
-
-        task_id = self.task_manager.start("AutoAugment", task)
+        task_id = self._request_worker(
+            "auto_augment",
+            {"project": self.project, "options": options},
+        )
         get_logger().info("Task started: AutoAugment %s", task_id)
         self._auto_augment_task_id = task_id
         self.augmentation_page.set_autoaugment_running(True)
@@ -3175,17 +3148,10 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Orientation Augmentation", "Open a dataset folder first.")
             return
 
-        def task(context):
-            return self.context.augmentation_api.run_orientation_augmentation(
-                self.project.mapsets,
-                options,
-                progress_callback=lambda completed, total, message: (
-                    context.check_cancelled(),
-                    context.report(round(completed / max(1, total) * 100), message),
-                ),
-            )
-
-        task_id = self.task_manager.start("Orientation augmentation", task)
+        task_id = self._request_worker(
+            "orientation_augment",
+            {"mapsets": self.project.mapsets, "options": options},
+        )
         self._task_handlers[task_id] = lambda result: QMessageBox.information(
             self,
             "Orientation Augmentation",
@@ -3196,28 +3162,23 @@ class MainWindow(QMainWindow):
         reply = QMessageBox.question(
             self,
             "Confirm Exit",
-            "Do you want to exit DatasetStudio?",
+            "Do you want to exit Dataset Editor?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
         if reply == QMessageBox.StandardButton.Yes:
             self.set_status("Waiting for background tasks to stop...")
-            if self.shutdown_workers(timeout_ms=30000):
+            self._shutdown_succeeded = False
+            self.shutdown_requested.emit(30000)
+            if self._shutdown_succeeded:
                 event.accept()
             else:
                 QMessageBox.critical(
                     self,
                     "Tasks Still Running",
-                    "DatasetStudio could not stop every background task. "
+                    "Dataset Editor could not stop every background task. "
                     "The window will remain open to avoid destroying a running thread.",
                 )
                 event.ignore()
         else:
             event.ignore()
-
-    def shutdown_workers(self, timeout_ms: int = 30000) -> bool:
-        """Cancel and release all owned workers before application teardown."""
-        stopped = self.task_manager.shutdown(timeout_ms)
-        if stopped:
-            self.pixmap_cache.clear()
-        return stopped

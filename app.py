@@ -1,154 +1,21 @@
 from __future__ import annotations
 
-import threading
 import traceback
-import uuid
 from dataclasses import dataclass
 from time import monotonic
-from typing import Callable
 
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtWidgets import QApplication
 
-from core.logging_setup import get_logger
 from service.augmentation_service import AugmentationApi
 from service.editing_service import PoissonApi
 from service.labeling_service import YoloApi
 from service.preprocessing_service import PreprocessApi
 from service.yolo_export_service import YoloExportApi
-
-
-class TaskCancelled(RuntimeError):
-    """Raised cooperatively when a background task is cancelled."""
-
-
-class TaskContext:
-    """Cancellation and progress channel passed to background functions."""
-
-    def __init__(self, progress_callback: Callable[[int, str], None]):
-        self._cancel_event = threading.Event()
-        self._progress_callback = progress_callback
-
-    @property
-    def is_cancelled(self) -> bool:
-        return self._cancel_event.is_set()
-
-    def cancel(self) -> None:
-        self._cancel_event.set()
-
-    def check_cancelled(self) -> None:
-        if self.is_cancelled:
-            raise TaskCancelled()
-
-    def report(self, value: int, message: str = "") -> None:
-        self._progress_callback(max(0, min(100, int(value))), message)
-
-
-class _TaskWorker(QObject):
-    progress = pyqtSignal(str, int, str)
-    succeeded = pyqtSignal(str, object)
-    failed = pyqtSignal(str, str, str)
-    cancelled = pyqtSignal(str)
-    finished = pyqtSignal(str)
-
-    def __init__(self, task_id: str, function: Callable[[TaskContext], object]):
-        super().__init__()
-        self.task_id = task_id
-        self.function = function
-        self.context = TaskContext(
-            lambda value, message: self.progress.emit(task_id, value, message)
-        )
-
-    @pyqtSlot()
-    def run(self) -> None:
-        try:
-            result = self.function(self.context)
-            self.context.check_cancelled()
-        except TaskCancelled:
-            self.cancelled.emit(self.task_id)
-        except Exception as exc:
-            self.failed.emit(self.task_id, str(exc), traceback.format_exc())
-        else:
-            self.succeeded.emit(self.task_id, result)
-        finally:
-            self.finished.emit(self.task_id)
-
-
-@dataclass
-class _TaskHandle:
-    name: str
-    thread: QThread
-    worker: _TaskWorker
-
-
-class TaskManager(QObject):
-    """Own all application threads until Qt confirms that they have stopped."""
-
-    task_started = pyqtSignal(str, str)
-    task_progress = pyqtSignal(str, int, str)
-    task_succeeded = pyqtSignal(str, object)
-    task_failed = pyqtSignal(str, str, str)
-    task_cancelled = pyqtSignal(str)
-    task_finished = pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._tasks: dict[str, _TaskHandle] = {}
-
-    @property
-    def active_task_ids(self) -> tuple[str, ...]:
-        return tuple(self._tasks)
-
-    def start(self, name: str, function: Callable[[TaskContext], object]) -> str:
-        task_id = uuid.uuid4().hex
-        get_logger().info("Task queued: %s %s", name, task_id)
-        thread = QThread(self)
-        thread.setObjectName(f"DatasetStudio:{name}:{task_id[:8]}")
-        worker = _TaskWorker(task_id, function)
-        worker.moveToThread(thread)
-        self._tasks[task_id] = _TaskHandle(name, thread, worker)
-
-        thread.started.connect(worker.run)
-        worker.progress.connect(self.task_progress)
-        worker.succeeded.connect(self.task_succeeded)
-        worker.failed.connect(self.task_failed)
-        worker.cancelled.connect(self.task_cancelled)
-        worker.finished.connect(thread.quit)
-        worker.finished.connect(worker.deleteLater)
-        thread.finished.connect(thread.deleteLater)
-        thread.finished.connect(lambda current=task_id: self._release(current))
-        thread.start()
-        self.task_started.emit(task_id, name)
-        return task_id
-
-    def cancel(self, task_id: str) -> bool:
-        handle = self._tasks.get(task_id)
-        if handle is None:
-            return False
-        get_logger().info("Task cancellation requested: %s %s", handle.name, task_id)
-        handle.worker.context.cancel()
-        return True
-
-    def cancel_all(self) -> None:
-        for handle in tuple(self._tasks.values()):
-            handle.worker.context.cancel()
-
-    def shutdown(self, timeout_ms: int = 10000) -> bool:
-        """Cancel all work and wait for every owned thread within one deadline."""
-        get_logger().info("TaskManager shutdown requested: active=%s timeout_ms=%s", len(self._tasks), timeout_ms)
-        self.cancel_all()
-        deadline = monotonic() + max(0, timeout_ms) / 1000.0
-        for handle in tuple(self._tasks.values()):
-            remaining_ms = max(0, int((deadline - monotonic()) * 1000))
-            if handle.thread.isRunning() and remaining_ms:
-                handle.thread.wait(remaining_ms)
-        return not any(handle.thread.isRunning() for handle in self._tasks.values())
-
-    @pyqtSlot(str)
-    def _release(self, task_id: str) -> None:
-        handle = self._tasks.pop(task_id, None)
-        if handle is not None:
-            get_logger().info("Task released: %s %s", handle.name, task_id)
-        self.task_finished.emit(task_id)
+from worker.augmentation_worker import AugmentationWorker
+from worker.editing_worker import EditingWorker
+from worker.export_worker import ExportWorker
+from worker.project_worker import ProjectWorker
 
 
 @dataclass
@@ -171,3 +38,86 @@ def create_app_context() -> AppContext:
         augmentation_api=AugmentationApi(poisson_api=poisson_api, yolo_api=yolo_api),
         export_api=YoloExportApi(yolo_api=yolo_api),
     )
+
+
+class DatasetEditorApp(QObject):
+    """Application owner: creates the window and owns all background task threads."""
+
+    def __init__(self, qt_app: QApplication, logger, parent=None):
+        super().__init__(parent)
+        from ui.mainwindow import MainWindow
+
+        self.qt_app = qt_app
+        self.logger = logger
+        self.context = create_app_context()
+        self._workers = {}
+        self.window = MainWindow(context=self.context)
+        self.window.task_requested.connect(self._start_worker)
+        self.window.task_cancel_requested.connect(self._cancel_worker)
+        self.window.shutdown_requested.connect(self._shutdown_from_window)
+
+    @pyqtSlot(str, str, object)
+    def _start_worker(self, task_id: str, operation: str, payload) -> None:
+        """Create the feature worker selected by a UI operation request."""
+        try:
+            if task_id in self._workers:
+                raise ValueError(f"Worker id is already active: {task_id}")
+            worker = self._create_worker(task_id, operation, payload)
+            worker.setObjectName(f"DatasetEditor:{operation}:{task_id[:8]}")
+            worker.progress.connect(self.window._on_task_progress)
+            worker.succeeded.connect(self.window._on_task_succeeded)
+            worker.failed.connect(self.window._on_task_failed)
+            worker.cancelled.connect(self.window._on_task_cancelled)
+            worker.finished.connect(lambda current=task_id: self._release_worker(current))
+            self._workers[task_id] = worker
+            self.logger.info("Worker started: %s %s", operation, task_id)
+            worker.start()
+        except Exception as exc:
+            traceback_text = traceback.format_exc()
+            self.logger.exception("Failed to start worker: %s %s", operation, task_id)
+            self.window._on_task_failed(task_id, str(exc), traceback_text)
+            self.window._on_task_finished(task_id)
+
+    def _create_worker(self, task_id: str, operation: str, payload):
+        """Build one concrete worker without hiding its feature ownership."""
+        if operation in ProjectWorker.OPERATIONS:
+            return ProjectWorker(task_id, operation, payload, self)
+        if operation in EditingWorker.OPERATIONS:
+            return EditingWorker(task_id, operation, payload, self.context.poisson_api, self)
+        if operation in AugmentationWorker.OPERATIONS:
+            return AugmentationWorker(task_id, operation, payload, self.context.augmentation_api, self)
+        if operation in ExportWorker.OPERATIONS:
+            return ExportWorker(task_id, operation, payload, self.context.export_api, self)
+        raise ValueError(f"Unknown worker operation: {operation}")
+
+    @pyqtSlot(str)
+    def _cancel_worker(self, task_id: str) -> None:
+        """Forward cancellation to the concrete worker owned by the app."""
+        worker = self._workers.get(task_id)
+        if worker is not None:
+            worker.cancel()
+
+    def _release_worker(self, task_id: str) -> None:
+        """Release a worker only after QThread reports that it has stopped."""
+        worker = self._workers.pop(task_id, None)
+        if worker is not None:
+            self.logger.info("Worker finished: %s %s", worker.operation, task_id)
+            worker.deleteLater()
+        self.window._on_task_finished(task_id)
+
+    @pyqtSlot(int)
+    def _shutdown_from_window(self, timeout_ms: int) -> None:
+        """Synchronously report app-owned worker shutdown back to the close event."""
+        self.window.complete_shutdown(self.shutdown(timeout_ms))
+
+    def shutdown(self, timeout_ms: int = 30000) -> bool:
+        """Cancel and join every worker owned by the application."""
+        workers = tuple(self._workers.values())
+        for worker in workers:
+            worker.cancel()
+        deadline = monotonic() + max(0, timeout_ms) / 1000.0
+        for worker in workers:
+            remaining_ms = max(0, int((deadline - monotonic()) * 1000))
+            if worker.isRunning() and remaining_ms:
+                worker.wait(remaining_ms)
+        return not any(worker.isRunning() for worker in workers)

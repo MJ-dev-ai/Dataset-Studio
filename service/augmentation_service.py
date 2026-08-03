@@ -14,15 +14,16 @@ import cv2
 import numpy as np
 
 from core.image_io import read_image, write_png
+from core.image_ops import rotate_bound
 from core.logging_setup import get_logger
-from core.mapset import ROI_CONTOUR_KEY
 from core.mask_ops import make_nonzero_mask, nonzero_bbox
-from service.editing_service import PoissonApi, clone_mode_from_text, rotate_bound
+from service.editing_service import PoissonApi, clone_mode_from_text
 from service.labeling_service import (
     YoloApi,
     YoloLabel,
     box_to_yolo_line,
     clip_bbox,
+    parse_yolo_line,
     transform_bbox_affine,
     xyxy_to_yolo,
     yolo_to_xyxy,
@@ -544,7 +545,7 @@ class AugmentationApi:
                     adapt_color="normal" not in options.target_map_key.casefold(),
                 )
             else:
-                mode = self.poisson_clone_mode(options)
+                mode = clone_mode_from_text(options.poisson_mode)
                 blended = self.poisson_api.poisson_blend(target, patch, x_pos, y_pos, patch_mask, mode=mode)
         except ValueError:
             return None, "invalid_poisson_mode"
@@ -562,20 +563,12 @@ class AugmentationApi:
             target.shape[1],
             target.shape[0],
         )
-        parsed = self.yolo_api.load_txt_from_lines([new_line]) if hasattr(self.yolo_api, "load_txt_from_lines") else None
+        parsed = parse_yolo_line(new_line)
         output_labels = list(labels)
         if parsed:
-            output_labels.extend(parsed)
-        else:
-            parts = new_line.split()
-            output_labels.append(YoloLabel(int(parts[0]), *(float(value) for value in parts[1:5])))
+            output_labels.append(YoloLabel(*parsed))
 
         return (blended, output_labels), "success"
-
-    @staticmethod
-    def poisson_clone_mode(options: AutoYoloAugmentOptions) -> int:
-        """Return the OpenCV clone constant selected in the AutoAugment UI."""
-        return clone_mode_from_text(options.poisson_mode)
 
     def _load_original_auto_sample(self, item: dict, options: AutoYoloAugmentOptions) -> tuple[str, np.ndarray, list[YoloLabel]] | None:
         """Load one original target image and resize it for YOLO output."""

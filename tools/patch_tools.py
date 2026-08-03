@@ -1,17 +1,36 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
 import math
 
 import cv2
 import numpy as np
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QImage
 
-from core.qt_image import bgr_mask_to_qpixmap, qimage_to_bgr
+from core.image_ops import rotate_bound
+from core.mask_ops import make_nonzero_mask
 from core.patch_clipboard import PatchClip
-from service.editing_service import transform_patch
+
+
+def transform_patch(
+    image: np.ndarray,
+    scale: float,
+    angle: float,
+    mask: np.ndarray | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Scale and rotate a patch while preserving its binary selection mask."""
+    height, width = image.shape[:2]
+    size = (max(1, int(round(width * scale))), max(1, int(round(height * scale))))
+    scaled = cv2.resize(image, size, interpolation=cv2.INTER_LINEAR)
+    scaled_mask = (
+        make_nonzero_mask(scaled)
+        if mask is None
+        else cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
+    )
+    rotated = rotate_bound(scaled, angle, interpolation=cv2.INTER_LINEAR)
+    rotated_mask = rotate_bound(scaled_mask, angle, interpolation=cv2.INTER_NEAREST)
+    if rotated_mask.ndim == 3:
+        rotated_mask = np.max(rotated_mask[:, :, :3], axis=2)
+    return rotated, np.where(rotated_mask > 0, 255, 0).astype(np.uint8)
 
 
 @dataclass
@@ -28,13 +47,19 @@ class PatchState:
     placement_active: bool = False
 
 
-class PatchTool:
-    """Copy a selection and apply a transformed Poisson patch."""
+@dataclass
+class PatchPreview:
+    patch: np.ndarray
+    mask: np.ndarray
+    x_pos: int
+    y_pos: int
 
-    def __init__(self, canvas):
-        self.canvas = canvas
+
+class PatchTool:
+    """Calculate transformed patch placement state."""
+
+    def __init__(self):
         self.state = PatchState()
-        self.state_changed: Callable[[PatchState], None] | None = None
         self._move_drag_active = False
         self._move_pointer_start = None
         self._move_position_start: tuple[int, int] = (0, 0)
@@ -42,86 +67,95 @@ class PatchTool:
         self._rotation_pointer_start = 0.0
         self._rotation_angle_start = 0.0
         self._active_clip: PatchClip | None = None
-        self.canvas.image_changed.connect(self._on_canvas_image_changed)
+        self._target_size: tuple[int, int] | None = None
 
-    def activate(self) -> None:
-        self.canvas.setCursor(Qt.CursorShape.SizeAllCursor)
-        self._refresh_preview()
+    @property
+    def has_active_placement(self) -> bool:
+        return self.state.placement_active and self.state.patch is not None
 
-    def deactivate(self) -> None:
+    @property
+    def is_moving_patch(self) -> bool:
+        return self._move_drag_active
+
+    @property
+    def is_rotating_patch(self) -> bool:
+        return self._rotation_drag_active
+
+    def set_target_size(self, width: int, height: int) -> None:
+        if width <= 0 or height <= 0:
+            self._target_size = None
+            return
+        self._target_size = (int(width), int(height))
+        self._normalize_position()
+
+    def begin_move_drag(self, image_position) -> bool:
+        if not self.has_active_placement:
+            return False
+        self._move_drag_active = True
+        self._move_pointer_start = image_position
+        self._move_position_start = (self.state.x_pos, self.state.y_pos)
+        return True
+
+    def update_move_drag(self, image_position) -> bool:
+        if not self.has_active_placement or not self._move_drag_active:
+            return False
+        if self._move_pointer_start is None:
+            self._move_pointer_start = image_position
+            self._move_position_start = (self.state.x_pos, self.state.y_pos)
+        dx = image_position.x() - self._move_pointer_start.x()
+        dy = image_position.y() - self._move_pointer_start.y()
+        return self.set_position(
+            round(self._move_position_start[0] + dx),
+            round(self._move_position_start[1] + dy),
+        )
+
+    def end_move_drag(self) -> None:
         self._move_drag_active = False
         self._move_pointer_start = None
+
+    def begin_rotation_drag(self, image_position) -> bool:
+        if not self.has_active_placement:
+            return False
+        self._rotation_drag_active = True
+        self._rotation_pointer_start = self._pointer_angle(image_position)
+        self._rotation_angle_start = self.state.angle
+        return True
+
+    def update_rotation_drag(self, image_position) -> bool:
+        if not self.has_active_placement or not self._rotation_drag_active:
+            return False
+        delta = math.degrees(self._pointer_angle(image_position) - self._rotation_pointer_start)
+        return self.set_rotation(self._rotation_angle_start + delta)
+
+    def end_rotation_drag(self) -> None:
         self._rotation_drag_active = False
-        self.canvas.unsetCursor()
-        self.canvas.clear_patch_preview()
 
-    def mouse_press_event(self, event) -> None:
-        if not self.state.placement_active or self.state.patch is None:
-            return
-        pos = self.canvas.to_image_pos(event.position())
-        if event.button() == Qt.MouseButton.RightButton:
-            self._rotation_drag_active = True
-            self._rotation_pointer_start = self._pointer_angle(pos)
-            self._rotation_angle_start = self.state.angle
-            event.accept()
-            return
-        if event.button() != Qt.MouseButton.LeftButton:
-            return
-        self._move_drag_active = True
-        self._move_pointer_start = pos
-        self._move_position_start = (self.state.x_pos, self.state.y_pos)
-        event.accept()
-
-    def mouse_move_event(self, event) -> None:
-        if not self.state.placement_active or self.state.patch is None:
-            return
-        if self._rotation_drag_active and event.buttons() & Qt.MouseButton.RightButton:
-            pos = self.canvas.to_image_pos(event.position())
-            delta = math.degrees(self._pointer_angle(pos) - self._rotation_pointer_start)
-            self.set_rotation(self._rotation_angle_start + delta)
-            event.accept()
-            return
-        if self._move_drag_active and event.buttons() & Qt.MouseButton.LeftButton:
-            pos = self.canvas.to_image_pos(event.position())
-            if self._move_pointer_start is None:
-                self._move_pointer_start = pos
-                self._move_position_start = (self.state.x_pos, self.state.y_pos)
-            dx = pos.x() - self._move_pointer_start.x()
-            dy = pos.y() - self._move_pointer_start.y()
-            self.set_position(
-                round(self._move_position_start[0] + dx),
-                round(self._move_position_start[1] + dy),
-            )
-            event.accept()
-
-    def mouse_release_event(self, event) -> None:
-        if event.button() == Qt.MouseButton.RightButton:
-            self._rotation_drag_active = False
-            event.accept()
-            return
-        if event.button() == Qt.MouseButton.LeftButton:
-            self._move_drag_active = False
-            self._move_pointer_start = None
-            event.accept()
-
-    def copy_from_selection(self, source_name: str = "") -> bool:
-        """Copy the active selection and preserve its exact rasterized mask."""
-        if self.canvas.pixmap.isNull() or not self.canvas.has_selection():
+    def load_selection_patch(
+        self,
+        patch: np.ndarray,
+        mask: np.ndarray,
+        x_pos: int,
+        y_pos: int,
+        source_name: str = "",
+    ) -> bool:
+        """Store a copied patch without starting placement."""
+        if patch is None or patch.size == 0 or mask is None or mask.size == 0:
             return False
-        bounds = self.canvas.selection_bounds().toAlignedRect().intersected(self.canvas.pixmap.rect())
-        if bounds.isEmpty():
+        if not np.any(mask):
             return False
-        source = qimage_to_bgr(self.canvas.pixmap)
-        self.state.patch = source[bounds.top():bounds.bottom() + 1, bounds.left():bounds.right() + 1].copy()
-        self.state.mask = self._selection_mask_array(bounds)
-        if self.state.mask is None or not np.any(self.state.mask):
-            return False
-        self.state.x_pos, self.state.y_pos = bounds.x(), bounds.y()
-        self.state.scale, self.state.angle = 1.0, 0.0
-        self.state.source_name = str(source_name)
-        self.state.clip_id = ""
-        self.state.placement_active = False
-        self._notify_state_changed()
+        self._active_clip = None
+        self.state = PatchState(
+            patch=patch.copy(),
+            mask=mask.copy(),
+            x_pos=int(x_pos),
+            y_pos=int(y_pos),
+            scale=1.0,
+            angle=0.0,
+            source_name=str(source_name),
+            clip_id="",
+            map_key="",
+            placement_active=False,
+        )
         return True
 
     def paste_preview(self) -> bool:
@@ -133,13 +167,15 @@ class PatchTool:
         center_x: float,
         center_y: float,
         map_key: str,
+        target_size: tuple[int, int],
     ) -> bool:
-        """Load one clipboard clip and begin placement at a canvas drop position."""
+        """Load one clipboard clip and begin placement at a target-image position."""
         try:
             preview_image = clip.image_for(map_key)
         except KeyError:
             return False
         self._active_clip = clip
+        self.set_target_size(*target_size)
         self.state = PatchState(
             patch=preview_image.copy(),
             mask=clip.mask.copy(),
@@ -153,28 +189,34 @@ class PatchTool:
         self.state.x_pos = round(float(center_x) - preview_image.shape[1] / 2.0)
         self.state.y_pos = round(float(center_y) - preview_image.shape[0] / 2.0)
         self._normalize_position()
-        self._notify_state_changed()
         return True
 
-    def set_active_map_key(self, map_key: str) -> bool:
+    def set_active_map_key(self, map_key: str, target_size: tuple[int, int]) -> bool:
         """Switch preview pixels while preserving the MapSet placement transform."""
         if self._active_clip is None or not self.state.placement_active:
             return False
         try:
             image = self._active_clip.image_for(map_key)
         except KeyError:
-            self.canvas.clear_patch_preview()
             return False
+        self.set_target_size(*target_size)
         center = self._patch_center()
         self.state.patch = image.copy()
         self.state.map_key = str(map_key)
         self._restore_patch_center(center)
-        self._notify_state_changed()
         return True
 
-    def begin_placement(self, x_pos: int | None = None, y_pos: int | None = None) -> bool:
+    def begin_placement(
+        self,
+        target_size: tuple[int, int],
+        x_pos: int | None = None,
+        y_pos: int | None = None,
+    ) -> bool:
         """Activate placement for a loaded patch without changing clipboard ownership."""
-        if self.state.patch is None or self.state.mask is None or self.canvas.pixmap.isNull():
+        if self.state.patch is None or self.state.mask is None:
+            return False
+        self.set_target_size(*target_size)
+        if self._target_size is None:
             return False
         self.state.placement_active = True
         if x_pos is not None:
@@ -182,7 +224,6 @@ class PatchTool:
         if y_pos is not None:
             self.state.y_pos = int(y_pos)
         self._normalize_position()
-        self._notify_state_changed()
         return True
 
     def clear_active_patch(self) -> None:
@@ -192,9 +233,6 @@ class PatchTool:
         self._rotation_drag_active = False
         self._active_clip = None
         self.state = PatchState()
-        self.canvas.clear_patch_preview()
-        if self.state_changed is not None:
-            self.state_changed(self.state)
 
     def transformed_patch(self) -> tuple[np.ndarray, np.ndarray]:
         """Return the patch and mask after the current scale and rotation."""
@@ -207,17 +245,32 @@ class PatchTool:
             self.state.mask,
         )
 
-    def composition_inputs(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, int, int]:
+    def preview_payload(self) -> PatchPreview | None:
+        if not self.state.placement_active or self.state.patch is None or self.state.mask is None:
+            return None
+        target_size = self._target_size
+        if target_size is None:
+            return None
+        patch, mask = self.transformed_patch()
+        if patch.shape[1] > target_size[0] or patch.shape[0] > target_size[1]:
+            return None
+        x_pos, y_pos = self._clamped_position(patch.shape[1], patch.shape[0])
+        self.state.x_pos, self.state.y_pos = x_pos, y_pos
+        return PatchPreview(patch=patch, mask=mask, x_pos=x_pos, y_pos=y_pos)
+
+    def composition_inputs(
+        self,
+        target: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, int, int]:
         """Create owned arrays and a placement safe for background composition."""
         if not self.state.placement_active:
             raise ValueError("Drag a clipboard patch onto the target image first")
-        if self.canvas.pixmap.isNull():
+        if target is None or target.size == 0:
             raise ValueError("Target image is empty")
         patch, mask = self.transformed_patch()
-        target = qimage_to_bgr(self.canvas.pixmap)
         if patch.shape[1] > target.shape[1] or patch.shape[0] > target.shape[0]:
             raise ValueError("Transformed patch is larger than the target image")
-        x_pos, y_pos = self._clamped_position(patch.shape[1], patch.shape[0])
+        x_pos, y_pos = self._clamped_position(patch.shape[1], patch.shape[0], (target.shape[1], target.shape[0]))
         return target.copy(), patch.copy(), mask.copy(), x_pos, y_pos
 
     def mapset_composition_inputs(
@@ -262,38 +315,27 @@ class PatchTool:
             )
         return result
 
-    def _selection_mask_array(self, bounds) -> np.ndarray | None:
-        mask_image = self.canvas.selection_mask(bounds)
-        if mask_image.isNull():
-            return None
-        gray = mask_image.convertToFormat(QImage.Format.Format_Grayscale8)
-        bits = gray.bits()
-        bits.setsize(gray.sizeInBytes())
-        view = np.frombuffer(bits, dtype=np.uint8).reshape(gray.height(), gray.bytesPerLine())
-        return np.where(view[:, :gray.width()] > 0, 255, 0).astype(np.uint8).copy()
-
     def rotate(self, degrees: float) -> bool:
         return self.set_rotation(self.state.angle + degrees)
 
     def scale(self, factor: float) -> bool:
         return self.set_scale(self.state.scale * factor)
 
-    def reset_transform(self) -> None:
+    def reset_transform(self) -> bool:
         if self.state.patch is None:
-            return
+            return False
         center = self._patch_center()
         self.state.scale, self.state.angle = 1.0, 0.0
         self._restore_patch_center(center)
-        self._notify_state_changed()
+        return True
 
     def set_position(self, x_pos: int, y_pos: int) -> bool:
-        """Set patch top-left coordinates and refresh the non-destructive preview."""
+        """Set patch top-left coordinates."""
         if self.state.patch is None:
             return False
         self.state.x_pos = int(x_pos)
         self.state.y_pos = int(y_pos)
         self._normalize_position()
-        self._notify_state_changed()
         return True
 
     def set_rotation(self, degrees: float) -> bool:
@@ -303,7 +345,6 @@ class PatchTool:
         center = self._patch_center()
         self.state.angle = float(degrees) % 360
         self._restore_patch_center(center)
-        self._notify_state_changed()
         return True
 
     def set_scale(self, scale: float) -> bool:
@@ -313,7 +354,6 @@ class PatchTool:
         center = self._patch_center()
         self.state.scale = max(0.1, min(10.0, float(scale)))
         self._restore_patch_center(center)
-        self._notify_state_changed()
         return True
 
     def _patch_center(self) -> tuple[float, float]:
@@ -330,21 +370,28 @@ class PatchTool:
         self._normalize_position()
 
     def _normalize_position(self) -> None:
-        if self.canvas.pixmap.isNull():
+        target_size = self._target_size
+        if target_size is None:
             return
         try:
             patch, _ = self.transformed_patch()
         except ValueError:
             return
-        if patch.shape[1] > self.canvas.pixmap.width() or patch.shape[0] > self.canvas.pixmap.height():
+        if patch.shape[1] > target_size[0] or patch.shape[0] > target_size[1]:
             return
         self.state.x_pos, self.state.y_pos = self._clamped_position(
-            patch.shape[1], patch.shape[0]
+            patch.shape[1],
+            patch.shape[0],
+            target_size,
         )
 
-    def _clamped_position(self, patch_width: int, patch_height: int) -> tuple[int, int]:
-        width = self.canvas.pixmap.width()
-        height = self.canvas.pixmap.height()
+    def _clamped_position(
+        self,
+        patch_width: int,
+        patch_height: int,
+        target_size: tuple[int, int] | None = None,
+    ) -> tuple[int, int]:
+        width, height = target_size or self._target_size or (patch_width, patch_height)
         return (
             max(0, min(int(self.state.x_pos), width - patch_width)),
             max(0, min(int(self.state.y_pos), height - patch_height)),
@@ -355,32 +402,3 @@ class PatchTool:
         center_x = self.state.x_pos + patch.shape[1] / 2.0
         center_y = self.state.y_pos + patch.shape[0] / 2.0
         return math.atan2(image_position.y() - center_y, image_position.x() - center_x)
-
-    def _refresh_preview(self) -> None:
-        if (
-            not self.state.placement_active
-            or self.state.patch is None
-            or self.state.mask is None
-            or self.canvas.pixmap.isNull()
-        ):
-            self.canvas.clear_patch_preview()
-            return
-        try:
-            patch, mask = self.transformed_patch()
-            if patch.shape[1] > self.canvas.pixmap.width() or patch.shape[0] > self.canvas.pixmap.height():
-                self.canvas.clear_patch_preview()
-                return
-            x_pos, y_pos = self._clamped_position(patch.shape[1], patch.shape[0])
-            self.canvas.set_patch_preview(bgr_mask_to_qpixmap(patch, mask), x_pos, y_pos)
-        except (ValueError, cv2.error):
-            self.canvas.clear_patch_preview()
-
-    def _notify_state_changed(self) -> None:
-        self._refresh_preview()
-        if self.state_changed is not None:
-            self.state_changed(self.state)
-
-    def _on_canvas_image_changed(self) -> None:
-        self._refresh_preview()
-        if self.state_changed is not None:
-            self.state_changed(self.state)

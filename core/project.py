@@ -10,7 +10,7 @@ PROJECT_MANIFEST = ".datasetstudio.json"
 
 @dataclass
 class DatasetProject:
-    """Runtime project state for a folder-backed DatasetStudio workspace."""
+    """Runtime project state for a folder-backed Dataset Editor workspace."""
 
     root_path: Path
     mapsets: list[MapSet]
@@ -27,4 +27,3 @@ def open_dataset_project(root_path: str | Path) -> DatasetProject:
         raise NotADirectoryError(f"Dataset folder does not exist: {root}")
     mapsets = discover_map_sets(root, MAP_SPECS, IMAGE_EXTENSIONS)
     return DatasetProject(root_path=root, mapsets=mapsets)
-

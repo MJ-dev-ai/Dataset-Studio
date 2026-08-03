@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 
 import cv2
 import numpy as np
-
-from core.mask_ops import morphology
 
 @dataclass(frozen=True)
 class PreprocessOptions:
@@ -23,20 +20,6 @@ class PreprocessOptions:
 
 class PreprocessApi:
 	"""Preprocessing functions exposed to UI and workers."""
-
-	def apply_clahe(self, image: np.ndarray, clip_limit: float = 2.0) -> np.ndarray:
-		return apply_clahe(image, clip_limit=clip_limit)
-
-	def resize(self, image: np.ndarray, size: tuple[int, int]) -> np.ndarray:
-		return cv2.resize(image, size, interpolation=cv2.INTER_AREA)
-
-	def threshold(self, image: np.ndarray, mode: str = "manual", value: int = 127, invert: bool = False) -> np.ndarray:
-		if mode == "otsu":
-			return otsu_threshold(image, invert=invert)
-		return threshold(image, value=value, invert=invert)
-
-	def morphology(self, mask: np.ndarray, operation: str, kernel_size: int, iterations: int = 1) -> np.ndarray:
-		return morphology(mask, operation, kernel_size, iterations)
 
 	def apply_options(self, image: np.ndarray, options: PreprocessOptions | dict) -> tuple[np.ndarray, np.ndarray]:
 		"""Apply resize, flip, rotation, and brightness while returning the label affine matrix."""
