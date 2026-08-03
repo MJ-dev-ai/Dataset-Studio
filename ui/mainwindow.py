@@ -27,7 +27,21 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from config.default_presets import IMAGE_EXTENSIONS, MAP_SPECS
+from config.settings import (
+    APP_NAME,
+    BOTTOM_LOGS_HEIGHT_RATIO,
+    DEFAULT_THEME,
+    IMAGE_DIALOG_FILTER,
+    IMAGE_EXTENSIONS,
+    LEFT_PROJECT_WIDTH_RATIO,
+    LEFT_TOOLS_WIDTH_RATIO,
+    LOG_CONSOLE_MAX_BLOCKS,
+    MAP_SPECS,
+    PANEL_LAYOUT_DELAY_MS,
+    RIGHT_PROPERTIES_WIDTH_RATIO,
+    TOP_OPTIONS_HEIGHT_RATIO,
+    WORKER_SHUTDOWN_TIMEOUT_MS,
+)
 from core.geometry import HealingStroke
 from service.project_service import safe_defect_name
 from core.mapset import MapSet, ROI_CONTOUR_KEY, discover_map_sets, mapset_from_image_path
@@ -74,8 +88,6 @@ from core.qt_image import bgr_to_qpixmap, qimage_to_bgr
 
 
 UI_PATH = Path(__file__).with_name("mainwindow.ui")
-APP_NAME = "Dataset Editor"
-IMAGE_FILTER = "Images (*.png *.jpg *.jpeg *.bmp *.tif *.tiff);;All Files (*)"
 PROJECT_FILTER = f"{APP_NAME} Project (*{PROJECT_MANIFEST});;JSON Files (*.json);;All Files (*)"
 
 
@@ -104,14 +116,13 @@ class MainWindow(QMainWindow):
         self.map_sets: list[MapSet] = []
         self._project_root_item: QTreeWidgetItem | None = None
         self._panel_ratio_pending = False
-        self.pixmap_cache = PixmapCache(max_bytes=384 * 1024 * 1024)
+        self.pixmap_cache = PixmapCache()
         self._active_task_ids: set[str] = set()
         self._shutdown_succeeded = False
         self._task_handlers: dict[str, callable] = {}
         self._auto_augment_task_id: str | None = None
         self._manual_poisson_task_id: str | None = None
         self._healing_task_id: str | None = None
-        self._healing_restore_images: dict[str, QImage] | None = None
         self._mapset_save_task_id: str | None = None
         self._mapset_update_task_id: str | None = None
         self._save_all_task_id: str | None = None
@@ -172,7 +183,7 @@ class MainWindow(QMainWindow):
             return
         self.log_console = QPlainTextEdit(self.dockLogsContents)
         self.log_console.setReadOnly(True)
-        self.log_console.setMaximumBlockCount(500)
+        self.log_console.setMaximumBlockCount(LOG_CONSOLE_MAX_BLOCKS)
         layout.addWidget(self.log_console)
 
     def _append_log(self, message: str) -> None:
@@ -264,9 +275,9 @@ class MainWindow(QMainWindow):
     def _setup_theme_actions(self) -> None:
         """Create persistent Dark/Light theme actions in the View menu."""
         settings = QSettings("TNSAI", APP_NAME)
-        current = str(settings.value("appearance/theme", "dark"))
+        current = str(settings.value("appearance/theme", DEFAULT_THEME))
         if current not in THEME_NAMES:
-            current = "dark"
+            current = DEFAULT_THEME
         menu = getattr(self, "menuView", None)
         if menu is None:
             menu = self.menuBar().addMenu("View")
@@ -347,7 +358,7 @@ class MainWindow(QMainWindow):
         tree.setUniformRowHeights(True)
         tree.setAnimated(True)
         tree.setIndentation(18)
-        self._apply_project_tree_branch_style(getattr(self, "current_theme", "dark"))
+        self._apply_project_tree_branch_style(getattr(self, "current_theme", DEFAULT_THEME))
 
     def _setup_patch_clipboard(self) -> None:
         """Replace the Designer placeholder with the draggable thumbnail clipboard."""
@@ -494,7 +505,7 @@ class MainWindow(QMainWindow):
         if self._panel_ratio_pending:
             return
         self._panel_ratio_pending = True
-        QTimer.singleShot(0, self._apply_panel_ratio)
+        QTimer.singleShot(PANEL_LAYOUT_DELAY_MS, self._apply_panel_ratio)
 
     def _apply_panel_ratio(self) -> None:
         """Apply proportional dock sizes without replacing the .ui layout."""
@@ -503,11 +514,11 @@ class MainWindow(QMainWindow):
         width = max(1, self.width())
         height = max(1, self.height())
 
-        left_tools = int(width * 0.035)
-        left_project = int(width * 0.14)
-        right_properties = int(width * 0.17)
-        bottom_logs = int(height * 0.15)
-        top_options = int(height * 0.045)
+        left_tools = int(width * LEFT_TOOLS_WIDTH_RATIO)
+        left_project = int(width * LEFT_PROJECT_WIDTH_RATIO)
+        right_properties = int(width * RIGHT_PROPERTIES_WIDTH_RATIO)
+        bottom_logs = int(height * BOTTOM_LOGS_HEIGHT_RATIO)
+        top_options = int(height * TOP_OPTIONS_HEIGHT_RATIO)
 
         dock_tools = getattr(self, "dockTools", None)
         dock_project = getattr(self, "dockProject", None)
@@ -900,13 +911,13 @@ class MainWindow(QMainWindow):
         self._write_project_manifest(destination)
 
     def open_image(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", IMAGE_FILTER)
+        path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", IMAGE_DIALOG_FILTER)
         if path:
             self._clear_map_tabs()
             self._load_image_to_canvas(Path(path))
 
     def open_images(self) -> None:
-        paths, _ = QFileDialog.getOpenFileNames(self, "Open Images", "", IMAGE_FILTER)
+        paths, _ = QFileDialog.getOpenFileNames(self, "Open Images", "", IMAGE_DIALOG_FILTER)
         if not paths:
             return
         self.add_image_mapsets([Path(path) for path in paths])
@@ -1927,8 +1938,6 @@ class MainWindow(QMainWindow):
             self.set_status("Healing Brush failed: no MapSet images could be loaded")
             return False
 
-        self._healing_restore_images = history_before
-
         task_id = self._request_worker(
             "healing",
             {
@@ -1962,20 +1971,6 @@ class MainWindow(QMainWindow):
 
         self._task_handlers[task_id] = apply_result
         return True
-
-    def _restore_healing_preview_after_task(self) -> None:
-        """Restore the visible preview when background healing does not commit."""
-        before = self._healing_restore_images
-        if before is None or self.current_image_path is None:
-            return
-        current_key = str(self.current_image_path.resolve())
-        image = before.get(current_key)
-        if image is None:
-            return
-        view_state = self.canvas.view_state()
-        self.canvas.set_map_image(QImage(image), modified=current_key in self._map_edit_states)
-        self.canvas.apply_view_state(*view_state)
-        self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
 
     def apply_mapset_selection_fill(self, color: QColor, opacity: float = 1.0) -> bool:
         if self.current_mapset is None or not self.canvas.has_selection() or self.canvas.pixmap.isNull():
@@ -2909,7 +2904,6 @@ class MainWindow(QMainWindow):
         if task_id == self._manual_poisson_task_id:
             self.set_status(f"Poisson failed: {message}")
         if task_id == self._healing_task_id:
-            self._restore_healing_preview_after_task()
             self.set_status(f"Healing Brush failed: {message}")
         if task_id == self._mapset_save_task_id:
             self.set_status(f"MapSet save failed: {message}")
@@ -2928,7 +2922,6 @@ class MainWindow(QMainWindow):
             if hasattr(self, "augmentation_page"):
                 self.augmentation_page.cancel_autoaugment_progress()
         if task_id == self._healing_task_id:
-            self._restore_healing_preview_after_task()
             self.set_status("Healing Brush cancelled")
         if task_id == self._save_all_task_id:
             self.set_status("Save All cancelled")
@@ -2946,7 +2939,6 @@ class MainWindow(QMainWindow):
             self.ui_setup.set_manual_poisson_running(False)
         if task_id == self._healing_task_id:
             self._healing_task_id = None
-            self._healing_restore_images = None
         if task_id == self._mapset_save_task_id:
             self._mapset_save_task_id = None
             if hasattr(self, "buttonSavePoissonMapSet"):
@@ -3019,7 +3011,7 @@ class MainWindow(QMainWindow):
                 painter = QPainter(themed)
                 painter.drawPixmap(0, 0, source)
                 painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
-                painter.fillRect(themed.rect(), QColor(theme_colors(getattr(self, "current_theme", "dark"))["icon"]))
+                painter.fillRect(themed.rect(), QColor(theme_colors(getattr(self, "current_theme", DEFAULT_THEME))["icon"]))
                 painter.end()
                 return QIcon(themed)
         return QIcon()
@@ -3169,7 +3161,7 @@ class MainWindow(QMainWindow):
         if reply == QMessageBox.StandardButton.Yes:
             self.set_status("Waiting for background tasks to stop...")
             self._shutdown_succeeded = False
-            self.shutdown_requested.emit(30000)
+            self.shutdown_requested.emit(WORKER_SHUTDOWN_TIMEOUT_MS)
             if self._shutdown_succeeded:
                 event.accept()
             else:

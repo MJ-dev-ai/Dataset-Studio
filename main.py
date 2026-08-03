@@ -8,6 +8,7 @@ from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt6.QtWidgets import QApplication
 
 from app import DatasetEditorApp
+from config.settings import DEFAULT_THEME, RUNTIME_LOG_DIRECTORY, WORKER_SHUTDOWN_TIMEOUT_MS
 from core.logging_setup import append_crash_report, append_pending_crash, configure_logging, flush_logs
 from ui.themes import theme_stylesheet
 
@@ -35,7 +36,7 @@ class FatalShutdownController(QObject):
     @pyqtSlot(str)
     def _shutdown(self, traceback_text: str) -> None:
         del traceback_text
-        if self.editor.shutdown(timeout_ms=30000):
+        if self.editor.shutdown(timeout_ms=WORKER_SHUTDOWN_TIMEOUT_MS):
             flush_logs(durable=True)
             self.app.exit(1)
         else:
@@ -45,8 +46,8 @@ class FatalShutdownController(QObject):
 
 def main() -> int:
     app = QApplication(sys.argv)
-    app.setStyleSheet(theme_stylesheet("dark"))
-    logger = configure_logging("runtime/logs")
+    app.setStyleSheet(theme_stylesheet(DEFAULT_THEME))
+    logger = configure_logging(RUNTIME_LOG_DIRECTORY)
     editor = DatasetEditorApp(app, logger)
     controller = FatalShutdownController(app, editor, logger)
     sys.excepthook = controller.handle
@@ -57,7 +58,7 @@ def main() -> int:
     threading.excepthook = thread_exception
     editor.window.show()
     exit_code = app.exec()
-    editor.shutdown(timeout_ms=30000)
+    editor.shutdown(timeout_ms=WORKER_SHUTDOWN_TIMEOUT_MS)
     flush_logs(durable=True)
     return exit_code
 

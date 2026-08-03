@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+from config.settings import LOGGER_NAME, LOG_BACKUP_COUNT, LOG_FILE_MAX_BYTES
 
-LOGGER_NAME = "dataset_editor"
 _LOG_DIRECTORY: Path | None = None
 
 
@@ -35,8 +35,8 @@ def configure_logging(log_dir: str | os.PathLike) -> logging.Logger:
     _LOG_DIRECTORY = directory
     handler = DurableRotatingFileHandler(
         directory / "dataset_editor.log",
-        maxBytes=10 * 1024 * 1024,
-        backupCount=5,
+        maxBytes=LOG_FILE_MAX_BYTES,
+        backupCount=LOG_BACKUP_COUNT,
         encoding="utf-8",
     )
     handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)-8s %(message)s", "%H:%M:%S"))

@@ -5,11 +5,13 @@ from collections import OrderedDict
 
 from PyQt6.QtGui import QPixmap
 
+from config.settings import PIXMAP_CACHE_BUDGET_BYTES
+
 
 class PixmapCache:
     """Main-thread LRU cache for decoded map pixmaps with a fixed memory estimate budget."""
 
-    def __init__(self, max_bytes: int = 256 * 1024 * 1024):
+    def __init__(self, max_bytes: int = PIXMAP_CACHE_BUDGET_BYTES):
         self.max_bytes = max(0, max_bytes)
         self.size_bytes = 0
         self.hits = 0

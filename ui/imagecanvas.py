@@ -5,18 +5,24 @@ from dataclasses import dataclass
 from PyQt6.QtCore import QPointF, QRect, QRectF, Qt, pyqtSignal
 from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 from PyQt6.QtWidgets import QWidget
-from core.patch_clipboard import PATCH_MIME_TYPE
+
+from config.settings import (
+    CANVAS_MAX_ZOOM,
+    CANVAS_MIN_ZOOM,
+    DEFAULT_THEME,
+    HISTORY_MAX_STATES,
+    HISTORY_MEMORY_BUDGET_BYTES,
+    SELECTION_HANDLE_SIZE,
+)
 from core.logging_setup import get_logger
+from core.patch_clipboard import PATCH_MIME_TYPE
 from ui.themes import theme_colors
 
 
-HISTORY_MEMORY_BUDGET = 256 * 1024 * 1024
-
-
-def calculate_history_limit(width: int, height: int, budget_bytes: int = HISTORY_MEMORY_BUDGET) -> int:
+def calculate_history_limit(width: int, height: int, budget_bytes: int = HISTORY_MEMORY_BUDGET_BYTES) -> int:
     """Return a bounded number of full-image states for the configured budget."""
     bytes_per_state = max(1, width * height * 4)
-    return max(1, min(50, budget_bytes // bytes_per_state))
+    return max(1, min(HISTORY_MAX_STATES, budget_bytes // bytes_per_state))
 
 
 @dataclass(frozen=True)
@@ -35,10 +41,6 @@ class ImageCanvas(QWidget):
     view_changed = pyqtSignal(float, float, float)
     patch_dropped = pyqtSignal(str, QPointF)
     tool_error = pyqtSignal(str)
-    MIN_ZOOM = 0.02
-    MAX_ZOOM = 64.0
-    SELECTION_HANDLE_SIZE = 8
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.image = None
@@ -61,7 +63,7 @@ class ImageCanvas(QWidget):
         self._pan_active = False
         self._pan_start = QPointF()
         self._pan_origin = QPointF()
-        self._background_color = QColor(theme_colors("dark")["canvas"])
+        self._background_color = QColor(theme_colors(DEFAULT_THEME)["canvas"])
         self.setMouseTracking(True)
         self.setAcceptDrops(True)
 
@@ -109,7 +111,7 @@ class ImageCanvas(QWidget):
         """Restore the same normalized image position after a synchronized map switch."""
         if self.pixmap.isNull():
             return
-        self.zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, float(zoom)))
+        self.zoom = max(CANVAS_MIN_ZOOM, min(CANVAS_MAX_ZOOM, float(zoom)))
         center = QPointF(self.width() / 2.0, self.height() / 2.0)
         image_point = QPointF(
             x_ratio * self.pixmap.width(),
@@ -125,7 +127,7 @@ class ImageCanvas(QWidget):
             return
         anchor = QPointF(anchor) if anchor is not None else QPointF(self.width() / 2.0, self.height() / 2.0)
         image_point = self.to_image_pos(anchor)
-        self.zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, float(zoom)))
+        self.zoom = max(CANVAS_MIN_ZOOM, min(CANVAS_MAX_ZOOM, float(zoom)))
         self.pan_offset = anchor - image_point * self.zoom
         self._emit_view_changed()
         self.update()
@@ -274,7 +276,7 @@ class ImageCanvas(QWidget):
         bounds = self.selection_edit_bounds()
         if bounds.isNull() or bounds.width() < 1.0 or bounds.height() < 1.0:
             return {}
-        size = max(float(self.SELECTION_HANDLE_SIZE) / max(self.zoom, 1e-6), 1.0)
+        size = max(float(SELECTION_HANDLE_SIZE) / max(self.zoom, 1e-6), 1.0)
         half = size / 2.0
         center = bounds.center()
         points = {
@@ -487,6 +489,15 @@ class ImageCanvas(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         dark_pen = QPen(QColor(0, 0, 0, 180), max(2.0 / self.zoom, 0.8))
         light_pen = QPen(QColor(255, 255, 255, 230), max(1.0 / self.zoom, 0.5))
+        source_anchor = self.tool_controller.healing_source_anchor
+        if source_anchor is not None and QRectF(self.pixmap.rect()).contains(source_anchor):
+            source_pen = QPen(
+                QColor(34, 211, 238, 240),
+                max(2.0 / self.zoom, 0.8),
+                Qt.PenStyle.DashLine,
+            )
+            painter.setPen(source_pen)
+            painter.drawEllipse(source_anchor, radius, radius)
         painter.setPen(dark_pen)
         painter.drawEllipse(self._tool_cursor_pos, radius, radius)
         painter.setPen(light_pen)
@@ -596,8 +607,8 @@ class ImageCanvas(QWidget):
         if self.pixmap.isNull() or self.width() <= 0 or self.height() <= 0:
             return
         self.zoom = max(
-            self.MIN_ZOOM,
-            min(self.MAX_ZOOM, self.width() / self.pixmap.width(), self.height() / self.pixmap.height()),
+            CANVAS_MIN_ZOOM,
+            min(CANVAS_MAX_ZOOM, self.width() / self.pixmap.width(), self.height() / self.pixmap.height()),
         )
         self.pan_offset = QPointF(
             (self.width() - self.pixmap.width() * self.zoom) / 2.0,

@@ -7,6 +7,7 @@ from time import monotonic
 from PyQt6.QtCore import QObject, pyqtSlot
 from PyQt6.QtWidgets import QApplication
 
+from config.settings import WORKER_SHUTDOWN_TIMEOUT_MS
 from service.augmentation_service import AugmentationApi
 from service.editing_service import PoissonApi
 from service.labeling_service import YoloApi
@@ -110,7 +111,7 @@ class DatasetEditorApp(QObject):
         """Synchronously report app-owned worker shutdown back to the close event."""
         self.window.complete_shutdown(self.shutdown(timeout_ms))
 
-    def shutdown(self, timeout_ms: int = 30000) -> bool:
+    def shutdown(self, timeout_ms: int = WORKER_SHUTDOWN_TIMEOUT_MS) -> bool:
         """Cancel and join every worker owned by the application."""
         workers = tuple(self._workers.values())
         for worker in workers:

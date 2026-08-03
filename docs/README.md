@@ -171,7 +171,7 @@ dataset_studio/
 ├─ app.py
 ├─ config/
 │  ├─ __init__.py
-│  └─ default_presets.py
+│  └─ settings.py
 ├─ core/
 │  ├─ geometry.py
 │  ├─ image_io.py

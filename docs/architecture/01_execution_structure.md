@@ -114,6 +114,7 @@ Dataset-Editor/
 ├─ main.py
 ├─ app.py
 ├─ config/
+│  └─ settings.py              # runtime path, cache/UI limits, feature presets
 ├─ core/
 ├─ service/
 │  ├─ augmentation_service.py

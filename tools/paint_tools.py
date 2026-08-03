@@ -100,6 +100,11 @@ class HealingBrushTool(BasePaintTool):
     def has_source_anchor(self) -> bool:
         return self._source_anchor is not None
 
+    @property
+    def source_anchor(self) -> QPointF | None:
+        """Return the center of the circular source sample, if selected."""
+        return QPointF(self._source_anchor) if self._source_anchor is not None else None
+
     def reset(self) -> None:
         super().reset()
         self._target_anchor = None

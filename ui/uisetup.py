@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from config.settings import DEFAULT_THEME
 from service.editing_service import clone_mode_from_text
 from ui.tool_controller import ToolMode
 from ui.themes import theme_colors
@@ -74,7 +75,7 @@ class UiSetup:
         self._setup_properties_scroll_area()
         self._hide_label_tool_widgets()
         self._setup_initial_panel_state()
-        self.apply_theme(getattr(self.window, "current_theme", "dark"))
+        self.apply_theme(getattr(self.window, "current_theme", DEFAULT_THEME))
 
     def _setup_poisson_mode_controls(self) -> None:
         """Keep the compact toolbar and Properties clone-mode controls synchronized."""
@@ -1412,7 +1413,7 @@ class UiSetup:
         painter = QPainter(marked)
         painter.drawPixmap(0, 0, source)
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(tint or QColor(theme_colors(getattr(self.window, "current_theme", "dark"))["icon"]))
+        painter.setBrush(tint or QColor(theme_colors(getattr(self.window, "current_theme", DEFAULT_THEME))["icon"]))
         painter.drawPolygon(QPolygon([QPoint(17, 23), QPoint(23, 23), QPoint(23, 17)]))
         painter.end()
         return QIcon(marked)

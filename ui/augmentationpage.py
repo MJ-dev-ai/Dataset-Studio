@@ -25,12 +25,22 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from config.settings import (
+    ASSET_ROOT,
+    AUTOAUGMENT_GENERATE_SAMPLES,
+    AUTOAUGMENT_MAX_SAME_CLASS_PER_IMAGE,
+    AUTOAUGMENT_RANDOM_MULTIPLIER,
+    AUTOAUGMENT_TEST_PERCENT,
+    AUTOAUGMENT_TRAIN_PERCENT,
+    AUTOAUGMENT_VALIDATION_PERCENT,
+    DEFAULT_THEME,
+)
 from service.augmentation_service import AutoYoloAugmentOptions, AugmentationApi
 from core.image_io import read_image
 from core.qt_image import bgr_to_qpixmap
 
 AUTOAUGMENT_UI_PATH = Path(__file__).with_name("autoaugment.ui")
-ICON_ROOT = Path(__file__).parent.parent / "assets" / "icons"
+ICON_ROOT = ASSET_ROOT / "icons"
 
 class _SliderSpinAdapter:
     """Expose a Designer slider/spin pair through the existing value API."""
@@ -249,11 +259,15 @@ class AugmentationPage(QDialog):
     def _bind_designer_widgets(self) -> None:
         """Bind semantic Designer widgets to the adapters used by AutoAugment."""
         self.generate_slider = _SliderSpinAdapter(
-            self.sample_count_slider, self.sample_count_spin, 0, 5000, 300
+            self.sample_count_slider,
+            self.sample_count_spin,
+            0,
+            5000,
+            AUTOAUGMENT_GENERATE_SAMPLES,
         )
         self.same_class_spin = self.same_class_max_spin
         self.same_class_spin.setRange(1, 100)
-        self.same_class_spin.setValue(1)
+        self.same_class_spin.setValue(AUTOAUGMENT_MAX_SAME_CLASS_PER_IMAGE)
         self.poisson_mode_combo = self.blend_mode_combo
         self.poisson_mode_combo.clear()
         self.poisson_mode_combo.addItems(
@@ -275,7 +289,11 @@ class AugmentationPage(QDialog):
         self.rotation_edit = self.rotation_angles_edit
         self.rotation_body = self.rotation_edit
         self.random_multiplier_slider = _SliderSpinAdapter(
-            self.random_count_slider, self.random_count_spin, 0, 100, 1
+            self.random_count_slider,
+            self.random_count_spin,
+            0,
+            100,
+            AUTOAUGMENT_RANDOM_MULTIPLIER,
         )
         self.random_check = _RandomEnabledAdapter(self.random_multiplier_slider)
         self.jitter_x_range = _LineRangeAdapter(
@@ -310,10 +328,14 @@ class AugmentationPage(QDialog):
         self.browse_defect_button = self.browse_defect_pool_button
         self.format_combo = self.output_format_combo
         self.train_spin = self.train_ratio_spin
-        self.val_spin = _NumericComboAdapter(self.validation_ratio_combo, 0, 100, 10)
-        self.test_spin = _NumericComboAdapter(self.test_ratio_combo, 0, 100, 10)
+        self.val_spin = _NumericComboAdapter(
+            self.validation_ratio_combo, 0, 100, AUTOAUGMENT_VALIDATION_PERCENT
+        )
+        self.test_spin = _NumericComboAdapter(
+            self.test_ratio_combo, 0, 100, AUTOAUGMENT_TEST_PERCENT
+        )
         self.train_spin.setRange(0, 100)
-        self.train_spin.setValue(80)
+        self.train_spin.setValue(AUTOAUGMENT_TRAIN_PERCENT)
 
         self.balance_widget = _BalanceBarsAdapter(
             (
@@ -406,7 +428,7 @@ class AugmentationPage(QDialog):
         self._result_output_root = None
         self._reset_result_values()
         self._prepare_autoaugment_visual_state()
-        self.apply_theme(getattr(self._main_window, "current_theme", "dark"))
+        self.apply_theme(getattr(self._main_window, "current_theme", DEFAULT_THEME))
     def _connect_signals(self) -> None:
         """Connect semantic Designer controls to AutoAugment behavior."""
         self.details_button.clicked.connect(self._show_details)

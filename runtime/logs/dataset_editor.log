@@ -44047,3 +44047,4 @@ PermissionError: [Errno 13] Permission denied: 'D:\\!$rFYLN\\data.yaml'
 19:50:30 INFO     Waiting for background tasks to stop...
 19:50:30 INFO     TaskManager shutdown requested: active=0 timeout_ms=30000
 19:50:30 INFO     TaskManager shutdown requested: active=0 timeout_ms=30000
+11:02:09 INFO     Healing Brush: Ctrl+click a clean source area

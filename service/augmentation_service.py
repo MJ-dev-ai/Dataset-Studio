@@ -13,6 +13,16 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from config.settings import (
+    AUGMENTATION_CACHE_BUDGET_BYTES,
+    AUTOAUGMENT_GENERATE_SAMPLES,
+    AUTOAUGMENT_MAX_SAME_CLASS_PER_IMAGE,
+    AUTOAUGMENT_RANDOM_MULTIPLIER,
+    AUTOAUGMENT_ROTATION_ANGLES,
+    AUTOAUGMENT_TEST_PERCENT,
+    AUTOAUGMENT_TRAIN_PERCENT,
+    AUTOAUGMENT_VALIDATION_PERCENT,
+)
 from core.image_io import read_image, write_png
 from core.image_ops import rotate_bound
 from core.logging_setup import get_logger
@@ -44,17 +54,17 @@ class AutoYoloAugmentOptions:
     defect_root: Path | None
     target_map_key: str
     class_names: list[str] = field(default_factory=list)
-    generate_samples: int = 300
-    max_same_class_per_image: int = 1
+    generate_samples: int = AUTOAUGMENT_GENERATE_SAMPLES
+    max_same_class_per_image: int = AUTOAUGMENT_MAX_SAME_CLASS_PER_IMAGE
     poisson_mode: str = "Detail Preserve"
     include_original: bool = True
     enable_poisson: bool = True
     enable_flip: bool = True
     enable_rotation: bool = True
     enable_random: bool = True
-    random_multiplier: int = 1
+    random_multiplier: int = AUTOAUGMENT_RANDOM_MULTIPLIER
     apply_extra_augment: bool = True
-    rotation_angles: list[float] = field(default_factory=lambda: [45, 90, 135, 180, 225, 270, 315])
+    rotation_angles: list[float] = field(default_factory=lambda: list(AUTOAUGMENT_ROTATION_ANGLES))
     jitter_x_min: int = -20
     jitter_x_max: int = 20
     jitter_y_min: int = -20
@@ -65,9 +75,9 @@ class AutoYoloAugmentOptions:
     contrast_max: int = 10
     outside_tolerance: float = 0.02
     image_size: int = 2048
-    train_ratio: float = 0.8
-    val_ratio: float = 0.1
-    test_ratio: float = 0.1
+    train_ratio: float = AUTOAUGMENT_TRAIN_PERCENT / 100.0
+    val_ratio: float = AUTOAUGMENT_VALIDATION_PERCENT / 100.0
+    test_ratio: float = AUTOAUGMENT_TEST_PERCENT / 100.0
     seed: int = 0
 
 
@@ -91,7 +101,7 @@ class SyncedTransformResult:
 class BoundedImageCache:
     """LRU cache for decoded OpenCV images with a strict byte budget."""
 
-    def __init__(self, max_bytes: int = 512 * 1024 * 1024):
+    def __init__(self, max_bytes: int = AUGMENTATION_CACHE_BUDGET_BYTES):
         self.max_bytes = max(0, max_bytes)
         self.size_bytes = 0
         self._items: OrderedDict[str, np.ndarray] = OrderedDict()

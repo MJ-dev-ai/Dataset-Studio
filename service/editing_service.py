@@ -57,9 +57,9 @@ def apply_healing_strokes(
 	*,
 	inplace: bool = False,
 	check_cancelled: Callable[[], None] | None = None,
-	fast_preview: bool = False,
+	poisson_api: PoissonApi | None = None,
 ) -> np.ndarray:
-	"""Apply healing brush strokes that map source dab centers to target dab centers."""
+	"""Apply circular NORMAL_CLONE dabs from source centers to target centers."""
 	if image is None or image.size == 0:
 		raise ValueError("image is empty")
 	if not strokes:
@@ -73,29 +73,41 @@ def apply_healing_strokes(
 	alpha_scale = float(np.clip(opacity, 0.0, 1.0))
 	if alpha_scale <= 0.0:
 		return result
+	api = poisson_api or PoissonApi()
+	last_dab: tuple[int, int, int, int] | None = None
 	for source_start, source_end, target_start, target_end in strokes:
 		if check_cancelled is not None:
 			check_cancelled()
-		distance = max(
-			abs(float(target_end[0]) - float(target_start[0])),
-			abs(float(target_end[1]) - float(target_start[1])),
-			1.0,
+		distance = float(
+			np.hypot(
+				float(target_end[0]) - float(target_start[0]),
+				float(target_end[1]) - float(target_start[1]),
+			)
 		)
-		dab_count = max(1, int(np.ceil(distance / step)))
+		dab_count = max(1, int(np.ceil(distance / step))) if distance > 0.0 else 0
 		for index in range(dab_count + 1):
 			if check_cancelled is not None and index % 8 == 0:
 				check_cancelled()
-			t = index / dab_count
+			t = index / dab_count if dab_count else 0.0
 			source_center = _interpolate_point(source_start, source_end, t)
 			target_center = _interpolate_point(target_start, target_end, t)
-			_apply_healing_dab(
+			dab = (
+				int(round(source_center[0])),
+				int(round(source_center[1])),
+				int(round(target_center[0])),
+				int(round(target_center[1])),
+			)
+			if dab == last_dab:
+				continue
+			last_dab = dab
+			_apply_seamless_healing_dab(
+				api,
 				source_reference,
 				result,
 				source_center,
 				target_center,
 				radius,
 				alpha_scale,
-				fast_preview=fast_preview,
 			)
 	return result
 
@@ -106,6 +118,7 @@ def apply_healing_to_images(
 	size: int,
 	opacity: float = 1.0,
 	*,
+	poisson_api: PoissonApi | None = None,
 	check_cancelled: Callable[[], None] | None = None,
 	progress: Callable[[int, int, str], None] | None = None,
 ) -> dict[str, np.ndarray]:
@@ -114,6 +127,7 @@ def apply_healing_to_images(
 	total = len(images)
 	if total == 0 or not strokes:
 		return results
+	api = poisson_api or PoissonApi()
 	for index, (key, image) in enumerate(images.items(), start=1):
 		if check_cancelled is not None:
 			check_cancelled()
@@ -129,6 +143,7 @@ def apply_healing_to_images(
 			source_image=source,
 			inplace=True,
 			check_cancelled=check_cancelled,
+			poisson_api=api,
 		)
 		if progress is not None:
 			progress(index, total, key)
@@ -146,16 +161,16 @@ def _interpolate_point(
 	)
 
 
-def _apply_healing_dab(
+def _apply_seamless_healing_dab(
+	poisson_api: PoissonApi,
 	source: np.ndarray,
 	target: np.ndarray,
 	source_center: tuple[float, float],
 	target_center: tuple[float, float],
 	radius: int,
 	opacity: float,
-	*,
-	fast_preview: bool = False,
 ) -> None:
+	"""Clone one clipped circular source sample into its target-center position."""
 	height, width = target.shape[:2]
 	source_x = int(round(source_center[0]))
 	source_y = int(round(source_center[1]))
@@ -188,93 +203,48 @@ def _apply_healing_dab(
 	]
 	if source_roi.size == 0 or target_roi.size == 0 or source_roi.shape != target_roi.shape:
 		return
-	mask = _healing_alpha_mask(
-		radius,
-		x0_offset + radius,
-		y0_offset + radius,
-		source_roi.shape[1],
-		source_roi.shape[0],
-		opacity,
-	)
+	mask = _centered_healing_circle_mask(valid_x, valid_y, radius)
 	if not np.any(mask > 0):
 		return
-	_apply_difference_domain_healing(source_roi, target_roi, mask, radius, fast_preview=fast_preview)
-
-
-def _apply_difference_domain_healing(
-	source_roi: np.ndarray,
-	target_roi: np.ndarray,
-	mask: np.ndarray,
-	radius: int,
-	*,
-	fast_preview: bool = False,
-) -> None:
-	source_float = source_roi.astype(np.float32)
-	target_float = target_roi.astype(np.float32)
-	selected = mask > 0.1
-	if not np.any(selected):
+	target_left = target_x + x0_offset
+	target_top = target_y + y0_offset
+	clone_center = (
+		target_left + source_roi.shape[1] // 2,
+		target_top + source_roi.shape[0] // 2,
+	)
+	try:
+		cloned = poisson_api.seamless_clone(
+			source_roi,
+			target,
+			mask,
+			clone_center,
+			mode=cv2.NORMAL_CLONE,
+		)
+	except (cv2.error, ValueError) as exc:
+		raise RuntimeError(
+			f"Healing Brush seamlessClone failed at target center ({target_x}, {target_y})"
+		) from exc
+	if opacity >= 1.0:
+		target[:] = cloned
 		return
-	difference = target_float - source_float
-	if fast_preview:
-		smooth_difference = _blur_reconstruct_difference(difference, radius)
-	else:
-		smooth_difference = _laplace_reconstruct_difference(difference, selected, radius)
-	healed = np.clip(source_float + smooth_difference, 0, 255)
-	target_roi[:] = np.clip(
-		healed * mask[:, :, None] + target_float * (1.0 - mask[:, :, None]),
-		0,
-		255,
-	).astype(np.uint8)
+	cloned_roi = cloned[
+		target_top:target_top + source_roi.shape[0],
+		target_left:target_left + source_roi.shape[1],
+	]
+	blended_roi = cv2.addWeighted(cloned_roi, opacity, target_roi, 1.0 - opacity, 0.0)
+	target_roi[mask > 0] = blended_roi[mask > 0]
 
 
-def _blur_reconstruct_difference(difference: np.ndarray, radius: int) -> np.ndarray:
-	"""Approximate difference-domain healing quickly for interactive previews."""
-	sigma = max(0.5, float(radius) * 0.35)
-	return cv2.GaussianBlur(difference, (0, 0), sigma)
-
-
-def _laplace_reconstruct_difference(
-	difference: np.ndarray,
-	selected: np.ndarray,
+def _centered_healing_circle_mask(
+	x_offsets: np.ndarray,
+	y_offsets: np.ndarray,
 	radius: int,
 ) -> np.ndarray:
-	"""Smooth target-source difference inside the brush mask with fixed outside values."""
-	if difference.shape[0] < 3 or difference.shape[1] < 3:
-		return difference
-	result = difference.copy()
-	inner = selected[1:-1, 1:-1]
-	if not np.any(inner):
-		return result
-	iterations = max(6, min(42, int(radius * 3.0)))
-	for _ in range(iterations):
-		average = (
-			result[:-2, 1:-1]
-			+ result[2:, 1:-1]
-			+ result[1:-1, :-2]
-			+ result[1:-1, 2:]
-		) * 0.25
-		center = result[1:-1, 1:-1]
-		center[inner] = average[inner]
-	return result
-
-
-def _healing_alpha_mask(
-	radius: int,
-	left: int,
-	top: int,
-	width: int,
-	height: int,
-	opacity: float,
-) -> np.ndarray:
-	size = radius * 2 + 1
-	y_grid, x_grid = np.ogrid[:size, :size]
-	distance = np.sqrt((x_grid - radius) ** 2 + (y_grid - radius) ** 2)
-	circle = distance <= radius
-	mask = np.where(circle, 1.0, 0.0).astype(np.float32)
-	mask = cv2.GaussianBlur(mask, (0, 0), max(0.5, radius * 0.25))
-	mask[~circle] = 0.0
-	cropped = mask[top:top + height, left:left + width]
-	return np.clip(cropped * opacity, 0.0, 1.0)
+	"""Build a binary circular seamlessClone mask around the dab center point."""
+	x_grid = x_offsets.astype(np.float32)[None, :]
+	y_grid = y_offsets.astype(np.float32)[:, None]
+	circle = x_grid * x_grid + y_grid * y_grid <= float(radius * radius)
+	return np.where(circle, 255, 0).astype(np.uint8)
 
 
 def apply_selection_fill(

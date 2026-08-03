@@ -34,6 +34,7 @@ class EditingWorker(BaseWorker):
             self.payload["strokes"],
             self.payload["size"],
             self.payload["opacity"],
+            poisson_api=self.poisson_api,
             check_cancelled=self.check_cancelled,
             progress=report,
         )
@@ -73,4 +74,3 @@ class EditingWorker(BaseWorker):
             results[map_key] = result
         self.report(100, "Manual Poisson complete")
         return results
-

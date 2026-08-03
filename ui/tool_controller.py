@@ -10,8 +10,7 @@ from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 
 from core.geometry import HealingStroke, PaintStroke
 from core.patch_clipboard import PatchClip
-from core.qt_image import bgr_mask_to_qpixmap, bgr_to_qpixmap, qimage_to_bgr
-from service.editing_service import apply_healing_strokes
+from core.qt_image import bgr_mask_to_qpixmap, qimage_to_bgr
 from tools.label_tools import BBoxTool, BBoxPreview
 from tools.paint_tools import (
     BrushTool,
@@ -89,8 +88,6 @@ class ToolController:
         self.mode_changed: Callable[[ToolMode], None] | None = None
         self.patch_state_changed: Callable[[PatchState], None] | None = None
         self.current_mode = ToolMode.MOVE
-        self._healing_preview_source_image = None
-        self._healing_preview_result_image = None
         self._tools = {
             ToolMode.RECT: RectSelectionTool(),
             ToolMode.POLYGON: PolygonSelectionTool(),
@@ -123,6 +120,13 @@ class ToolController:
         if not self.show_cursor_circle:
             return 0.0
         return float(self.tool(self.current_mode).cursor_radius)
+
+    @property
+    def healing_source_anchor(self) -> QPointF | None:
+        """Return the Healing Brush source-circle center while that tool is active."""
+        if self.current_mode != ToolMode.HEALING_BRUSH:
+            return None
+        return self.tool(ToolMode.HEALING_BRUSH).source_anchor
 
     def tool(self, mode: ToolMode | str):
         return self._tools[ToolMode.from_value(mode)]
@@ -368,7 +372,6 @@ class ToolController:
             self.tool(self.current_mode).cancel_selection(clear_canvas=False)
         elif self.current_mode in self.PAINT_MODES or self.current_mode == ToolMode.HEALING_BRUSH:
             self.tool(self.current_mode).reset()
-            self._clear_healing_preview_state()
         elif self.current_mode == ToolMode.PATCH:
             self.tool(ToolMode.PATCH).end_move_drag()
             self.tool(ToolMode.PATCH).end_rotation_drag()
@@ -532,6 +535,7 @@ class ToolController:
         point = self._image_point(event)
         if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
             tool.set_source_anchor(point)
+            self.canvas.update()
             self.window.set_status("Healing Brush source set")
             event.accept()
             return
@@ -539,11 +543,9 @@ class ToolController:
             self.window.set_status("Ctrl+click a clean source area before healing")
             return
         self._begin_image_edit_history()
-        self._healing_preview_source_image = qimage_to_bgr(self.canvas.pixmap)
-        self._healing_preview_result_image = self._healing_preview_source_image.copy()
         stroke = tool.begin_healing_stroke(point)
         if stroke is not None:
-            self._apply_healing_preview_strokes([stroke])
+            self.window.set_status("Healing Brush: release to apply to every MapSet map")
             event.accept()
 
     def _move_healing(self, event) -> None:
@@ -552,7 +554,6 @@ class ToolController:
         stroke = self.tool(ToolMode.HEALING_BRUSH).continue_healing_stroke(self._image_point(event))
         if stroke is None:
             return
-        self._apply_healing_preview_strokes([stroke])
         event.accept()
 
     def _release_healing(self, event) -> None:
@@ -561,10 +562,7 @@ class ToolController:
         finish = self.tool(ToolMode.HEALING_BRUSH).finish_healing_stroke(self._image_point(event))
         if finish is None:
             return
-        if finish.preview_stroke is not None:
-            self._apply_healing_preview_strokes([finish.preview_stroke])
         self._commit_healing_strokes(finish.strokes, self.tool(ToolMode.HEALING_BRUSH).options)
-        self._clear_healing_preview_state()
         event.accept()
 
     def _press_fill(self, event) -> None:
@@ -658,29 +656,6 @@ class ToolController:
         self.canvas._revision += 1
         self.canvas.image_changed.emit()
 
-    def _apply_healing_preview_strokes(self, strokes: list[HealingStroke]) -> None:
-        image = self._healing_preview_result_image
-        if image is None or image.size == 0 or not strokes:
-            return
-        try:
-            result = apply_healing_strokes(
-                image,
-                list(strokes),
-                self.tool(ToolMode.HEALING_BRUSH).options.size,
-                self.tool(ToolMode.HEALING_BRUSH).options.opacity,
-                source_image=self._healing_preview_source_image,
-                inplace=True,
-                fast_preview=True,
-            )
-        except ValueError as exc:
-            self.window.set_status(f"Healing Brush failed: {exc}")
-            return
-        self._healing_preview_result_image = result
-        pixmap = bgr_to_qpixmap(result)
-        self.canvas.pixmap = pixmap
-        self.canvas.image = pixmap.toImage()
-        self.canvas.update()
-
     def _commit_healing_strokes(self, strokes: list[HealingStroke], options: PaintOptions) -> None:
         if not strokes:
             return
@@ -693,10 +668,6 @@ class ToolController:
             return
         self.canvas._revision += 1
         self.canvas.image_changed.emit()
-
-    def _clear_healing_preview_state(self) -> None:
-        self._healing_preview_source_image = None
-        self._healing_preview_result_image = None
 
     def _apply_fill(self, options: PaintOptions) -> bool:
         if self.canvas.pixmap.isNull():
@@ -784,7 +755,6 @@ class ToolController:
             return
         if self.current_mode in self.PAINT_MODES or self.current_mode == ToolMode.HEALING_BRUSH:
             self.tool(self.current_mode).reset()
-            self._clear_healing_preview_state()
         elif self.current_mode == ToolMode.PATCH:
             self.clear_active_patch()
             return
