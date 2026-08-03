@@ -255,7 +255,7 @@ UI에서는 각 기능을 직접 구현하지 않고, connect 함수에서 필�
 ```python
 self.poisson_api.poisson_blend(...)
 self.yolo_api.save_labels(...)
-self.preprocess_api.apply_clahe(...)
+self.preprocess_api.apply_options(...)
 self.augmentation_api.create_preview_samples(...)
 self.yolo_export_api.export_dataset(...)
 ```

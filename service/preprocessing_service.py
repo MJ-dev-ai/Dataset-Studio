@@ -106,29 +106,6 @@ def _coerce_options(options: PreprocessOptions | dict) -> PreprocessOptions:
 	)
 
 
-def apply_clahe(image: np.ndarray, clip_limit: float = 2.0, tile_grid_size: tuple[int, int] = (8, 8)) -> np.ndarray:
-	clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
-	if image.ndim == 2:
-		return clahe.apply(image)
-	lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-	lab[:, :, 0] = clahe.apply(lab[:, :, 0])
-	return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
-
-
-def threshold(image: np.ndarray, value: int = 127, invert: bool = False) -> np.ndarray:
-	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
-	threshold_type = cv2.THRESH_BINARY_INV if invert else cv2.THRESH_BINARY
-	_ret, result = cv2.threshold(gray, value, 255, threshold_type)
-	return result
-
-
-def otsu_threshold(image: np.ndarray, invert: bool = False) -> np.ndarray:
-	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
-	threshold_type = cv2.THRESH_BINARY_INV if invert else cv2.THRESH_BINARY
-	_ret, result = cv2.threshold(gray, 0, 255, threshold_type | cv2.THRESH_OTSU)
-	return result
-
-
 def to_uint8(image: np.ndarray) -> np.ndarray:
 	minimum = float(np.min(image))
 	maximum = float(np.max(image))

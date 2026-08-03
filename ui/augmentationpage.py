@@ -10,17 +10,15 @@ from pathlib import Path
 
 from PyQt6 import uic
 from PyQt6.QtCore import QUrl, Qt, QSize
-from PyQt6.QtGui import QColor, QDesktopServices, QIcon, QPainter, QPixmap
+from PyQt6.QtGui import QDesktopServices, QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QDialog,
     QFileDialog,
-    QHBoxLayout,
     QLabel,
     QLineEdit,
     QMessageBox,
-    QProgressBar,
     QPushButton,
     QSpinBox,
     QSlider,
@@ -217,119 +215,6 @@ class ClassBalanceItem:
     class_name: str
     current_count: int
     expected_count: int
-
-
-class SliderSpinBox(QWidget):
-    """Compact horizontal slider and spinbox pair for integer settings."""
-
-    def __init__(self, minimum: int, maximum: int, value: int, parent=None):
-        """Create a synchronized slider and spin box."""
-        super().__init__(parent)
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.slider = QSlider(Qt.Orientation.Horizontal, self)
-        self.spin = QSpinBox(self)
-        self.slider.setRange(minimum, maximum)
-        self.spin.setRange(minimum, maximum)
-        self.slider.setValue(value)
-        self.spin.setValue(value)
-        self.spin.setFixedWidth(92)
-        layout.addWidget(self.slider, 1)
-        layout.addWidget(self.spin)
-        self.slider.valueChanged.connect(self.spin.setValue)
-        self.spin.valueChanged.connect(self.slider.setValue)
-
-    def value(self) -> int:
-        """Return the current integer value."""
-        return int(self.spin.value())
-
-    def set_value(self, value: int) -> None:
-        """Set both the slider and spinbox value."""
-        self.spin.setValue(int(value))
-
-    @property
-    def valueChanged(self):
-        """Expose the spin box value-changed signal."""
-        return self.spin.valueChanged
-
-
-class RangeEdit(QWidget):
-    """Two spin boxes used for min and max integer ranges."""
-
-    def __init__(self, minimum: int, maximum: int, low: int, high: int, parent=None):
-        """Create a compact pair of integer spin boxes."""
-        super().__init__(parent)
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.low = QSpinBox(self)
-        self.high = QSpinBox(self)
-        self.low.setRange(minimum, maximum)
-        self.high.setRange(minimum, maximum)
-        self.low.setValue(low)
-        self.high.setValue(high)
-        self.low.setFixedWidth(92)
-        self.high.setFixedWidth(92)
-        layout.addWidget(self.low)
-        layout.addWidget(QLabel("~", self))
-        layout.addWidget(self.high)
-        layout.addStretch(1)
-
-    def values(self) -> tuple[int, int]:
-        """Return the normalized low and high values."""
-        first = int(self.low.value())
-        second = int(self.high.value())
-        return min(first, second), max(first, second)
-
-
-class ClassBalanceBarWidget(QWidget):
-    """Draw current and expected class counts for AutoAugment planning."""
-
-    def __init__(self, parent=None, accent: str = "#3971FF"):
-        """Create an empty class-balance chart."""
-        super().__init__(parent)
-        self.items: list[ClassBalanceItem] = []
-        self.accent = QColor(accent)
-        self.setMinimumHeight(150)
-
-    def set_items(self, items: list[ClassBalanceItem]) -> None:
-        """Update the balance data and repaint the widget."""
-        self.items = list(items)
-        self.setMinimumHeight(max(110, min(220, 28 * len(self.items) + 18)))
-        self.updateGeometry()
-        self.update()
-
-    def paintEvent(self, event):
-        """Paint current and expected class counts."""
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        text_color = self.palette().text().color()
-        base_color = QColor(self.accent)
-        added_color = QColor(self.accent).lighter(145)
-        back_color = self.palette().base().color()
-        max_count = max((item.expected_count for item in self.items), default=1)
-        left = 116
-        right = 78
-        bar_height = 10
-        row_height = 26
-        for row, item in enumerate(self.items):
-            y = 12 + row * row_height
-            painter.setPen(text_color)
-            painter.drawText(4, y + 15, item.class_name[:16])
-            bar_x = left
-            bar_w = max(1, self.width() - left - right)
-            painter.setPen(Qt.PenStyle.NoPen)
-            painter.setBrush(back_color.darker(115))
-            painter.drawRoundedRect(bar_x, y + 3, bar_w, bar_height, 4, 4)
-            current_w = int(bar_w * item.current_count / max_count)
-            expected_w = int(bar_w * item.expected_count / max_count)
-            painter.setBrush(base_color)
-            painter.drawRoundedRect(bar_x, y + 3, current_w, bar_height, 4, 4)
-            if expected_w > current_w:
-                painter.setBrush(added_color)
-                painter.drawRoundedRect(bar_x + current_w, y + 3, expected_w - current_w, bar_height, 4, 4)
-            painter.setPen(text_color)
-            painter.drawText(bar_x + bar_w + 8, y + 15, f"{item.current_count} → {item.expected_count}")
-        painter.end()
 
 
 class AugmentationPage(QDialog):

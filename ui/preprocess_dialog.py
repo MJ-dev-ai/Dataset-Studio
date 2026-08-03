@@ -5,7 +5,6 @@ Author: TNS AI
 
 from __future__ import annotations
 
-from dataclasses import replace
 
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
@@ -17,7 +16,6 @@ from PyQt6.QtWidgets import (
 	QGroupBox,
 	QHBoxLayout,
 	QLabel,
-	QLineEdit,
 	QPushButton,
 	QRadioButton,
 	QSlider,
