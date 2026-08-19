@@ -1,4 +1,4 @@
-﻿"""Transform panels and dialogs for image preprocessing.
+"""Transform panels and dialogs for image preprocessing.
 
 Author: TNS AI
 """
@@ -6,8 +6,8 @@ Author: TNS AI
 from __future__ import annotations
 
 
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import (
 	QButtonGroup,
 	QCheckBox,
 	QDialog,
@@ -30,7 +30,7 @@ from service.preprocessing_service import PreprocessOptions
 class ValueSlider(QWidget):
 	"""Expose one bounded integer value through a slider and spin box."""
 
-	value_changed = pyqtSignal(int)
+	value_changed = Signal(int)
 
 	def __init__(
 		self,
@@ -74,9 +74,9 @@ class ValueSlider(QWidget):
 class TransformPropertiesPanel(QWidget):
 	"""Edit current-image transform options from the Properties dock."""
 
-	preview_requested = pyqtSignal(object)
-	apply_requested = pyqtSignal(object)
-	reset_requested = pyqtSignal()
+	preview_requested = Signal(object)
+	apply_requested = Signal(object)
+	reset_requested = Signal()
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -308,7 +308,7 @@ class ResizeDialog(QDialog):
 class RotateDialog(QDialog):
 	"""Edit one rotation angle while the canvas previews automatically."""
 
-	value_changed = pyqtSignal(object)
+	value_changed = Signal(object)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -339,7 +339,7 @@ class RotateDialog(QDialog):
 class BrightnessContrastDialog(QDialog):
 	"""Edit brightness and contrast while the canvas previews automatically."""
 
-	value_changed = pyqtSignal(object)
+	value_changed = Signal(object)
 
 	def __init__(self, parent=None):
 		super().__init__(parent)

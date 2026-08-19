@@ -271,7 +271,7 @@ self.yolo_export_api.export_dataset(...)
 ```text
 OS: Windows 10/11
 Python: 3.11
-GUI: PyQt6
+GUI: PySide6
 ```
 
 가상환경 생성:

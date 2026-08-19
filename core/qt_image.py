@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import cv2
 import numpy as np
-from PyQt6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QImage, QPixmap
 
 
 def qimage_to_bgr(image: QImage | QPixmap) -> np.ndarray:

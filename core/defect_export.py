@@ -5,8 +5,8 @@ import re
 from collections.abc import Callable, Iterable
 from pathlib import Path
 
-from PyQt6.QtCore import QRect, Qt
-from PyQt6.QtGui import QImage, QPainter, QPainterPath
+from PySide6.QtCore import QRect, Qt
+from PySide6.QtGui import QImage, QPainter, QPainterPath
 
 
 def safe_defect_name(value: str) -> str:

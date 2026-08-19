@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import QPainterPath, QPolygonF, QTransform
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import QPainterPath, QPolygonF, QTransform
 
 
 SelectionCombineMode = Literal["replace", "add", "subtract"]

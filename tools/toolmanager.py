@@ -5,8 +5,8 @@ from typing import Callable
 
 import cv2
 import numpy as np
-from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 
 from core.geometry import HealingStroke, PaintStroke
 from core.patch_clipboard import PatchClip

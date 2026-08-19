@@ -4,7 +4,7 @@ import random
 from collections import Counter
 from pathlib import Path
 
-from PyQt6.QtCore import pyqtSlot
+from PySide6.QtCore import Slot
 
 from core.image_io import read_image, write_png
 from core.logging_setup import get_logger
@@ -17,7 +17,7 @@ class AugmentationWorker(BaseWorker):
 
 	OPERATIONS = frozenset({"augmentation_preview", "auto_augment", "orientation_augment"})
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_augmentation_preview(self) -> None:
 		self._begin()
 		try:
@@ -37,7 +37,7 @@ class AugmentationWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_auto_augment(self) -> None:
 		self._begin()
 		try:
@@ -136,7 +136,7 @@ class AugmentationWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_orientation_augment(self) -> None:
 		self._begin()
 		try:

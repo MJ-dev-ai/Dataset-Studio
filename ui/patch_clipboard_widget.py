@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import QMimeData, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QDrag, QIcon
-from PyQt6.QtWidgets import QAbstractItemView, QListView, QListWidget, QListWidgetItem, QMenu
+from PySide6.QtCore import QMimeData, QSize, Qt, Signal
+from PySide6.QtGui import QDrag, QIcon
+from PySide6.QtWidgets import QAbstractItemView, QListView, QListWidget, QListWidgetItem, QMenu
 
 from core.patch_clipboard import PATCH_MIME_TYPE, PatchClipboard
 from core.qt_image import bgr_mask_to_qpixmap
@@ -11,9 +11,9 @@ from core.qt_image import bgr_mask_to_qpixmap
 class PatchClipboardWidget(QListWidget):
     """Thumbnail view that exports stable patch IDs through Qt drag-and-drop."""
 
-    clip_activated = pyqtSignal(str)
-    clipboard_changed = pyqtSignal()
-    import_requested = pyqtSignal()
+    clip_activated = Signal(str)
+    clipboard_changed = Signal()
+    import_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)

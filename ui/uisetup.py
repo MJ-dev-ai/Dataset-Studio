@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Callable
 
-from PyQt6.QtCore import QPoint, QSignalBlocker, QSize, Qt
-from PyQt6.QtGui import QAction, QColor, QIcon, QKeySequence, QPainter, QPixmap, QPolygon
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import QPoint, QSignalBlocker, QSize, Qt
+from PySide6.QtGui import QAction, QColor, QIcon, QKeySequence, QPainter, QPixmap, QPolygon
+from PySide6.QtWidgets import (
     QAbstractButton,
     QColorDialog,
     QDockWidget,

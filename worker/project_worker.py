@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSlot
+from PySide6.QtCore import Slot
 
 from core.mapset import discover_map_sets
 from core.patch_clipboard import read_defect_pool
@@ -20,7 +20,7 @@ class ProjectWorker(BaseWorker):
 		"export_defect",
 	})
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_import_defect_pool(self) -> None:
 		self._begin()
 		try:
@@ -35,7 +35,7 @@ class ProjectWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_scan_dataset(self) -> None:
 		self._begin()
 		try:
@@ -54,7 +54,7 @@ class ProjectWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_save_mapset(self) -> None:
 		self._begin()
 		try:
@@ -71,7 +71,7 @@ class ProjectWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_save_all(self) -> None:
 		self._begin()
 		try:
@@ -102,7 +102,7 @@ class ProjectWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_save_mapset_copy(self) -> None:
 		self._begin()
 		try:
@@ -119,7 +119,7 @@ class ProjectWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_export_defect(self) -> None:
 		self._begin()
 		try:

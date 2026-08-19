@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from PyQt6.QtCore import QPointF, QRectF
-from PyQt6.QtGui import QPainterPath
+from PySide6.QtCore import QPointF, QRectF
+from PySide6.QtGui import QPainterPath
 
 
 @dataclass

@@ -264,7 +264,7 @@ yolo_export_service.export_dataset(mapsets, options, progress_callback=...)
 ```text
 OS: Windows 10/11
 Python: 3.11
-GUI: PyQt6
+GUI: PySide6
 ```
 
 가상환경 생성:

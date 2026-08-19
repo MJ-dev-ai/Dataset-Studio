@@ -4,8 +4,8 @@ import sys
 import threading
 import traceback
 
-from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtCore import QObject, Signal, Slot
+from PySide6.QtWidgets import QApplication
 
 from app import DatasetEditorApp
 from config.settings import DEFAULT_THEME, RUNTIME_LOG_DIRECTORY, WORKER_SHUTDOWN_TIMEOUT_MS
@@ -17,7 +17,7 @@ from ui.mainwindow import MainWindow
 class FatalShutdownController(QObject):
     """Move fatal shutdown work onto the GUI thread and flush crash diagnostics."""
 
-    fatal = pyqtSignal(str)
+    fatal = Signal(str)
 
     def __init__(self, app: QApplication, editor: DatasetEditorApp, logger):
         super().__init__()
@@ -34,7 +34,7 @@ class FatalShutdownController(QObject):
         flush_logs(durable=True)
         self.fatal.emit(text)
 
-    @pyqtSlot(str)
+    @Slot(str)
     def _shutdown(self, traceback_text: str) -> None:
         del traceback_text
         if self.editor.shutdown(timeout_ms=WORKER_SHUTDOWN_TIMEOUT_MS):

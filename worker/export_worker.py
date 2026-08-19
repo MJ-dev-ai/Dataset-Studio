@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSlot
+from PySide6.QtCore import Slot
 
 from service import yolo_export_service
 from worker.base_worker import BaseWorker, WorkerCancelled
@@ -11,7 +11,7 @@ class ExportWorker(BaseWorker):
 
 	OPERATIONS = frozenset({"yolo_export"})
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_yolo_export(self) -> None:
 		self._begin()
 		try:

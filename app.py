@@ -4,7 +4,7 @@ import traceback
 from dataclasses import dataclass
 from time import monotonic
 
-from PyQt6.QtCore import QObject, QThread, pyqtSlot
+from PySide6.QtCore import QObject, QThread, Slot
 
 from config.settings import WORKER_SHUTDOWN_TIMEOUT_MS
 from worker.augmentation_worker import AugmentationWorker
@@ -31,7 +31,7 @@ class DatasetEditorApp(QObject):
 		self.window.task_cancel_requested.connect(self._cancel_worker)
 		self.window.shutdown_requested.connect(self._shutdown_from_window)
 
-	@pyqtSlot(str, str, object)
+	@Slot(str, str, object)
 	def _start_worker(self, task_id: str, operation: str, payload) -> None:
 		if operation in ProjectWorker.OPERATIONS:
 			self._start_project_worker(task_id, operation, payload)
@@ -103,20 +103,20 @@ class DatasetEditorApp(QObject):
 			self.window._on_task_failed(task_id, str(exc), traceback_text)
 			self.window._on_task_finished(task_id)
 
-	@pyqtSlot(str)
+	@Slot(str)
 	def _cancel_worker(self, task_id: str) -> None:
 		runtime = self._workers.get(task_id)
 		if runtime is not None:
 			runtime.worker.cancel()
 
-	@pyqtSlot(str)
+	@Slot(str)
 	def _release_worker(self, task_id: str) -> None:
 		runtime = self._workers.pop(task_id, None)
 		if runtime is not None:
 			self.logger.info("Worker finished: %s %s", runtime.worker.operation, task_id)
 		self.window._on_task_finished(task_id)
 
-	@pyqtSlot(int)
+	@Slot(int)
 	def _shutdown_from_window(self, timeout_ms: int) -> None:
 		self.window.complete_shutdown(self.shutdown(timeout_ms))
 

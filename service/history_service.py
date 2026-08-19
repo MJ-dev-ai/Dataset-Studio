@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 import numpy as np
-from PyQt6.QtGui import QImage, QPainter
+from PySide6.QtGui import QImage, QPainter
 
 
 @dataclass(frozen=True)

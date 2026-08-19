@@ -3,7 +3,7 @@ from __future__ import annotations
 import threading
 import traceback
 
-from PyQt6.QtCore import QObject, pyqtSignal
+from PySide6.QtCore import QObject, Signal
 
 from config.flag import WorkerFlag
 
@@ -15,11 +15,11 @@ class WorkerCancelled(RuntimeError):
 class BaseWorker(QObject):
 	"""Common QObject worker lifecycle for one feature-specific background operation."""
 
-	progress = pyqtSignal(str, int, str)
-	succeeded = pyqtSignal(str, object)
-	failed = pyqtSignal(str, str, str)
-	cancelled = pyqtSignal(str)
-	finished = pyqtSignal(str)
+	progress = Signal(str, int, str)
+	succeeded = Signal(str, object)
+	failed = Signal(str, str, str)
+	cancelled = Signal(str)
+	finished = Signal(str)
 
 	def __init__(self, task_id: str, operation: str, payload: object, parent=None):
 		super().__init__(parent)

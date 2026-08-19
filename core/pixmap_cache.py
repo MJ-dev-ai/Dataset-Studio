@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from collections import OrderedDict
 
-from PyQt6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap
 
 from config.settings import PIXMAP_CACHE_BUDGET_BYTES
 

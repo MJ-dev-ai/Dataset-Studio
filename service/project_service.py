@@ -10,8 +10,8 @@ import uuid
 
 import cv2
 import numpy as np
-from PyQt6.QtCore import QRect, Qt
-from PyQt6.QtGui import QImage, QPainter, QPainterPath
+from PySide6.QtCore import QRect, Qt
+from PySide6.QtGui import QImage, QPainter, QPainterPath
 
 
 @dataclass(frozen=True)

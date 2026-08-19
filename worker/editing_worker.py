@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSlot
+from PySide6.QtCore import Slot
 
 from service import editing_service
 from worker.base_worker import BaseWorker, WorkerCancelled
@@ -11,7 +11,7 @@ class EditingWorker(BaseWorker):
 
 	OPERATIONS = frozenset({"healing", "manual_poisson"})
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_healing(self) -> None:
 		self._begin()
 		try:
@@ -37,7 +37,7 @@ class EditingWorker(BaseWorker):
 		finally:
 			self._finish()
 
-	@pyqtSlot()
+	@Slot()
 	def _execute_manual_poisson(self) -> None:
 		self._begin()
 		try:

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from PyQt6.QtCore import QPointF, QRect, QRectF, Qt, pyqtSignal
-from PyQt6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
-from PyQt6.QtWidgets import QWidget
+from PySide6.QtCore import QPointF, QRect, QRectF, Qt, Signal
+from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtWidgets import QWidget
 
 from config.settings import (
     CANVAS_MAX_ZOOM,
@@ -35,12 +35,12 @@ class CanvasAnnotation:
 class ImageCanvas(QWidget):
     """Memory-bounded image editor with shared selection and label overlays."""
 
-    image_changed = pyqtSignal()
-    selection_changed = pyqtSignal(bool)
-    annotations_changed = pyqtSignal()
-    view_changed = pyqtSignal(float, float, float)
-    patch_dropped = pyqtSignal(str, QPointF)
-    tool_error = pyqtSignal(str)
+    image_changed = Signal()
+    selection_changed = Signal(bool)
+    annotations_changed = Signal()
+    view_changed = Signal(float, float, float)
+    patch_dropped = Signal(str, QPointF)
+    tool_error = Signal(str)
     def __init__(self, parent=None):
         super().__init__(parent)
         self.image = None

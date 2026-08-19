@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from PyQt6.QtCore import QPointF
-from PyQt6.QtGui import QColor
+from PySide6.QtCore import QPointF
+from PySide6.QtGui import QColor
 
 from core.geometry import HealingStroke, PaintStroke
 

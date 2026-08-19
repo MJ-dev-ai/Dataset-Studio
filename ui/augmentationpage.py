@@ -1,4 +1,4 @@
-﻿"""AutoAugment page for selected-map YOLO dataset generation.
+"""AutoAugment page for selected-map YOLO dataset generation.
 
 Author: Mingyu Jang
 """
@@ -8,10 +8,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from PyQt6 import uic
-from PyQt6.QtCore import QUrl, Qt, QSize
-from PyQt6.QtGui import QDesktopServices, QIcon, QPixmap
-from PyQt6.QtWidgets import (
+from ui.ui_loader import load_ui
+from PySide6.QtCore import QUrl, Qt, QSize
+from PySide6.QtGui import QDesktopServices, QIcon, QPixmap
+from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QDialog,
@@ -252,7 +252,7 @@ class AugmentationPage(QDialog):
 
     def _setup_ui(self) -> None:
         """Load the Qt Designer form and bind it to the AutoAugment behavior."""
-        uic.loadUi(str(AUTOAUGMENT_UI_PATH), self)
+        load_ui(AUTOAUGMENT_UI_PATH, self)
         self._bind_designer_widgets()
         return
 

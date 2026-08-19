@@ -7,10 +7,10 @@ from dataclasses import replace
 import numpy as np
 from pathlib import Path
 
-from PyQt6 import uic
-from PyQt6.QtCore import QEvent, QRect, QRectF, QSettings, Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QAction, QActionGroup, QColor, QIcon, QImage, QKeySequence, QPainter, QPainterPath, QPixmap, QShortcut
-from PyQt6.QtWidgets import (
+from ui.ui_loader import load_ui
+from PySide6.QtCore import QEvent, QRect, QRectF, QSettings, Qt, QTimer, Signal
+from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QImage, QKeySequence, QPainter, QPainterPath, QPixmap, QShortcut
+from PySide6.QtWidgets import (
     QApplication,
     QDialog,
     QFileDialog,
@@ -96,9 +96,9 @@ PROJECT_FILTER = f"{APP_NAME} Project (*{PROJECT_MANIFEST});;JSON Files (*.json)
 class MainWindow(QMainWindow):
     """Main application window for Dataset Editor."""
 
-    task_requested = pyqtSignal(str, str, object)
-    task_cancel_requested = pyqtSignal(str)
-    shutdown_requested = pyqtSignal(int)
+    task_requested = Signal(str, str, object)
+    task_cancel_requested = Signal(str)
+    shutdown_requested = Signal(int)
 
     MAPSET_ROLE = int(Qt.ItemDataRole.UserRole) + 100
     PATH_ROLE = int(Qt.ItemDataRole.UserRole) + 101
@@ -271,7 +271,7 @@ class MainWindow(QMainWindow):
         self.tool_manager.set_selection_combine_mode(normalized)
 
     def _load_ui(self) -> None:
-        uic.loadUi(str(UI_PATH), self)
+        load_ui(UI_PATH, self)
         self.setWindowTitle(APP_NAME)
 
     def _setup_theme_actions(self) -> None:
