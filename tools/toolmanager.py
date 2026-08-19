@@ -76,8 +76,15 @@ class ToolMode(str, Enum):
             raise ValueError(f"Unknown tool mode: {value}") from exc
 
 
-class ToolController:
-    """Translate Qt canvas events into tool state changes and UI updates."""
+class ToolManager:
+    """Single canvas tool router and image-coordinate owner.
+
+    Flow:
+    1. MainWindow/UiSetup activates a ToolMode or updates tool options.
+    2. ImageCanvas forwards Qt mouse/drop events here.
+    3. The active pure tool calculates geometry/state.
+    4. ToolManager applies the result to canvas or asks MainWindow to commit data.
+    """
 
     SELECTION_MODES = frozenset({ToolMode.RECT, ToolMode.POLYGON, ToolMode.LASSO})
     PAINT_MODES = frozenset({ToolMode.BRUSH, ToolMode.ERASER})
@@ -99,9 +106,10 @@ class ToolController:
             ToolMode.PATCH: PatchTool(),
             ToolMode.BBOX: BBoxTool(),
         }
-        self.canvas.set_tool_controller(self)
+        self.canvas.set_tool_manager(self)
         self.canvas.image_changed.connect(self.refresh_patch_preview)
 
+    # UI-visible state queried by ImageCanvas and UiSetup.
 
     @property
     def patch_state(self) -> PatchState:
@@ -133,6 +141,9 @@ class ToolController:
 
     def has_patch_preview(self) -> bool:
         return self.tool(ToolMode.PATCH).paste_preview()
+
+    # Commands called by UiSetup/MainWindow. These update pure tool state first,
+    # then refresh canvas/UI feedback from that state.
 
     def set_selection_combine_mode(self, mode: str) -> None:
         for tool_mode in (ToolMode.RECT, ToolMode.POLYGON, ToolMode.LASSO):
@@ -166,7 +177,7 @@ class ToolController:
                 changed = True
 
         self._activate_current_mode()
-        self.canvas.set_tool_controller(self)
+        self.canvas.set_tool_manager(self)
         if mode is not None and changed and self.mode_changed is not None:
             self.mode_changed(self.current_mode)
 
@@ -295,7 +306,22 @@ class ToolController:
     ) -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray, int, int]]:
         return self.tool(ToolMode.PATCH).mapset_composition_inputs(target_images)
 
+    # Canvas event flow. ImageCanvas forwards Qt mouse events here; each branch
+    # converts widget coordinates once, calls the active tool, then applies the
+    # result to canvas/window immediately.
+
+    def image_pos(self, widget_pos) -> QPointF:
+        return QPointF(
+            (widget_pos.x() - self.canvas.pan_offset.x()) / max(self.canvas.zoom, 1e-6),
+            (widget_pos.y() - self.canvas.pan_offset.y()) / max(self.canvas.zoom, 1e-6),
+        )
+
     def mouse_press_event(self, event) -> None:
+        self._update_cursor_position(event)
+        if event.button() == Qt.MouseButton.MiddleButton:
+            self.canvas.begin_pan(event.position())
+            event.accept()
+            return
         if self.current_mode == ToolMode.MOVE:
             self._press_navigation(event)
         elif self.current_mode == ToolMode.RECT:
@@ -316,6 +342,11 @@ class ToolController:
             self._press_bbox(event)
 
     def mouse_move_event(self, event) -> None:
+        self._update_cursor_position(event)
+        if self.canvas.is_panning:
+            self.canvas.update_pan(event.position())
+            event.accept()
+            return
         if self.current_mode == ToolMode.MOVE:
             self._move_navigation(event)
         elif self.current_mode == ToolMode.RECT:
@@ -332,6 +363,12 @@ class ToolController:
             self._move_bbox(event)
 
     def mouse_release_event(self, event) -> None:
+        self._update_cursor_position(event)
+        if self.canvas.is_panning and event.button() == Qt.MouseButton.MiddleButton:
+            self.canvas.end_pan()
+            self.activate()
+            event.accept()
+            return
         if self.current_mode == ToolMode.MOVE:
             self._release_navigation(event)
         elif self.current_mode == ToolMode.RECT:
@@ -351,6 +388,20 @@ class ToolController:
         if self.current_mode == ToolMode.POLYGON:
             self.finish_polygon_selection()
             event.accept()
+
+    def wheel_event(self, event) -> bool:
+        delta = event.angleDelta().y()
+        if not delta:
+            return False
+        self.canvas.zoom_by(1.2 if delta > 0 else 1 / 1.2, event.position())
+        event.accept()
+        return True
+
+    def dropped_patch_position(self, event) -> QPointF:
+        return self.image_pos(event.position())
+
+    # Mode enter/exit. Keep cursor and temporary tool state consistent whenever
+    # UiSetup changes modes or panning re-applies the current mode.
 
     def _activate_current_mode(self) -> None:
         if self.current_mode == ToolMode.MOVE:
@@ -379,6 +430,8 @@ class ToolController:
         elif self.current_mode == ToolMode.BBOX:
             self.tool(ToolMode.BBOX).reset()
 
+    # Navigation events.
+
     def _press_navigation(self, event) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
             self.canvas.begin_pan(event.position())
@@ -394,6 +447,8 @@ class ToolController:
             self.canvas.end_pan()
             self.canvas.setCursor(Qt.CursorShape.OpenHandCursor)
             event.accept()
+
+    # Selection events.
 
     def _press_rect(self, event) -> None:
         if event.button() != Qt.MouseButton.LeftButton:
@@ -497,6 +552,8 @@ class ToolController:
     def _release_lasso(self, event) -> None:
         self._set_selection_path(self.tool(ToolMode.LASSO).finish_lasso(self._image_point(event)))
 
+    # Paint and healing events.
+
     def _press_paint(self, event) -> None:
         if event.button() != Qt.MouseButton.LeftButton or self.canvas.pixmap.isNull():
             return
@@ -565,6 +622,8 @@ class ToolController:
         self._commit_healing_strokes(finish.strokes, self.tool(ToolMode.HEALING_BRUSH).options)
         event.accept()
 
+    # Fill, patch placement, and bbox label events.
+
     def _press_fill(self, event) -> None:
         if event.button() != Qt.MouseButton.LeftButton:
             return
@@ -620,6 +679,8 @@ class ToolController:
             return
         self._apply_bbox_preview(preview)
         self.window.show_label_manager()
+
+    # Canvas mutation and MainWindow commit helpers.
 
     def _paint_segment_on_canvas(self, segment: PaintStroke, options: PaintOptions) -> None:
         pixmap = QPixmap(self.canvas.pixmap)
@@ -696,6 +757,8 @@ class ToolController:
         self.canvas._push_undo()
         self.canvas._redo.clear()
 
+    # Small geometry/state helpers.
+
     def _set_selection_path(self, path: QPainterPath | None) -> None:
         if path is not None:
             self.canvas.set_selection(path)
@@ -764,7 +827,10 @@ class ToolController:
             self.canvas.clear_selection()
 
     def _image_point(self, event):
-        return self.canvas.to_image_pos(event.position())
+        return self.image_pos(event.position())
+
+    def _update_cursor_position(self, event) -> None:
+        self.canvas.set_tool_cursor_pos(self._image_point(event))
 
     def _image_rect(self) -> QRectF:
         return QRectF(self.canvas.pixmap.rect()) if not self.canvas.pixmap.isNull() else QRectF()

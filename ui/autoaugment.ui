@@ -441,7 +441,7 @@
             <item>
              <widget class="QLineEdit" name="defect_pool_path_edit">
               <property name="text">
-               <string>C:\Users\tnsmi\Desktop</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -472,7 +472,7 @@
             <item>
              <widget class="QLineEdit" name="output_path_edit">
               <property name="text">
-               <string>C:\Users\tnsmi\Desktop</string>
+               <string/>
               </property>
              </widget>
             </item>

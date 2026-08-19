@@ -56,7 +56,14 @@ class PatchPreview:
 
 
 class PatchTool:
-    """Calculate transformed patch placement state."""
+    """Own temporary patch placement state for ToolManager.
+
+    Flow:
+    1. Load a selection copy or clipboard clip.
+    2. Drag/rotate/update transform values.
+    3. Build a preview for ImageCanvas.
+    4. Build MapSet composition inputs for MainWindow/worker.
+    """
 
     def __init__(self):
         self.state = PatchState()
@@ -72,14 +79,6 @@ class PatchTool:
     @property
     def has_active_placement(self) -> bool:
         return self.state.placement_active and self.state.patch is not None
-
-    @property
-    def is_moving_patch(self) -> bool:
-        return self._move_drag_active
-
-    @property
-    def is_rotating_patch(self) -> bool:
-        return self._rotation_drag_active
 
     def set_target_size(self, width: int, height: int) -> None:
         if width <= 0 or height <= 0:
@@ -129,6 +128,8 @@ class PatchTool:
 
     def end_rotation_drag(self) -> None:
         self._rotation_drag_active = False
+
+    # Patch loading.
 
     def load_selection_patch(
         self,
@@ -206,26 +207,6 @@ class PatchTool:
         self._restore_patch_center(center)
         return True
 
-    def begin_placement(
-        self,
-        target_size: tuple[int, int],
-        x_pos: int | None = None,
-        y_pos: int | None = None,
-    ) -> bool:
-        """Activate placement for a loaded patch without changing clipboard ownership."""
-        if self.state.patch is None or self.state.mask is None:
-            return False
-        self.set_target_size(*target_size)
-        if self._target_size is None:
-            return False
-        self.state.placement_active = True
-        if x_pos is not None:
-            self.state.x_pos = int(x_pos)
-        if y_pos is not None:
-            self.state.y_pos = int(y_pos)
-        self._normalize_position()
-        return True
-
     def clear_active_patch(self) -> None:
         """End placement and discard only the tool copy, not the clipboard model clip."""
         self._move_drag_active = False
@@ -233,6 +214,8 @@ class PatchTool:
         self._rotation_drag_active = False
         self._active_clip = None
         self.state = PatchState()
+
+    # Preview and worker payloads.
 
     def transformed_patch(self) -> tuple[np.ndarray, np.ndarray]:
         """Return the patch and mask after the current scale and rotation."""
@@ -258,28 +241,16 @@ class PatchTool:
         self.state.x_pos, self.state.y_pos = x_pos, y_pos
         return PatchPreview(patch=patch, mask=mask, x_pos=x_pos, y_pos=y_pos)
 
-    def composition_inputs(
-        self,
-        target: np.ndarray,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, int, int]:
-        """Create owned arrays and a placement safe for background composition."""
-        if not self.state.placement_active:
-            raise ValueError("Drag a clipboard patch onto the target image first")
-        if target is None or target.size == 0:
-            raise ValueError("Target image is empty")
-        patch, mask = self.transformed_patch()
-        if patch.shape[1] > target.shape[1] or patch.shape[0] > target.shape[0]:
-            raise ValueError("Transformed patch is larger than the target image")
-        x_pos, y_pos = self._clamped_position(patch.shape[1], patch.shape[0], (target.shape[1], target.shape[0]))
-        return target.copy(), patch.copy(), mask.copy(), x_pos, y_pos
-
     def mapset_composition_inputs(
         self,
         target_images: dict[str, np.ndarray],
     ) -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray, int, int]]:
-        """Build aligned transformed inputs for every corresponding target map."""
+        """Build worker inputs from the exact placement currently shown in preview."""
         if not self.state.placement_active or self._active_clip is None:
             raise ValueError("Drag a MapSet patch onto the target first")
+        preview = self.preview_payload()
+        if preview is None:
+            raise ValueError("Patch preview is not valid for the current target image")
         source_maps = self._active_clip.map_images
         target_keys = tuple(target_images)
         missing = [key for key in target_keys if key not in source_maps]
@@ -302,18 +273,20 @@ class PatchTool:
                 self.state.angle,
                 self._active_clip.mask,
             )
+            if patch.shape[:2] != preview.patch.shape[:2] or mask.shape[:2] != preview.mask.shape[:2]:
+                raise ValueError("MapSet patch transforms do not share one preview size")
             if patch.shape[1] > target.shape[1] or patch.shape[0] > target.shape[0]:
                 raise ValueError(f"Transformed patch is larger than target map: {map_key}")
-            x_pos = max(0, min(self.state.x_pos, target.shape[1] - patch.shape[1]))
-            y_pos = max(0, min(self.state.y_pos, target.shape[0] - patch.shape[0]))
             result[map_key] = (
                 target.copy(),
                 patch.copy(),
                 mask.copy(),
-                int(x_pos),
-                int(y_pos),
+                int(preview.x_pos),
+                int(preview.y_pos),
             )
         return result
+
+    # Transform controls.
 
     def rotate(self, degrees: float) -> bool:
         return self.set_rotation(self.state.angle + degrees)
@@ -355,6 +328,8 @@ class PatchTool:
         self.state.scale = max(0.1, min(10.0, float(scale)))
         self._restore_patch_center(center)
         return True
+
+    # Internal geometry helpers.
 
     def _patch_center(self) -> tuple[float, float]:
         patch, _ = self.transformed_patch()

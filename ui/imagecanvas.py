@@ -47,7 +47,7 @@ class ImageCanvas(QWidget):
         self.pixmap = QPixmap()
         self.zoom = 1.0
         self.pan_offset = QPointF(0.0, 0.0)
-        self.tool_controller = None
+        self.tool_manager = None
         self.selection_path = QPainterPath()
         self.annotations: list[CanvasAnnotation] = []
         self.labels_visible = True
@@ -154,6 +154,14 @@ class ImageCanvas(QWidget):
     def end_pan(self) -> None:
         self._pan_active = False
         self.unsetCursor()
+
+    @property
+    def is_panning(self) -> bool:
+        return self._pan_active
+
+    def set_tool_cursor_pos(self, image_pos: QPointF | None) -> None:
+        self._tool_cursor_pos = QPointF(image_pos) if image_pos is not None else None
+        self.update()
 
     def _emit_view_changed(self) -> None:
         zoom, x_ratio, y_ratio = self.view_state()
@@ -448,7 +456,7 @@ class ImageCanvas(QWidget):
             painter.fillPath(self.selection_path, QColor(37, 99, 235, 35))
             painter.setPen(QPen(QColor("white"), max(1.0 / self.zoom, 0.5), Qt.PenStyle.DashLine))
             painter.drawPath(self.selection_path)
-            if self.tool_controller is not None and self.tool_controller.show_selection_handles:
+            if self.tool_manager is not None and self.tool_manager.show_selection_handles:
                 self._draw_selection_handles(painter)
         pen = QPen(QColor("#ff4040"), max(2.0 / self.zoom, 1.0))
         painter.setPen(pen)
@@ -477,19 +485,19 @@ class ImageCanvas(QWidget):
         painter.restore()
 
     def draw_tool_cursor(self, painter: QPainter) -> None:
-        if self.tool_controller is None or not self.tool_controller.show_cursor_circle:
+        if self.tool_manager is None or not self.tool_manager.show_cursor_circle:
             return
         if self._tool_cursor_pos is None or self.pixmap.isNull():
             return
         if not QRectF(self.pixmap.rect()).contains(self._tool_cursor_pos):
             return
-        radius = float(self.tool_controller.cursor_radius)
+        radius = float(self.tool_manager.cursor_radius)
         if radius <= 0:
             return
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         dark_pen = QPen(QColor(0, 0, 0, 180), max(2.0 / self.zoom, 0.8))
         light_pen = QPen(QColor(255, 255, 255, 230), max(1.0 / self.zoom, 0.5))
-        source_anchor = self.tool_controller.healing_source_anchor
+        source_anchor = self.tool_manager.healing_source_anchor
         if source_anchor is not None and QRectF(self.pixmap.rect()).contains(source_anchor):
             source_pen = QPen(
                 QColor(34, 211, 238, 240),
@@ -516,43 +524,21 @@ class ImageCanvas(QWidget):
         )
 
     def mousePressEvent(self, event):
-        self._tool_cursor_pos = self.to_image_pos(event.position())
-        self.update()
-        if event.button() == Qt.MouseButton.MiddleButton:
-            self.begin_pan(event.position())
-            event.accept()
-            return
-        if self.tool_controller is not None:
-            self._run_tool_event("mouse_press_event", self.tool_controller.mouse_press_event, event)
+        if self.tool_manager is not None:
+            self._run_tool_event("mouse_press_event", self.tool_manager.mouse_press_event, event)
 
     def mouseMoveEvent(self, event):
-        self._tool_cursor_pos = self.to_image_pos(event.position())
-        self.update()
-        if self._pan_active:
-            self.update_pan(event.position())
-            event.accept()
-            return
-        if self.tool_controller is not None:
-            self._run_tool_event("mouse_move_event", self.tool_controller.mouse_move_event, event)
+        if self.tool_manager is not None:
+            self._run_tool_event("mouse_move_event", self.tool_manager.mouse_move_event, event)
 
     def mouseReleaseEvent(self, event):
-        self._tool_cursor_pos = self.to_image_pos(event.position())
-        self.update()
-        if self._pan_active and event.button() == Qt.MouseButton.MiddleButton:
-            self.end_pan()
-            if self.tool_controller is not None:
-                self.tool_controller.activate()
-            event.accept()
-            return
-        if self.tool_controller is not None:
-            self._run_tool_event("mouse_release_event", self.tool_controller.mouse_release_event, event)
+        if self.tool_manager is not None:
+            self._run_tool_event("mouse_release_event", self.tool_manager.mouse_release_event, event)
 
     def wheelEvent(self, event):
-        delta = event.angleDelta().y()
-        if delta:
-            self.zoom_by(1.2 if delta > 0 else 1 / 1.2, event.position())
-            event.accept()
-            return
+        if self.tool_manager is not None:
+            if self._run_tool_event("wheel_event", self.tool_manager.wheel_event, event):
+                return
         super().wheelEvent(event)
 
     def leaveEvent(self, event):
@@ -581,27 +567,29 @@ class ImageCanvas(QWidget):
         except (UnicodeDecodeError, ValueError):
             event.ignore()
             return
-        self.patch_dropped.emit(clip_id, self.to_image_pos(event.position()))
+        position = self.tool_manager.dropped_patch_position(event) if self.tool_manager is not None else self.to_image_pos(event.position())
+        self.patch_dropped.emit(clip_id, position)
         event.acceptProposedAction()
 
     def mouseDoubleClickEvent(self, event):
-        if self.tool_controller is not None:
+        if self.tool_manager is not None:
             self._run_tool_event(
                 "mouse_double_click_event",
-                self.tool_controller.mouse_double_click_event,
+                self.tool_manager.mouse_double_click_event,
                 event,
             )
 
-    def _run_tool_event(self, event_name: str, handler, event) -> None:
+    def _run_tool_event(self, event_name: str, handler, event):
         """Keep recoverable tool failures from terminating the entire Qt process."""
         try:
-            handler(event)
+            return handler(event)
         except Exception as exc:  # Qt event-handler boundary.
             get_logger().exception("Canvas tool event failed: %s", event_name)
             self.tool_error.emit(str(exc))
+        return None
 
-    def set_tool_controller(self, controller) -> None:
-        self.tool_controller = controller
+    def set_tool_manager(self, controller) -> None:
+        self.tool_manager = controller
 
     def fit_to_window(self) -> None:
         if self.pixmap.isNull() or self.width() <= 0 or self.height() <= 0:

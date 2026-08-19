@@ -13,15 +13,14 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from service.yolo_export_service import YoloExportApi, YoloExportOptions
+from service.yolo_export_service import YoloExportOptions
 
 
 class ExportDialog(QDialog):
     """Popup dialog for YOLO dataset export."""
 
-    def __init__(self, export_api: YoloExportApi, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.export_api = export_api
         self.output_root_edit = QLineEdit(self)
         self.class_names_edit = QLineEdit(self._default_class_names(), self)
         self._setup_ui()

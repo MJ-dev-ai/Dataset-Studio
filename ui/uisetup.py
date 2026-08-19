@@ -19,7 +19,7 @@ from PyQt6.QtWidgets import (
 
 from config.settings import DEFAULT_THEME
 from service.editing_service import clone_mode_from_text
-from ui.tool_controller import ToolMode
+from tools.toolmanager import ToolMode
 from ui.themes import theme_colors
 
 
@@ -55,7 +55,7 @@ class UiSetup:
         }
 
     def setup(self) -> None:
-        self.window.tool_controller.mode_changed = self.update_tool_ui
+        self.window.tool_manager.mode_changed = self.update_tool_ui
         self._setup_action_texts()
         self._setup_file_menu()
         self._setup_edit_menu()
@@ -114,7 +114,7 @@ class UiSetup:
             )
             layout.insertWidget(max(0, layout.count() - 1), self.window.buttonSavePoissonMapSet)
 
-        self.window.tool_controller.patch_state_changed = self._sync_manual_poisson_controls
+        self.window.tool_manager.patch_state_changed = self._sync_manual_poisson_controls
 
         spin_x = getattr(self.window, "spin_paste_x", None)
         spin_y = getattr(self.window, "spin_paste_y", None)
@@ -122,23 +122,23 @@ class UiSetup:
         scale = getattr(self.window, "double_paste_scale", None)
         if spin_x is not None:
             spin_x.valueChanged.connect(
-                lambda value: self.window.tool_controller.set_patch_position(
+                lambda value: self.window.tool_manager.set_patch_position(
                     value,
-                    self.window.tool_controller.patch_state.y_pos,
+                    self.window.tool_manager.patch_state.y_pos,
                 )
             )
         if spin_y is not None:
             spin_y.valueChanged.connect(
-                lambda value: self.window.tool_controller.set_patch_position(
-                    self.window.tool_controller.patch_state.x_pos,
+                lambda value: self.window.tool_manager.set_patch_position(
+                    self.window.tool_manager.patch_state.x_pos,
                     value,
                 )
             )
         if rotation is not None:
-            rotation.valueChanged.connect(self.window.tool_controller.set_patch_rotation)
+            rotation.valueChanged.connect(self.window.tool_manager.set_patch_rotation)
         if scale is not None:
-            scale.valueChanged.connect(self.window.tool_controller.set_patch_scale)
-        self._sync_manual_poisson_controls(self.window.tool_controller.patch_state)
+            scale.valueChanged.connect(self.window.tool_manager.set_patch_scale)
+        self._sync_manual_poisson_controls(self.window.tool_manager.patch_state)
 
     def _sync_manual_poisson_controls(self, state) -> None:
         """Reflect PatchTool state without feeding values back through Qt signals."""
@@ -197,7 +197,7 @@ class UiSetup:
             if widget is not None:
                 widget.setEnabled(not running)
         if not running:
-            self._sync_manual_poisson_controls(self.window.tool_controller.patch_state)
+            self._sync_manual_poisson_controls(self.window.tool_manager.patch_state)
 
 
 
@@ -875,7 +875,7 @@ class UiSetup:
             self._set_brush_opacity(opacity_spin.value())
         size_spin = getattr(self.window, "spinOptionsBrushSize", None)
         if size_spin is not None:
-            self.window.tool_controller.set_paint_size(size_spin.value())
+            self.window.tool_manager.set_paint_size(size_spin.value())
 
     def _setup_top_selection_options(self) -> None:
         layout = getattr(self.window, "layoutOptionsSelect", None)
@@ -1188,13 +1188,13 @@ class UiSetup:
         self._connect_button("button_brush_color", self._choose_brush_color)
         spin = getattr(self.window, "spinOptionsBrushSize", None)
         if spin is not None:
-            spin.valueChanged.connect(self.window.tool_controller.set_paint_size)
+            spin.valueChanged.connect(self.window.tool_manager.set_paint_size)
 
     def _finish_polygon(self) -> None:
-        if self.window.tool_controller.current_mode != ToolMode.POLYGON:
+        if self.window.tool_manager.current_mode != ToolMode.POLYGON:
             self.window.set_status("Polygon finish is available in polygon mode")
             return
-        self.window.tool_controller.finish_polygon_selection()
+        self.window.tool_manager.finish_polygon_selection()
 
     def _apply_poisson(self) -> None:
         if not self._require_mode(ToolMode.PATCH, "Poisson blend"):
@@ -1214,7 +1214,7 @@ class UiSetup:
         except (ValueError, RuntimeError) as exc:
             self.window.set_status(f"Poisson failed: {exc}")
             return
-        if not applied and not self.window.tool_controller.has_patch_preview():
+        if not applied and not self.window.tool_manager.has_patch_preview():
             self.window.set_status("Copy a selection first")
 
     def _apply_hard_paste(self) -> None:
@@ -1225,32 +1225,32 @@ class UiSetup:
         except (ValueError, RuntimeError) as exc:
             self.window.set_status(f"Patch failed: {exc}")
             return
-        if not applied and not self.window.tool_controller.has_patch_preview():
+        if not applied and not self.window.tool_manager.has_patch_preview():
             self.window.set_status("Copy a selection first")
 
     def _patch_transform(self, operation: str, value: float) -> None:
         if not self._require_mode(ToolMode.PATCH, "Patch transform"):
             return
-        if not self.window.tool_controller.has_patch_preview():
+        if not self.window.tool_manager.has_patch_preview():
             self.window.set_status("Paste a patch before transforming it")
             return
         if operation == "reset":
-            self.window.tool_controller.reset_patch_transform()
+            self.window.tool_manager.reset_patch_transform()
         elif operation == "rotate":
-            self.window.tool_controller.rotate_patch(value)
+            self.window.tool_manager.rotate_patch(value)
         elif operation == "scale":
-            self.window.tool_controller.scale_patch(value)
+            self.window.tool_manager.scale_patch(value)
 
     def _copy_for_current_mode(self) -> None:
-        if self.window.tool_controller.current_mode == ToolMode.PATCH:
+        if self.window.tool_manager.current_mode == ToolMode.PATCH:
             self.window.set_status("Switch to a selection mode before copying a patch")
             return
         self.window.copy_selection_to_patch()
 
     def _delete_for_current_mode(self) -> None:
-        if self.window.tool_controller.current_mode == ToolMode.PATCH:
-            if self.window.tool_controller.has_patch_preview():
-                self.window.tool_controller.cancel_current_tool(
+        if self.window.tool_manager.current_mode == ToolMode.PATCH:
+            if self.window.tool_manager.has_patch_preview():
+                self.window.tool_manager.cancel_current_tool(
                     clear_canvas=False,
                     fallback_mode=ToolMode.MOVE,
                 )
@@ -1259,20 +1259,20 @@ class UiSetup:
         self.window.delete_active_selection()
 
     def _require_mode(self, mode: ToolMode, command_name: str) -> bool:
-        if self.window.tool_controller.current_mode == mode:
+        if self.window.tool_manager.current_mode == mode:
             return True
         self.window.set_status(f"{command_name} is available in {mode.value} mode")
         return False
 
     def _set_brush_opacity(self, value: int) -> None:
-        self.window.tool_controller.set_paint_opacity(float(value) / 100.0)
+        self.window.tool_manager.set_paint_opacity(float(value) / 100.0)
 
     def _choose_brush_color(self) -> None:
-        current = self.window.tool_controller.brush_color()
+        current = self.window.tool_manager.brush_color()
         color = QColorDialog.getColor(current, self.window, "Brush Color")
         if not color.isValid():
             return
-        self.window.tool_controller.set_brush_color(color)
+        self.window.tool_manager.set_brush_color(color)
         text = color.name().upper()
         for name in ("buttonOptionsBrushColor", "button_brush_color"):
             button = getattr(self.window, name, None)
@@ -1282,7 +1282,7 @@ class UiSetup:
 
     def activate_tool(self, mode: ToolMode | str) -> None:
         tool_mode = ToolMode.from_value(mode)
-        self.window.tool_controller.activate(tool_mode)
+        self.window.tool_manager.activate(tool_mode)
         self.window.set_status(f"Tool: {tool_mode.value}")
 
     def update_tool_ui(self, mode: ToolMode | str) -> None:
@@ -1332,8 +1332,8 @@ class UiSetup:
                 action.setChecked(mapped_tool == tool_mode)
 
     def _update_patch_action_availability(self) -> None:
-        patch_mode = self.window.tool_controller.current_mode == ToolMode.PATCH
-        ready = patch_mode and self.window.tool_controller.has_patch_preview()
+        patch_mode = self.window.tool_manager.current_mode == ToolMode.PATCH
+        ready = patch_mode and self.window.tool_manager.has_patch_preview()
         for action_name in (
             "action_rotate_left",
             "action_rotate_right",

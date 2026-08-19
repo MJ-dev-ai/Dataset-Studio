@@ -18,78 +18,51 @@ class PreprocessOptions:
 	brightness_shift: int = 0
 	contrast_shift: int = 0
 
-class PreprocessApi:
-	"""Preprocessing functions exposed to UI and workers."""
-
-	def apply_options(self, image: np.ndarray, options: PreprocessOptions | dict) -> tuple[np.ndarray, np.ndarray]:
-		"""Apply resize, flip, rotation, and brightness while returning the label affine matrix."""
-		config = _coerce_options(options)
-		if image is None:
-			raise ValueError("Preprocessing input image is None.")
-		result = np.ascontiguousarray(image)
-		if result.ndim not in {2, 3}:
-			raise ValueError(f"Unsupported image shape: {result.shape}")
-		if result.dtype != np.uint8:
-			result = to_uint8(result)
-
-		source_height, source_width = result.shape[:2]
-		matrix = np.eye(3, dtype=np.float32)
-		current_width, current_height = source_width, source_height
-
-		if config.resize_enabled:
-			target_width = max(1, int(config.width))
-			target_height = max(1, int(config.height))
-			result = cv2.resize(result, (target_width, target_height), interpolation=cv2.INTER_AREA)
-			scale = np.array(
-				[
-					[target_width / max(1.0, float(current_width)), 0.0, 0.0],
-					[0.0, target_height / max(1.0, float(current_height)), 0.0],
-					[0.0, 0.0, 1.0],
-				],
-				dtype=np.float32,
-			)
-			matrix = scale @ matrix
-			current_width, current_height = target_width, target_height
-
-		if config.flip_horizontal or config.flip_vertical:
-			flip_code = -1 if config.flip_horizontal and config.flip_vertical else 1 if config.flip_horizontal else 0
-			result = cv2.flip(result, flip_code)
-			flip = np.eye(3, dtype=np.float32)
-			if config.flip_horizontal:
-				flip[0, 0] = -1.0
-				flip[0, 2] = float(current_width)
-			if config.flip_vertical:
-				flip[1, 1] = -1.0
-				flip[1, 2] = float(current_height)
-			matrix = flip @ matrix
-
-		brightness = int(config.brightness_shift)
-		contrast = int(config.contrast_shift)
-		if brightness or contrast:
-			alpha = 1.0 + float(contrast) / 100.0
-			result = np.clip(
-				result.astype(np.float32) * alpha + float(brightness),
-				0,
-				255,
-			).astype(np.uint8)
-
-		angle = float(config.rotation_degrees)
-		if abs(angle) > 1e-6:
-			center = ((current_width - 1) * 0.5, (current_height - 1) * 0.5)
-			rotation_2x3 = cv2.getRotationMatrix2D(center, angle, 1.0).astype(np.float32)
-			result = cv2.warpAffine(
-				result,
-				rotation_2x3,
-				(current_width, current_height),
-				flags=cv2.INTER_LINEAR,
-				borderMode=cv2.BORDER_CONSTANT,
-				borderValue=0,
-			)
-			rotation = np.eye(3, dtype=np.float32)
-			rotation[:2, :] = rotation_2x3
-			matrix = rotation @ matrix
-
-		return np.ascontiguousarray(result), matrix
+def apply_options(image: np.ndarray, options: PreprocessOptions | dict) -> tuple[np.ndarray, np.ndarray]:
+	"""Apply resize, flip, rotation, and brightness while returning the label affine matrix."""
+	config = _coerce_options(options)
+	if image is None:
+		raise ValueError("Preprocessing input image is None.")
+	result = np.ascontiguousarray(image)
+	if result.ndim not in {2, 3}:
+		raise ValueError(f"Unsupported image shape: {result.shape}")
+	if result.dtype != np.uint8:
+		result = to_uint8(result)
+	source_height, source_width = result.shape[:2]
+	matrix = np.eye(3, dtype=np.float32)
+	current_width, current_height = source_width, source_height
+	if config.resize_enabled:
+		target_width = max(1, int(config.width))
+		target_height = max(1, int(config.height))
+		result = cv2.resize(result, (target_width, target_height), interpolation=cv2.INTER_AREA)
+		scale = np.array([[target_width / max(1.0, float(current_width)), 0.0, 0.0], [0.0, target_height / max(1.0, float(current_height)), 0.0], [0.0, 0.0, 1.0]], dtype=np.float32)
+		matrix = scale @ matrix
+		current_width, current_height = target_width, target_height
+	if config.flip_horizontal or config.flip_vertical:
+		flip_code = -1 if config.flip_horizontal and config.flip_vertical else 1 if config.flip_horizontal else 0
+		result = cv2.flip(result, flip_code)
+		flip = np.eye(3, dtype=np.float32)
+		if config.flip_horizontal:
+			flip[0, 0] = -1.0
+			flip[0, 2] = float(current_width)
+		if config.flip_vertical:
+			flip[1, 1] = -1.0
+			flip[1, 2] = float(current_height)
+		matrix = flip @ matrix
+	brightness = int(config.brightness_shift)
+	contrast = int(config.contrast_shift)
+	if brightness or contrast:
+		alpha = 1.0 + float(contrast) / 100.0
+		result = np.clip(result.astype(np.float32) * alpha + float(brightness), 0, 255).astype(np.uint8)
+	angle = float(config.rotation_degrees)
+	if abs(angle) > 1e-6:
+		center = ((current_width - 1) * 0.5, (current_height - 1) * 0.5)
+		rotation_2x3 = cv2.getRotationMatrix2D(center, angle, 1.0).astype(np.float32)
+		result = cv2.warpAffine(result, rotation_2x3, (current_width, current_height), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+		rotation = np.eye(3, dtype=np.float32)
+		rotation[:2, :] = rotation_2x3
+		matrix = rotation @ matrix
+	return np.ascontiguousarray(result), matrix
 
 def _coerce_options(options: PreprocessOptions | dict) -> PreprocessOptions:
 	if isinstance(options, PreprocessOptions):

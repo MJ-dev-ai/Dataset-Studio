@@ -214,11 +214,13 @@ dataset_studio/
 ├─ assets/
 │  └─ icons/
 ├─ training/
-│  ├─ config/
-│  ├─ notebooks/
-│  ├─ scripts/
-│  ├─ weights/
-│  └─ workspace/
+│  ├─ yolo_train_config.py
+│  ├─ yolo_dataset_tools.py
+│  ├─ visualize_result_test.py
+│  ├─ *_pipeline*.ipynb
+│  ├─ yolov8n.pt
+│  ├─ requirements.txt
+│  └─ yolo_workspace/
 ├─ runtime/logs/
 │  └─ .gitkeep
 └─ runtime/outputs/results/
@@ -270,7 +272,6 @@ self.yolo_export_api.export_dataset(...)
 OS: Windows 10/11
 Python: 3.11
 GUI: PyQt6
-Deep Learning: PyTorch CUDA 11.8
 ```
 
 가상환경 생성:
@@ -299,24 +300,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
----
-
-## CUDA 확인
-
-PyTorch CUDA가 정상적으로 설치되었는지 확인합니다.
-
-```powershell
-python -c "import torch; print('torch:', torch.__version__); print('cuda:', torch.version.cuda); print('available:', torch.cuda.is_available()); print('device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
-```
-
-정상 예시:
-
-```text
-torch: 2.x.x+cu118
-cuda: 11.8
-available: True
-device: NVIDIA ...
-```
+YOLO 학습 파이프라인은 현재 앱 범위에서 제외되어 `training/` 아래에 분리되어 있습니다. 학습 노트북이나 결과 확인 스크립트를 실행할 때만 `training/requirements.txt`와 별도 PyTorch 설치를 사용합니다.
 
 ---
 
@@ -400,7 +384,6 @@ Dataset Load
 → Preprocessing
 → Auto Augmentation
 → YOLO Dataset Export
-→ Model Training
 ```
 
 Dataset Editor는 단순한 이미지 뷰어가 아니라, 학습 데이터 제작을 위한 실용적인 Dataset Authoring Tool을 지향합니다.

@@ -11,6 +11,7 @@ from app import DatasetEditorApp
 from config.settings import DEFAULT_THEME, RUNTIME_LOG_DIRECTORY, WORKER_SHUTDOWN_TIMEOUT_MS
 from core.logging_setup import append_crash_report, append_pending_crash, configure_logging, flush_logs
 from ui.themes import theme_stylesheet
+from ui.mainwindow import MainWindow
 
 
 class FatalShutdownController(QObject):
@@ -48,7 +49,8 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setStyleSheet(theme_stylesheet(DEFAULT_THEME))
     logger = configure_logging(RUNTIME_LOG_DIRECTORY)
-    editor = DatasetEditorApp(app, logger)
+    window = MainWindow()
+    editor = DatasetEditorApp(window, logger)
     controller = FatalShutdownController(app, editor, logger)
     sys.excepthook = controller.handle
 
@@ -56,7 +58,7 @@ def main() -> int:
         controller.handle(args.exc_type, args.exc_value, args.exc_traceback)
 
     threading.excepthook = thread_exception
-    editor.window.show()
+    window.show()
     exit_code = app.exec()
     editor.shutdown(timeout_ms=WORKER_SHUTDOWN_TIMEOUT_MS)
     flush_logs(durable=True)

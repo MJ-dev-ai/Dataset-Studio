@@ -1,5 +1,5 @@
 """Application service layer.
 
-Services expose feature APIs and do not own Qt threads. Long-running service
-calls are wrapped by workers from the worker layer.
+Services expose calculation functions and import-time constants only. Qt
+threads, UI state, and worker ownership live outside this package.
 """

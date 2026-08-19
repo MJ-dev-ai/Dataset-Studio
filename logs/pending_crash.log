@@ -1,0 +1,113 @@
+
+[2026-06-24T05:17:19.392177+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1722, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 449, in apply
+    map_sets = self._apply_project_roi_contours_to_mapsets(map_sets, project_payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1648, in _apply_project_roi_contours_to_mapsets
+    valid_keys = set(map_set.map_paths) | {ROI_CONTOUR_KEY}
+                                           ^^^^^^^^^^^^^^^
+NameError: name 'ROI_CONTOUR_KEY' is not defined
+
+[2026-06-24T05:18:05.404390+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1722, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 449, in apply
+    map_sets = self._apply_project_roi_contours_to_mapsets(map_sets, project_payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1648, in _apply_project_roi_contours_to_mapsets
+    valid_keys = set(map_set.map_paths) | {ROI_CONTOUR_KEY}
+                                           ^^^^^^^^^^^^^^^
+NameError: name 'ROI_CONTOUR_KEY' is not defined
+
+[2026-06-24T05:20:05.905241+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1724, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 449, in apply
+    map_sets = self._apply_project_roi_contours_to_mapsets(map_sets, project_payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1650, in _apply_project_roi_contours_to_mapsets
+    valid_keys = set(map_set.map_paths) | {ROI_CONTOUR_KEY}
+                                           ^^^^^^^^^^^^^^^
+NameError: name 'ROI_CONTOUR_KEY' is not defined
+
+[2026-06-24T05:21:36.653825+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1552, in set_current_selection_as_placement_mask
+    self.current_mapset = self._update_mapset_roi_contours(self.current_mapset, ROI_CONTOUR_KEY, contours)
+                                                                                ^^^^^^^^^^^^^^^
+NameError: name 'ROI_CONTOUR_KEY' is not defined
+
+[2026-06-24T09:37:24.236972+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1880, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2070, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T03:28:36.187614+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1880, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2070, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T04:33:39.723680+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1884, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2107, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T05:52:19.577779+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1884, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2107, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T08:17:16.138666+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1901, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2127, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T09:03:25.739008+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1901, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2127, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T09:08:34.649883+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1901, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2127, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-26T01:58:01.152721+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\imagecanvas.py", line 356, in mouseMoveEvent
+    def mouseMoveEvent(self, event):
+    
+KeyboardInterrupt

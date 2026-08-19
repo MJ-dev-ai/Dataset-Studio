@@ -40,8 +40,6 @@ def normalize_selection_combine_mode(value: str) -> SelectionCombineMode:
 class BaseSelectionTool:
     """Shared selection state and geometry helpers."""
 
-    show_selection_handles = False
-
     def __init__(self):
         self.combine_mode: SelectionCombineMode = "replace"
         self._active_combine_mode: SelectionCombineMode = "replace"
@@ -86,8 +84,6 @@ class BaseSelectionTool:
 
 class RectSelectionTool(BaseSelectionTool):
     """Calculate rectangle selection geometry and existing-selection drags."""
-
-    show_selection_handles = True
 
     def __init__(self):
         super().__init__()

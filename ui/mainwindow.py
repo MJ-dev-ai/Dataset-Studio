@@ -42,6 +42,7 @@ from config.settings import (
     TOP_OPTIONS_HEIGHT_RATIO,
     WORKER_SHUTDOWN_TIMEOUT_MS,
 )
+from config.flag import UiFlag
 from core.geometry import HealingStroke
 from service.project_service import safe_defect_name
 from core.mapset import MapSet, ROI_CONTOUR_KEY, discover_map_sets, mapset_from_image_path
@@ -54,8 +55,9 @@ from core.pixmap_cache import PixmapCache
 from core.image_io import read_image
 from core.logging_setup import append_crash_report, get_logger
 from core.project import DatasetProject, PROJECT_MANIFEST
+from service import augmentation_service, labeling_service, preprocessing_service
 from service.labeling_service import move_in_catalog, normalize_catalog, remove_from_catalog, update_catalog
-from ui.tool_controller import ToolController, ToolMode
+from tools.toolmanager import ToolManager, ToolMode
 from tools.selection_tools import normalize_selection_combine_mode
 from service.editing_service import (
     apply_paint_strokes,
@@ -105,9 +107,9 @@ class MainWindow(QMainWindow):
     DATASET_MAP_SPECS = MAP_SPECS
     IMAGE_EXTENSIONS = IMAGE_EXTENSIONS
 
-    def __init__(self, context):
+    def __init__(self):
         super().__init__()
-        self.context = context
+        self.flag = UiFlag()
         self.project = None
         self.current_mapset: MapSet | None = None
         self.current_image_path: Path | None = None
@@ -151,12 +153,12 @@ class MainWindow(QMainWindow):
         self._setup_selection_actions()
         self._setup_log_console()
 
-        self.tool_controller = ToolController(self)
+        self.tool_manager = ToolManager(self)
         self.ui_setup = UiSetup(self)
         self.ui_setup.setup()
         self._setup_transform_properties_panel()
         self._setup_shortcuts()
-        self.tool_controller.activate(ToolMode.MOVE)
+        self.tool_manager.activate(ToolMode.MOVE)
         self.apply_theme(self.current_theme, persist=False)
         self._connect_signals()
         self._queue_panel_ratio_update()
@@ -224,7 +226,7 @@ class MainWindow(QMainWindow):
         self.escape_shortcut.activated.connect(self._activate_move_from_edit_tool)
 
     def _activate_move_from_edit_tool(self) -> None:
-        self.tool_controller.cancel_current_tool(clear_canvas=True, fallback_mode=ToolMode.MOVE)
+        self.tool_manager.cancel_current_tool(clear_canvas=True, fallback_mode=ToolMode.MOVE)
 
     def eventFilter(self, watched, event) -> bool:
         if event.type() == QEvent.Type.KeyPress:
@@ -254,8 +256,8 @@ class MainWindow(QMainWindow):
 
     def clear_active_selection_state(self) -> None:
         """Clear selection geometry and temporary points from the active selection tool."""
-        if hasattr(self, "tool_controller"):
-            self.tool_controller.cancel_current_tool(clear_canvas=True, fallback_mode=None)
+        if hasattr(self, "tool_manager"):
+            self.tool_manager.cancel_current_tool(clear_canvas=True, fallback_mode=None)
         else:
             self.canvas.clear_selection()
         self.canvas.clear_annotation_selection()
@@ -264,9 +266,9 @@ class MainWindow(QMainWindow):
         """Apply the default replace/add/subtract mode to every selection tool."""
         normalized = normalize_selection_combine_mode(mode)
         self._selection_combine_mode = normalized
-        if not hasattr(self, "tool_controller"):
+        if not hasattr(self, "tool_manager"):
             return
-        self.tool_controller.set_selection_combine_mode(normalized)
+        self.tool_manager.set_selection_combine_mode(normalized)
 
     def _load_ui(self) -> None:
         uic.loadUi(str(UI_PATH), self)
@@ -321,7 +323,7 @@ class MainWindow(QMainWindow):
 
     def _setup_pages(self) -> None:
         self.canvas = ImageCanvas(self)
-        self.augmentation_page = AugmentationPage(self.context.augmentation_api, self)
+        self.augmentation_page = AugmentationPage(self)
         self.editor_page = QWidget(self)
         editor_layout = QVBoxLayout(self.editor_page)
         editor_layout.setContentsMargins(0, 0, 0, 0)
@@ -403,7 +405,7 @@ class MainWindow(QMainWindow):
 
     def _on_patch_clipboard_changed(self) -> None:
         """Cancel placement if its backing clipboard clip was removed."""
-        tool = getattr(self, "tool_controller", None)
+        tool = getattr(self, "tool_manager", None)
         if tool is None or not tool.patch_state.clip_id:
             return
         if self.patch_clipboard.get(tool.patch_state.clip_id) is None:
@@ -1294,8 +1296,8 @@ class MainWindow(QMainWindow):
         else:
             self.canvas.set_map_image(pixmap, modified=stored is not None)
             self.canvas.fit_to_window()
-        if hasattr(self, "tool_controller") and self.tool_controller.patch_state.placement_active:
-            self.tool_controller.set_patch_active_map_key(_map_key)
+        if hasattr(self, "tool_manager") and self.tool_manager.patch_state.placement_active:
+            self.tool_manager.set_patch_active_map_key(_map_key)
         self._update_image_property_panel(path, pixmap)
         self.set_status(f"Map: {self.map_switch_tabs.tabText(index)}")
 
@@ -1620,7 +1622,7 @@ class MainWindow(QMainWindow):
             width, height = self.canvas.pixmap.width(), self.canvas.pixmap.height()
             annotations = []
             catalog = dict(self._label_catalog)
-            for label in self.context.yolo_api.load_txt(label_path):
+            for label in labeling_service.load_txt(label_path):
                 if label.class_id not in catalog:
                     catalog[label.class_id] = f"class {label.class_id}"
                     self._label_catalog.append((label.class_id, catalog[label.class_id]))
@@ -1684,12 +1686,12 @@ class MainWindow(QMainWindow):
             return False
         source_name = self.current_image_path.name if self.current_image_path is not None else "Current image"
         bounds = self.canvas.selection_bounds().toAlignedRect().intersected(self.canvas.pixmap.rect())
-        if not self.tool_controller.copy_selection_to_patch(source_name):
+        if not self.tool_manager.copy_selection_to_patch(source_name):
             self.set_status("Select an area before copying a patch")
             return False
         try:
             source_images = self._mapset_image_snapshots(self.current_mapset)
-            mask = self.tool_controller.patch_state.mask
+            mask = self.tool_manager.patch_state.mask
             if mask is None:
                 raise ValueError("Selection mask is empty")
             map_patches = {
@@ -1707,10 +1709,10 @@ class MainWindow(QMainWindow):
                 preview_key=self._current_map_key() or "",
             )
         except (OSError, ValueError) as exc:
-            self.tool_controller.clear_active_patch()
+            self.tool_manager.clear_active_patch()
             self.set_status(f"Failed to copy MapSet patch: {exc}")
             return False
-        self.tool_controller.clear_active_patch()
+        self.tool_manager.clear_active_patch()
         self.listMasks.refresh(select_id=clip.clip_id)
         self.canvas.clear_selection()
         self.set_status(
@@ -1904,10 +1906,14 @@ class MainWindow(QMainWindow):
             return False
         bgr_color = (color.blue(), color.green(), color.red())
         processed: dict[str, QImage] = {}
+        expected_shape = (self.canvas.pixmap.height(), self.canvas.pixmap.width())
         for _map_key, map_path in self.current_mapset.maps:
             source = self._load_editable_map_image(map_path)
             if source is None:
                 continue
+            if source.shape[:2] != expected_shape:
+                self.set_status("Brush failed: MapSet maps do not share the current canvas coordinate system")
+                return False
             result = apply_paint_strokes(source, strokes, bgr_color, size, opacity)
             processed[str(map_path.resolve())] = bgr_to_qpixmap(result).toImage()
         return self._commit_mapset_images(processed, "Brush applied to MapSet")
@@ -1928,10 +1934,15 @@ class MainWindow(QMainWindow):
         target_folder = str(target_mapset.folder.resolve())
         history_before = self._take_mapset_history_before()
         images: dict[str, np.ndarray] = {}
+        expected_shape = (self.canvas.pixmap.height(), self.canvas.pixmap.width())
         for _map_key, map_path in target_mapset.maps:
             source = self._load_editable_map_image(map_path)
             if source is None:
                 continue
+            if source.shape[:2] != expected_shape:
+                self._pending_mapset_history_before = None
+                self.set_status("Healing Brush failed: MapSet maps do not share the current canvas coordinate system")
+                return False
             images[str(map_path.resolve())] = source
         if not images:
             self._pending_mapset_history_before = None
@@ -1986,6 +1997,9 @@ class MainWindow(QMainWindow):
             source = self._load_editable_map_image(map_path)
             if source is None:
                 continue
+            if source.shape[:2] != mask.shape[:2]:
+                self.set_status("Fill failed: MapSet maps do not share the current selection coordinate system")
+                return False
             result = apply_selection_fill(source, mask, bgr_color, opacity)
             processed[str(map_path.resolve())] = bgr_to_qpixmap(result).toImage()
         return self._commit_mapset_images(processed, "Fill applied to MapSet")
@@ -2003,6 +2017,9 @@ class MainWindow(QMainWindow):
             source = self._load_editable_map_image(map_path)
             if source is None:
                 continue
+            if source.shape[:2] != mask.shape[:2]:
+                self.set_status("Delete failed: MapSet maps do not share the current selection coordinate system")
+                return False
             result = apply_selection_delete(source, mask)
             processed[str(map_path.resolve())] = bgr_to_qpixmap(result).toImage()
         return self._commit_mapset_images(processed, "Selection deleted from MapSet")
@@ -2057,7 +2074,7 @@ class MainWindow(QMainWindow):
         if missing:
             self.set_status(f"Clipboard MapSet patch is missing map keys: {', '.join(missing)}")
             return False
-        if not self.tool_controller.load_patch_clip(clip, center_x, center_y, map_key):
+        if not self.tool_manager.load_patch_clip(clip, center_x, center_y, map_key):
             self.set_status("Failed to load clipboard patch")
             return False
         self.ui_setup.activate_tool(ToolMode.PATCH)
@@ -2069,7 +2086,7 @@ class MainWindow(QMainWindow):
         if self._manual_poisson_task_id in self._active_task_ids:
             self.set_status("Manual Poisson is already running")
             return False
-        if not self.tool_controller.has_patch_preview():
+        if not self.tool_manager.has_patch_preview():
             self.set_status("Copy a selection first")
             return False
         target_mapset = self.current_mapset
@@ -2078,7 +2095,7 @@ class MainWindow(QMainWindow):
             return False
         try:
             target_images = self._mapset_image_snapshots(target_mapset)
-            composition_inputs = self.tool_controller.patch_mapset_composition_inputs(target_images)
+            composition_inputs = self.tool_manager.patch_mapset_composition_inputs(target_images)
             history_before = self._mapset_edit_snapshot(target_mapset)
         except (OSError, ValueError, RuntimeError) as exc:
             self.set_status(f"Poisson failed: {exc}")
@@ -2106,6 +2123,7 @@ class MainWindow(QMainWindow):
                 processed[str(map_path)] = bgr_to_qpixmap(result).toImage()
             self._push_mapset_history_entry(history_before, processed)
             self._map_edit_states.update(processed)
+            self.tool_manager.complete_current_tool(ToolMode.MOVE)
             if current_key in results:
                 current_path = target_mapset.map_paths[current_key].resolve()
                 current_image = self._map_edit_states.get(str(current_path))
@@ -2114,7 +2132,6 @@ class MainWindow(QMainWindow):
                     self.canvas.set_map_image(current_image, modified=True)
                     self.canvas.apply_view_state(*view_state)
                     self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
-            self.tool_controller.complete_current_tool(ToolMode.MOVE)
             self._save_current_map_edit()
             self.set_status(f"Poisson applied to {len(results)} MapSet maps ({mode_name})")
 
@@ -2431,7 +2448,7 @@ class MainWindow(QMainWindow):
             self.canvas.clear_preview_image()
             return
         image = qimage_to_bgr(self.canvas.pixmap)
-        result, matrix = self.context.preprocess_api.apply_options(image, preview_options)
+        result, matrix = preprocessing_service.apply_options(image, preview_options)
         annotations = self._preview_annotations_from_matrix(matrix, result.shape[1], result.shape[0])
         self.canvas.set_preview_image(bgr_to_qpixmap(result), annotations)
 
@@ -2472,7 +2489,7 @@ class MainWindow(QMainWindow):
 
     def _apply_preprocessing_to_current_image(self, options) -> None:
         image = qimage_to_bgr(self.canvas.pixmap)
-        result, matrix = self.context.preprocess_api.apply_options(image, options)
+        result, matrix = preprocessing_service.apply_options(image, options)
         self._apply_annotation_affine(matrix, result.shape[1], result.shape[0])
         self.canvas.replace_pixmap(bgr_to_qpixmap(result))
         self.canvas.clear_selection()
@@ -2488,7 +2505,7 @@ class MainWindow(QMainWindow):
             source = self._load_editable_map_image(path)
             if source is None:
                 continue
-            result, item_matrix = self.context.preprocess_api.apply_options(source, options)
+            result, item_matrix = preprocessing_service.apply_options(source, options)
             processed[str(path.resolve())] = bgr_to_qpixmap(result).toImage()
             if matrix is None:
                 matrix = item_matrix
@@ -2526,7 +2543,7 @@ class MainWindow(QMainWindow):
                 source = self._load_editable_map_image(path)
                 if source is None:
                     continue
-                result, matrix = self.context.preprocess_api.apply_options(source, options)
+                result, matrix = preprocessing_service.apply_options(source, options)
                 image = bgr_to_qpixmap(result).toImage()
                 self._map_edit_states[str(path.resolve())] = image
                 count += 1
@@ -3040,7 +3057,7 @@ class MainWindow(QMainWindow):
 
         if not self._save_current_yolo_labels_if_needed():
             return
-        dialog = ExportDialog(self.context.export_api, self)
+        dialog = ExportDialog(self)
         dialog.exec()
 
     def start_yolo_export(self, options) -> None:
@@ -3066,7 +3083,7 @@ class MainWindow(QMainWindow):
         if self.project is None:
             QMessageBox.warning(self, "Auto Augmentation", "Open a dataset folder first.")
             return
-        defect_paths = self.context.augmentation_api.discover_defect_paths(options.defect_root)
+        defect_paths = augmentation_service.discover_defect_paths(options.defect_root)
         target_paths = [item.reference_path for item in self.project.mapsets]
         if not defect_paths or not target_paths:
             QMessageBox.warning(self, "Auto Augmentation", "No defect patches or target MapSets were found.")

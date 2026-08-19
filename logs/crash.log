@@ -1,0 +1,34 @@
+
+[2026-06-25T08:17:16.138666+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1901, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2127, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T09:03:25.740007+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1901, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2127, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-25T09:08:34.649883+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 1901, in _on_task_succeeded
+    handler(result)
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\mainwindow.py", line 2127, in show
+    self.augmentation_page.refresh_project()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AugmentationPage' object has no attribute 'refresh_project'
+
+[2026-06-26T01:58:01.152721+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\dataset_studio\ui\imagecanvas.py", line 356, in mouseMoveEvent
+    def mouseMoveEvent(self, event):
+    
+KeyboardInterrupt

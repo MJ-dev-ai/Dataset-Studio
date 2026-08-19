@@ -11,10 +11,8 @@ from core.geometry import HealingStroke, PaintStroke
 @dataclass
 class PaintOptions:
     size: int = 20
-    hardness: float = 1.0
     opacity: float = 1.0
     color: QColor = field(default_factory=lambda: QColor(255, 255, 255))
-    mode: str = "image"
 
 
 @dataclass
@@ -30,9 +28,7 @@ class HealingStrokeFinish:
 
 
 class BasePaintTool:
-    """Track brush stroke geometry in image coordinates."""
-
-    show_cursor_circle = True
+    """Track press-move-release brush strokes in image coordinates."""
 
     def __init__(self):
         self.options = PaintOptions()
@@ -172,4 +168,4 @@ class EraserTool(BasePaintTool):
 
 
 class FillTool(BasePaintTool):
-    show_cursor_circle = False
+    """Keep fill color/opacity options; ToolManager applies the fill on click."""

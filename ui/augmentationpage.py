@@ -35,7 +35,8 @@ from config.settings import (
     AUTOAUGMENT_VALIDATION_PERCENT,
     DEFAULT_THEME,
 )
-from service.augmentation_service import AutoYoloAugmentOptions, AugmentationApi
+from service import augmentation_service
+from service.augmentation_service import AutoYoloAugmentOptions
 from core.image_io import read_image
 from core.qt_image import bgr_to_qpixmap
 
@@ -230,13 +231,12 @@ class ClassBalanceItem:
 class AugmentationPage(QDialog):
     """Modeless AutoAugment dialog for Poisson-based YOLO dataset generation."""
 
-    def __init__(self, augmentation_api: AugmentationApi, parent=None):
+    def __init__(self, parent=None):
         """Initialize the modeless Designer-backed AutoAugment dialog."""
         super().__init__(parent)
         self._main_window = parent
         self.setModal(False)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
-        self.augmentation_api = augmentation_api
         self._class_catalog: list[tuple[int, str]] = []
         self._target_image_count = 0
         self._folder_count = 1
@@ -469,7 +469,7 @@ class AugmentationPage(QDialog):
         project = getattr(window, "project", None)
         if project is None:
             return
-        map_keys = self.augmentation_api.project_map_keys(project.mapsets)
+        map_keys = augmentation_service.project_map_keys(project.mapsets)
         current = self.target_map_combo.currentText()
         self.target_map_combo.blockSignals(True)
         self.target_map_combo.clear()
@@ -480,7 +480,7 @@ class AugmentationPage(QDialog):
         catalog = getattr(window, "label_catalog", lambda: [])()
         self._class_catalog = list(catalog)
         target_map = self.target_map_combo.currentText() or (map_keys[0] if map_keys else "")
-        summary = self.augmentation_api.auto_yolo_summary(project, target_map)
+        summary = augmentation_service.auto_yolo_summary(project, target_map)
         class_counts = {int(key): int(value) for key, value in summary.get("class_counts", {}).items()}
         for class_id, _name in self._class_catalog:
             class_counts.setdefault(int(class_id), 0)

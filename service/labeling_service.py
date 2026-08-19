@@ -14,59 +14,46 @@ class YoloLabel:
     width: float
     height: float
 
-class YoloApi:
-    """YOLO label loading, saving, and conversion helpers."""
-
-    def load_txt(self, path: str | Path) -> list[YoloLabel]:
-        label_path = Path(path)
-        if not label_path.exists():
-            return []
-        labels = []
-        with label_path.open("r", encoding="utf-8") as file:
-            for line in file:
-                parsed = parse_yolo_line(line)
-                if parsed is None:
-                    continue
-                labels.append(YoloLabel(*parsed))
-        return labels
-
-    def save_txt(self, path: str | Path, labels: list[YoloLabel]) -> None:
-        label_path = Path(path)
-        label_path.parent.mkdir(parents=True, exist_ok=True)
-        with label_path.open("w", encoding="utf-8") as file:
-            for label in labels:
-                file.write(
-                    f"{label.class_id} {label.x_center:.6f} {label.y_center:.6f} "
-                    f"{label.width:.6f} {label.height:.6f}\n"
-                )
-
-    def read_valid_lines(self, path: str | Path) -> list[str]:
-        return [
-            f"{label.class_id} {label.x_center:.6f} {label.y_center:.6f} {label.width:.6f} {label.height:.6f}"
-            for label in self.load_txt(path)
-        ]
-
-    def auto_label_from_threshold(self, image: np.ndarray, class_id: int) -> list[YoloLabel]:
-        """Create one YOLO label per external foreground contour in a thresholded image."""
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
-        _value, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        contours, _hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        labels = []
-        height, width = gray.shape[:2]
-        for contour in contours:
-            x_pos, y_pos, box_width, box_height = cv2.boundingRect(contour)
-            if box_width * box_height < 4:
-                continue
-            line = box_to_yolo_line(
-                class_id,
-                (x_pos, y_pos, x_pos + box_width, y_pos + box_height),
-                width,
-                height,
-            )
+def load_txt(path: str | Path) -> list[YoloLabel]:
+    label_path = Path(path)
+    if not label_path.exists():
+        return []
+    labels = []
+    with label_path.open("r", encoding="utf-8") as file:
+        for line in file:
             parsed = parse_yolo_line(line)
             if parsed is not None:
                 labels.append(YoloLabel(*parsed))
-        return labels
+    return labels
+
+
+def save_txt(path: str | Path, labels: list[YoloLabel]) -> None:
+    label_path = Path(path)
+    label_path.parent.mkdir(parents=True, exist_ok=True)
+    with label_path.open("w", encoding="utf-8") as file:
+        for label in labels:
+            file.write(f"{label.class_id} {label.x_center:.6f} {label.y_center:.6f} {label.width:.6f} {label.height:.6f}\n")
+
+
+def read_valid_lines(path: str | Path) -> list[str]:
+    return [f"{label.class_id} {label.x_center:.6f} {label.y_center:.6f} {label.width:.6f} {label.height:.6f}" for label in load_txt(path)]
+
+
+def auto_label_from_threshold(image: np.ndarray, class_id: int) -> list[YoloLabel]:
+    """Create one YOLO label per external foreground contour in a thresholded image."""
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image
+    _value, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    contours, _hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    labels = []
+    height, width = gray.shape[:2]
+    for contour in contours:
+        x_pos, y_pos, box_width, box_height = cv2.boundingRect(contour)
+        if box_width * box_height < 4:
+            continue
+        parsed = parse_yolo_line(box_to_yolo_line(class_id, (x_pos, y_pos, x_pos + box_width, y_pos + box_height), width, height))
+        if parsed is not None:
+            labels.append(YoloLabel(*parsed))
+    return labels
 
 
 LabelCatalog = list[tuple[int, str]]
