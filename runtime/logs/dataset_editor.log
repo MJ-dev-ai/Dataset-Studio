@@ -44048,3 +44048,193 @@ PermissionError: [Errno 13] Permission denied: 'D:\\!$rFYLN\\data.yaml'
 19:50:30 INFO     TaskManager shutdown requested: active=0 timeout_ms=30000
 19:50:30 INFO     TaskManager shutdown requested: active=0 timeout_ms=30000
 11:02:09 INFO     Healing Brush: Ctrl+click a clean source area
+00:59:25 CRITICAL Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\disre\Documents\Dataset_Studio_UX\ui\mainwindow.py", line 231, in eventFilter
+    def eventFilter(self, watched, event) -> bool:
+    
+KeyboardInterrupt
+
+01:05:00 INFO     Main editor
+01:05:00 INFO     Map: Image
+01:05:00 INFO     Opened MapSet: albedo_map
+01:05:00 INFO     Added 3 image MapSet(s)
+01:05:13 INFO     Tool: rectangle
+01:06:07 INFO     Auto augmentation dialog
+01:06:09 INFO     Auto augmentation dialog
+01:06:12 INFO     Waiting for background tasks to stop...
+01:08:33 INFO     Worker started: scan_dataset 44ae99036996423085d2b40bc50963b3
+01:08:33 INFO     1% C:\Users\disre\Documents\results\result_20260620_151919_input_20260610_111935_Crack
+01:08:33 INFO     1% C:\Users\disre\Documents\results\result_20260620_151919_input_20260610_111935_Crack
+01:08:33 INFO     2% C:\Users\disre\Documents\results\result_20260620_151923_input_20260610_112511_exp4000_pol
+01:08:33 INFO     2% C:\Users\disre\Documents\results\result_20260620_151923_input_20260610_112511_exp4000_pol
+01:08:33 INFO     3% C:\Users\disre\Documents\results\result_20260620_151926_input_20260610_114109_Scratch
+01:08:33 INFO     3% C:\Users\disre\Documents\results\result_20260620_151926_input_20260610_114109_Scratch
+01:08:33 INFO     4% C:\Users\disre\Documents\results\result_20260620_151929_input_20260610_115443_Scratch
+01:08:33 INFO     4% C:\Users\disre\Documents\results\result_20260620_151929_input_20260610_115443_Scratch
+01:08:33 INFO     5% C:\Users\disre\Documents\results\result_20260620_151933_input_20260610_120241
+01:08:33 INFO     5% C:\Users\disre\Documents\results\result_20260620_151933_input_20260610_120241
+01:08:33 INFO     6% C:\Users\disre\Documents\results\result_20260620_151936_input_20260610_120639
+01:08:33 INFO     6% C:\Users\disre\Documents\results\result_20260620_151936_input_20260610_120639
+01:08:33 INFO     7% C:\Users\disre\Documents\results\result_20260620_151939_input_20260610_121456_Scratch_Polut
+01:08:33 INFO     7% C:\Users\disre\Documents\results\result_20260620_151939_input_20260610_121456_Scratch_Polut
+01:08:33 INFO     8% C:\Users\disre\Documents\results\result_20260620_151943_input_20260610_122241_Marker
+01:08:33 INFO     8% C:\Users\disre\Documents\results\result_20260620_151943_input_20260610_122241_Marker
+01:08:33 INFO     9% C:\Users\disre\Documents\results\result_20260620_151946_input_20260610_122241_Marker_contour_test_outputs
+01:08:33 INFO     9% C:\Users\disre\Documents\results\result_20260620_151946_input_20260610_122241_Marker_contour_test_outputs
+01:08:33 INFO     10% C:\Users\disre\Documents\results\result_20260620_151950_input_20260610_125234_Gain30
+01:08:33 INFO     10% C:\Users\disre\Documents\results\result_20260620_151950_input_20260610_125234_Gain30
+01:08:33 INFO     11% C:\Users\disre\Documents\results\result_20260620_151954_input_20260610_135700_Gain20
+01:08:33 INFO     11% C:\Users\disre\Documents\results\result_20260620_151954_input_20260610_135700_Gain20
+01:08:33 INFO     12% C:\Users\disre\Documents\results\result_20260620_151958_input_20260610_140727_exp5000_gain20
+01:08:33 INFO     12% C:\Users\disre\Documents\results\result_20260620_151958_input_20260610_140727_exp5000_gain20
+01:08:33 INFO     13% C:\Users\disre\Documents\results\result_20260620_152002_input_20260610_144009_Crack_lowdust
+01:08:33 INFO     13% C:\Users\disre\Documents\results\result_20260620_152002_input_20260610_144009_Crack_lowdust
+01:08:33 INFO     14% C:\Users\disre\Documents\results\result_20260620_152006_input_20260610_144415_Scratch_Gain20
+01:08:33 INFO     14% C:\Users\disre\Documents\results\result_20260620_152006_input_20260610_144415_Scratch_Gain20
+01:08:33 INFO     15% C:\Users\disre\Documents\results\result_20260620_152010_input_20260610_145149_Dent_Gain20
+01:08:33 INFO     15% C:\Users\disre\Documents\results\result_20260620_152010_input_20260610_145149_Dent_Gain20
+01:08:33 INFO     16% C:\Users\disre\Documents\results\result_20260620_152014_input_20260610_145453_Best
+01:08:33 INFO     16% C:\Users\disre\Documents\results\result_20260620_152014_input_20260610_145453_Best
+01:08:33 INFO     17% C:\Users\disre\Documents\results\result_20260620_152018_input_20260610_150102_Scratch_Dent
+01:08:33 INFO     17% C:\Users\disre\Documents\results\result_20260620_152018_input_20260610_150102_Scratch_Dent
+01:08:33 INFO     18% C:\Users\disre\Documents\results\result_20260620_152022_input_20260610_151308_Dent_Scratch
+01:08:33 INFO     18% C:\Users\disre\Documents\results\result_20260620_152022_input_20260610_151308_Dent_Scratch
+01:08:33 INFO     19% C:\Users\disre\Documents\results\result_20260620_152026_input_20260610_152343_Dent_Scratch
+01:08:33 INFO     19% C:\Users\disre\Documents\results\result_20260620_152026_input_20260610_152343_Dent_Scratch
+01:08:33 INFO     20% C:\Users\disre\Documents\results\result_20260620_152030_input_20260610_153126_InnerScratch_Dent
+01:08:33 INFO     20% C:\Users\disre\Documents\results\result_20260620_152030_input_20260610_153126_InnerScratch_Dent
+01:08:33 INFO     21% C:\Users\disre\Documents\results\result_20260620_152034_input_20260610_153851_Scratch_Dent
+01:08:33 INFO     21% C:\Users\disre\Documents\results\result_20260620_152034_input_20260610_153851_Scratch_Dent
+01:08:33 INFO     22% C:\Users\disre\Documents\results\result_20260620_152038_input_20260610_154832_2Dent_Scratch
+01:08:33 INFO     22% C:\Users\disre\Documents\results\result_20260620_152038_input_20260610_154832_2Dent_Scratch
+01:08:33 INFO     23% C:\Users\disre\Documents\results\result_20260620_152042_input_20260610_155630_Bigdent_Scratch
+01:08:33 INFO     23% C:\Users\disre\Documents\results\result_20260620_152042_input_20260610_155630_Bigdent_Scratch
+01:08:33 INFO     24% C:\Users\disre\Documents\results\result_20260620_152046_input_20260610_162741_Scratch
+01:08:33 INFO     24% C:\Users\disre\Documents\results\result_20260620_152046_input_20260610_162741_Scratch
+01:08:33 INFO     25% C:\Users\disre\Documents\results\result_20260620_152050_input_20260610_164604_Scratch_Pollution
+01:08:33 INFO     25% C:\Users\disre\Documents\results\result_20260620_152050_input_20260610_164604_Scratch_Pollution
+01:08:33 INFO     26% C:\Users\disre\Documents\results\result_20260620_152053_input_20260610_165719_Dent_Scratch
+01:08:33 INFO     26% C:\Users\disre\Documents\results\result_20260620_152053_input_20260610_165719_Dent_Scratch
+01:08:33 INFO     27% C:\Users\disre\Documents\results\result_20260620_152057_input_20260610_170611_2Dent_Scratch
+01:08:33 INFO     27% C:\Users\disre\Documents\results\result_20260620_152057_input_20260610_170611_2Dent_Scratch
+01:08:33 INFO     28% C:\Users\disre\Documents\results\result_20260620_152101_input_20260610_170949_Dent_Scratch
+01:08:33 INFO     28% C:\Users\disre\Documents\results\result_20260620_152101_input_20260610_170949_Dent_Scratch
+01:08:33 INFO     29% C:\Users\disre\Documents\results\result_20260620_152105_input_20260610_171501_Pollu_Scratch
+01:08:33 INFO     29% C:\Users\disre\Documents\results\result_20260620_152105_input_20260610_171501_Pollu_Scratch
+01:08:33 INFO     30% C:\Users\disre\Documents\results\result_20260620_152109_input_20260610_175019_Dent_Scratch_Pollu
+01:08:33 INFO     30% C:\Users\disre\Documents\results\result_20260620_152109_input_20260610_175019_Dent_Scratch_Pollu
+01:08:33 INFO     31% C:\Users\disre\Documents\results\result_20260620_152113_input_20260610_175531_Scratch_Dent
+01:08:33 INFO     31% C:\Users\disre\Documents\results\result_20260620_152113_input_20260610_175531_Scratch_Dent
+01:08:33 INFO     32% C:\Users\disre\Documents\results\result_20260620_152117_input_20260610_180438_Scratch_Dent
+01:08:33 INFO     32% C:\Users\disre\Documents\results\result_20260620_152117_input_20260610_180438_Scratch_Dent
+01:08:33 INFO     33% C:\Users\disre\Documents\results\result_20260620_152121_input_20260610_181439_Scratch_Strain_Pollu
+01:08:33 INFO     33% C:\Users\disre\Documents\results\result_20260620_152121_input_20260610_181439_Scratch_Strain_Pollu
+01:08:33 INFO     34% C:\Users\disre\Documents\results\result_20260620_152125_input_20260610_182509_Scratch_Dent
+01:08:33 INFO     34% C:\Users\disre\Documents\results\result_20260620_152125_input_20260610_182509_Scratch_Dent
+01:08:33 INFO     35% C:\Users\disre\Documents\results\result_20260620_152129_input_20260611_122230_Crack_Scratch
+01:08:33 INFO     35% C:\Users\disre\Documents\results\result_20260620_152129_input_20260611_122230_Crack_Scratch
+01:08:33 INFO     36% C:\Users\disre\Documents\results\result_20260620_152133_input_20260611_122742_Scratch_Dust
+01:08:33 INFO     36% C:\Users\disre\Documents\results\result_20260620_152133_input_20260611_122742_Scratch_Dust
+01:08:33 INFO     37% C:\Users\disre\Documents\results\result_20260620_152136_input_20260611_123502_Scratch_Strain
+01:08:33 INFO     37% C:\Users\disre\Documents\results\result_20260620_152136_input_20260611_123502_Scratch_Strain
+01:08:33 INFO     38% C:\Users\disre\Documents\results\result_20260620_152140_input_20260612_112736_Scratch_Strain_Dust
+01:08:33 INFO     38% C:\Users\disre\Documents\results\result_20260620_152140_input_20260612_112736_Scratch_Strain_Dust
+01:08:33 INFO     39% C:\Users\disre\Documents\results\result_20260620_152144_input_20260612_115819_Scratch
+01:08:33 INFO     39% C:\Users\disre\Documents\results\result_20260620_152144_input_20260612_115819_Scratch
+01:08:33 INFO     40% C:\Users\disre\Documents\results\result_20260620_152148_input_20260612_121039_Scratch_Dust
+01:08:33 INFO     40% C:\Users\disre\Documents\results\result_20260620_152148_input_20260612_121039_Scratch_Dust
+01:08:33 INFO     41% C:\Users\disre\Documents\results\result_20260620_152152_input_20260612_121641_Strain_Scratch_Dust
+01:08:33 INFO     41% C:\Users\disre\Documents\results\result_20260620_152152_input_20260612_121641_Strain_Scratch_Dust
+01:08:33 INFO     42% C:\Users\disre\Documents\results\result_20260620_152156_input_20260612_122449_Scratch_Pollu_Dust_Strain
+01:08:33 INFO     42% C:\Users\disre\Documents\results\result_20260620_152156_input_20260612_122449_Scratch_Pollu_Dust_Strain
+01:08:33 INFO     43% C:\Users\disre\Documents\results\result_20260620_152201_input_20260612_123729_Scratch_Dent_Pollu
+01:08:33 INFO     43% C:\Users\disre\Documents\results\result_20260620_152201_input_20260612_123729_Scratch_Dent_Pollu
+01:08:33 INFO     44% C:\Users\disre\Documents\results\result_20260620_152205_input_20260612_125144_Dust_Dent_Scratch
+01:08:33 INFO     44% C:\Users\disre\Documents\results\result_20260620_152205_input_20260612_125144_Dust_Dent_Scratch
+01:08:33 INFO     45% C:\Users\disre\Documents\results\result_20260620_152209_input_20260612_125559_Scratch_Strain
+01:08:33 INFO     45% C:\Users\disre\Documents\results\result_20260620_152209_input_20260612_125559_Scratch_Strain
+01:08:33 INFO     46% C:\Users\disre\Documents\results\result_20260620_152213_input_20260612_154236_Scratch_Strain
+01:08:33 INFO     46% C:\Users\disre\Documents\results\result_20260620_152213_input_20260612_154236_Scratch_Strain
+01:08:33 INFO     47% C:\Users\disre\Documents\results\result_20260620_152217_input_20260612_154745_Scratch_Contamination
+01:08:33 INFO     47% C:\Users\disre\Documents\results\result_20260620_152217_input_20260612_154745_Scratch_Contamination
+01:08:33 INFO     48% C:\Users\disre\Documents\results\result_20260620_152220_input_20260612_155720_Scratch_Dent
+01:08:33 INFO     48% C:\Users\disre\Documents\results\result_20260620_152220_input_20260612_155720_Scratch_Dent
+01:08:33 INFO     49% C:\Users\disre\Documents\results\result_20260620_152224_input_20260612_160530_Scratch_Dent
+01:08:33 INFO     49% C:\Users\disre\Documents\results\result_20260620_152224_input_20260612_160530_Scratch_Dent
+01:08:33 INFO     50% C:\Users\disre\Documents\results\result_20260620_152228_input_20260612_160759_Scratch_Dent
+01:08:33 INFO     50% C:\Users\disre\Documents\results\result_20260620_152228_input_20260612_160759_Scratch_Dent
+01:08:33 INFO     51% C:\Users\disre\Documents\results\result_20260620_152232_input_20260612_161408_Scratch
+01:08:33 INFO     51% C:\Users\disre\Documents\results\result_20260620_152232_input_20260612_161408_Scratch
+01:08:33 INFO     52% C:\Users\disre\Documents\results\result_20260620_152236_input_20260612_162005_Scratch
+01:08:33 INFO     52% C:\Users\disre\Documents\results\result_20260620_152236_input_20260612_162005_Scratch
+01:08:33 INFO     53% C:\Users\disre\Documents\results\result_20260620_152240_input_20260612_162423_Scratch
+01:08:33 INFO     53% C:\Users\disre\Documents\results\result_20260620_152240_input_20260612_162423_Scratch
+01:08:33 INFO     54% C:\Users\disre\Documents\results\result_20260620_152244_input_20260612_181348_Scratch_Dust
+01:08:33 INFO     54% C:\Users\disre\Documents\results\result_20260620_152244_input_20260612_181348_Scratch_Dust
+01:08:33 INFO     55% C:\Users\disre\Documents\results\result_20260620_152248_input_20260612_185838_Crack_Strain_Scratch
+01:08:33 INFO     55% C:\Users\disre\Documents\results\result_20260620_152248_input_20260612_185838_Crack_Strain_Scratch
+01:08:33 INFO     56% C:\Users\disre\Documents\results\result_20260620_152252_input_20260612_190236_Scratch_Strain
+01:08:33 INFO     56% C:\Users\disre\Documents\results\result_20260620_152252_input_20260612_190236_Scratch_Strain
+01:08:33 INFO     57% C:\Users\disre\Documents\results\result_20260620_152256_input_20260612_191438_Scratch_Dent_Contamination
+01:08:33 INFO     57% C:\Users\disre\Documents\results\result_20260620_152256_input_20260612_191438_Scratch_Dent_Contamination
+01:08:33 INFO     58% C:\Users\disre\Documents\results\result_20260620_152300_input_20260612_191912_Scratch
+01:08:33 INFO     58% C:\Users\disre\Documents\results\result_20260620_152300_input_20260612_191912_Scratch
+01:08:33 INFO     59% C:\Users\disre\Documents\results\result_20260620_152304_input_20260612_192309_Scratch_Strain
+01:08:33 INFO     59% C:\Users\disre\Documents\results\result_20260620_152304_input_20260612_192309_Scratch_Strain
+01:08:33 INFO     60% C:\Users\disre\Documents\results\result_20260620_152308_input_20260612_192701_Scratch_Dust
+01:08:33 INFO     60% C:\Users\disre\Documents\results\result_20260620_152308_input_20260612_192701_Scratch_Dust
+01:08:33 INFO     61% C:\Users\disre\Documents\results\result_20260620_152311_input_20260612_193033_Scratch_Strain
+01:08:33 INFO     61% C:\Users\disre\Documents\results\result_20260620_152311_input_20260612_193033_Scratch_Strain
+01:08:33 INFO     62% C:\Users\disre\Documents\results\result_20260620_152315_input_20260612_193727_Scratch_Dent_Strain
+01:08:33 INFO     62% C:\Users\disre\Documents\results\result_20260620_152315_input_20260612_193727_Scratch_Dent_Strain
+01:08:33 INFO     63% C:\Users\disre\Documents\results\result_20260620_152319_input_20260612_195138_All
+01:08:33 INFO     63% C:\Users\disre\Documents\results\result_20260620_152319_input_20260612_195138_All
+01:08:33 INFO     64% C:\Users\disre\Documents\results\result_20260620_152323_input_20260615_113449_steelplate2
+01:08:33 INFO     64% C:\Users\disre\Documents\results\result_20260620_152323_input_20260615_113449_steelplate2
+01:08:33 INFO     65% C:\Users\disre\Documents\results\result_20260620_152327_input_20260615_113637_steelplate
+01:08:33 INFO     65% C:\Users\disre\Documents\results\result_20260620_152327_input_20260615_113637_steelplate
+01:08:33 INFO     66% C:\Users\disre\Documents\results\result_20260620_152331_input_20260615_114749_steelplate3
+01:08:33 INFO     66% C:\Users\disre\Documents\results\result_20260620_152331_input_20260615_114749_steelplate3
+01:08:33 INFO     67% C:\Users\disre\Documents\results\result_20260620_152335_input_20260615_115033_steelplate4
+01:08:33 INFO     67% C:\Users\disre\Documents\results\result_20260620_152335_input_20260615_115033_steelplate4
+01:08:33 INFO     68% C:\Users\disre\Documents\results\result_20260620_152339_input_20260615_120346_Scratch_Strain
+01:08:33 INFO     68% C:\Users\disre\Documents\results\result_20260620_152339_input_20260615_120346_Scratch_Strain
+01:08:33 INFO     69% C:\Users\disre\Documents\results\result_20260620_152343_input_20260615_120654_Scratch_Strain_Bubble
+01:08:33 INFO     69% C:\Users\disre\Documents\results\result_20260620_152343_input_20260615_120654_Scratch_Strain_Bubble
+01:08:33 INFO     70% C:\Users\disre\Documents\results\result_20260620_152347_input_20260615_121003_Scratch_Strain_Bubble
+01:08:33 INFO     70% C:\Users\disre\Documents\results\result_20260620_152347_input_20260615_121003_Scratch_Strain_Bubble
+01:08:33 INFO     71% C:\Users\disre\Documents\results\result_20260620_152351_input_20260615_122640_Scratch_Bubble_Dust
+01:08:33 INFO     71% C:\Users\disre\Documents\results\result_20260620_152351_input_20260615_122640_Scratch_Bubble_Dust
+01:08:33 INFO     72% C:\Users\disre\Documents\results\result_20260620_152355_input_20260615_123134_Scratch_Dent
+01:08:33 INFO     72% C:\Users\disre\Documents\results\result_20260620_152355_input_20260615_123134_Scratch_Dent
+01:08:33 INFO     73% C:\Users\disre\Documents\results\result_20260620_152359_input_20260615_123624_Scratch_Dust_Bubble
+01:08:33 INFO     73% C:\Users\disre\Documents\results\result_20260620_152359_input_20260615_123624_Scratch_Dust_Bubble
+01:08:33 INFO     74% C:\Users\disre\Documents\results\result_20260620_152403_input_20260615_123948_Scratch_Strain
+01:08:33 INFO     74% C:\Users\disre\Documents\results\result_20260620_152403_input_20260615_123948_Scratch_Strain
+01:08:33 INFO     75% C:\Users\disre\Documents\results\result_20260620_152407_input_20260615_124419_Scratch_Bubble
+01:08:33 INFO     75% C:\Users\disre\Documents\results\result_20260620_152407_input_20260615_124419_Scratch_Bubble
+01:08:33 INFO     76% C:\Users\disre\Documents\results\result_20260620_152410_input_20260615_124702_Scratch_Bubble_Dust
+01:08:33 INFO     76% C:\Users\disre\Documents\results\result_20260620_152410_input_20260615_124702_Scratch_Bubble_Dust
+01:08:33 INFO     77% C:\Users\disre\Documents\results\result_20260620_152415_input_20260615_124957_Scratch
+01:08:33 INFO     77% C:\Users\disre\Documents\results\result_20260620_152415_input_20260615_124957_Scratch
+01:08:33 INFO     78% C:\Users\disre\Documents\results\result_20260620_152419_input_20260615_125506_Scratch
+01:08:33 INFO     78% C:\Users\disre\Documents\results\result_20260620_152419_input_20260615_125506_Scratch
+01:08:33 INFO     79% C:\Users\disre\Documents\results\result_20260620_152423_input_20260615_130000_Scratch
+01:08:33 INFO     79% C:\Users\disre\Documents\results\result_20260620_152423_input_20260615_130000_Scratch
+01:08:33 INFO     80% C:\Users\disre\Documents\results\result_20260620_152427_input_20260615_130412_Scratch
+01:08:33 INFO     80% C:\Users\disre\Documents\results\result_20260620_152427_input_20260615_130412_Scratch
+01:08:33 INFO     81% C:\Users\disre\Documents\results\result_20260620_152431_input_20260615_130710_Scratch
+01:08:33 INFO     81% C:\Users\disre\Documents\results\result_20260620_152431_input_20260615_130710_Scratch
+01:08:33 INFO     Worker finished: scan_dataset 44ae99036996423085d2b40bc50963b3
+01:08:33 INFO     Task finished: 44ae99036996423085d2b40bc50963b3
+01:08:34 INFO     Loaded 81 MapSet(s): C:\Users\disre\Documents\results
+01:08:36 INFO     Main editor
+01:08:36 INFO     Map: Albedo
+01:08:36 INFO     Opened MapSet: result_20260620_152415_input_20260615_124957_Scratch
+01:08:36 INFO     Main editor
+01:08:36 INFO     Map: Albedo
+01:08:36 INFO     Opened MapSet: result_20260620_152415_input_20260615_124957_Scratch
+01:08:38 INFO     Map: Normal
+01:08:41 INFO     Auto augmentation dialog
+01:09:18 INFO     Waiting for background tasks to stop...

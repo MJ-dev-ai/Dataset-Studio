@@ -38,3 +38,10 @@ Traceback (most recent call last):
   File "C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py", line 370, in _normalized_mask
     raise ValueError("mask size must match image size")
 ValueError: mask size must match image size
+
+[2026-08-19T15:59:25.513238+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\disre\Documents\Dataset_Studio_UX\ui\mainwindow.py", line 231, in eventFilter
+    def eventFilter(self, watched, event) -> bool:
+    
+KeyboardInterrupt

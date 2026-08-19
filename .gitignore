@@ -9,4 +9,3 @@ training/
 tests/
 *.md
 !README.md
-docs/

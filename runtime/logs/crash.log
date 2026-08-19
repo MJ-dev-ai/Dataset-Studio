@@ -70,3 +70,10 @@ Traceback (most recent call last):
     return io.open(self, mode, buffering, encoding, errors, newline)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 PermissionError: [Errno 13] Permission denied: 'D:\\!$rFYLN\\data.yaml'
+
+[2026-08-19T15:59:25.515256+00:00] Unhandled exception
+Traceback (most recent call last):
+  File "C:\Users\disre\Documents\Dataset_Studio_UX\ui\mainwindow.py", line 231, in eventFilter
+    def eventFilter(self, watched, event) -> bool:
+    
+KeyboardInterrupt

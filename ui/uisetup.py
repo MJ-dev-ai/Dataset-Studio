@@ -380,7 +380,7 @@ class UiSetup:
         if not isinstance(menu, QMenu):
             return
 
-        menu.clear()
+        self._clear_menu_actions(menu)
         menu.setTitle("File")
         menu.addAction(self.window.action_open_project)
         menu.addAction(self.window.action_open_folder)
@@ -409,7 +409,7 @@ class UiSetup:
         if not isinstance(menu, QMenu):
             return
 
-        menu.clear()
+        self._clear_menu_actions(menu)
         menu.addAction(self.window.action_undo)
         menu.addAction(self.window.action_redo)
         menu.addSeparator()
@@ -428,7 +428,7 @@ class UiSetup:
             menu = self.window.menuBar().addMenu("Transform")
             self.window.menuImage = menu
         menu.setTitle("Transform")
-        menu.clear()
+        self._clear_menu_actions(menu)
 
         actions = {
             "action_transform_resize": "Resize...",
@@ -479,7 +479,7 @@ class UiSetup:
         if not isinstance(menu, QMenu):
             return
         menu.setTitle("Tools")
-        menu.clear()
+        self._clear_menu_actions(menu)
 
         menu.addAction(self.window.action_move_tool)
         menu.addSeparator()
@@ -511,7 +511,7 @@ class UiSetup:
         if not isinstance(menu, QMenu):
             return
         menu.setTitle("Label")
-        menu.clear()
+        self._clear_menu_actions(menu)
         menu.addAction(self.window.action_label_browser)
         menu.addAction(self.window.action_show_labels)
         menu.addSeparator()
@@ -531,7 +531,7 @@ class UiSetup:
         if not isinstance(menu, QMenu):
             return
         menu.setTitle("Augment")
-        menu.clear()
+        self._clear_menu_actions(menu)
         menu.addAction(self.window.action_auto_augment)
         menu.addSeparator()
         menu.addAction(self.window.action_auto_roi_selection)
@@ -552,7 +552,7 @@ class UiSetup:
         if not isinstance(menu, QMenu):
             return
         menu.setTitle("View")
-        menu.clear()
+        self._clear_menu_actions(menu)
 
         theme_menu = QMenu("Theme", menu)
         for action in getattr(self.window, "theme_actions", {}).values():
@@ -1376,6 +1376,10 @@ class UiSetup:
     def _show_review_workspace(self) -> None:
         self.window.show_main_page()
         self.window.set_status("Review workspace")
+
+    def _clear_menu_actions(self, menu: QMenu) -> None:
+        for action in tuple(menu.actions()):
+            menu.removeAction(action)
 
     def _set_action_text(self, action_name: str, text: str) -> None:
         action = getattr(self.window, action_name, None)
