@@ -39,6 +39,7 @@ from config.settings import (
     MAP_SPECS,
     PANEL_LAYOUT_DELAY_MS,
     RIGHT_PROPERTIES_WIDTH_RATIO,
+    SETTINGS_ORGANIZATION,
     TOP_OPTIONS_HEIGHT_RATIO,
     WORKER_SHUTDOWN_TIMEOUT_MS,
 )
@@ -276,7 +277,7 @@ class MainWindow(QMainWindow):
 
     def _setup_theme_actions(self) -> None:
         """Create persistent Dark/Light theme actions in the View menu."""
-        settings = QSettings("TNSAI", APP_NAME)
+        settings = QSettings(SETTINGS_ORGANIZATION, APP_NAME)
         current = str(settings.value("appearance/theme", DEFAULT_THEME))
         if current not in THEME_NAMES:
             current = DEFAULT_THEME
@@ -319,7 +320,7 @@ class MainWindow(QMainWindow):
         if action is not None:
             action.setChecked(True)
         if persist:
-            QSettings("TNSAI", APP_NAME).setValue("appearance/theme", theme)
+            QSettings(SETTINGS_ORGANIZATION, APP_NAME).setValue("appearance/theme", theme)
 
     def _setup_pages(self) -> None:
         self.canvas = ImageCanvas(self)

@@ -1,7 +1,4 @@
-"""Dialog for selecting detected map keys before loading.
-
-Author: TNS AI
-"""
+"""Dialog for selecting detected map keys before loading."""
 
 from __future__ import annotations
 

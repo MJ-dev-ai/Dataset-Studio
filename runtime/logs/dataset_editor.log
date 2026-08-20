@@ -44238,3 +44238,874 @@ KeyboardInterrupt
 01:08:38 INFO     Map: Normal
 01:08:41 INFO     Auto augmentation dialog
 01:09:18 INFO     Waiting for background tasks to stop...
+11:49:37 INFO     Waiting for background tasks to stop...
+11:59:58 INFO     Auto augmentation dialog
+12:00:54 INFO     Worker started: scan_dataset fa1049c8ca7943a1a88410d6b3b452f0
+12:00:54 INFO     1% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal01
+12:00:54 INFO     1% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal01
+12:00:54 INFO     2% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal02
+12:00:54 INFO     2% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal02
+12:00:54 INFO     3% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal03
+12:00:54 INFO     3% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal03
+12:00:54 INFO     4% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal04
+12:00:54 INFO     4% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal04
+12:00:54 INFO     5% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal05
+12:00:54 INFO     5% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal05
+12:00:54 INFO     6% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal06
+12:00:54 INFO     6% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal06
+12:00:54 INFO     7% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal07
+12:00:54 INFO     7% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal07
+12:00:54 INFO     8% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal08
+12:00:54 INFO     8% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal08
+12:00:54 INFO     9% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal09
+12:00:54 INFO     9% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal09
+12:00:54 INFO     10% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal10
+12:00:54 INFO     10% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal10
+12:00:54 INFO     11% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal11
+12:00:54 INFO     11% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal11
+12:00:54 INFO     12% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal12
+12:00:54 INFO     12% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal12
+12:00:54 INFO     13% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal13
+12:00:54 INFO     13% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal13
+12:00:54 INFO     14% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal14
+12:00:54 INFO     14% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal14
+12:00:54 INFO     15% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal15
+12:00:54 INFO     15% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal15
+12:00:54 INFO     16% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal16
+12:00:54 INFO     16% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal16
+12:00:54 INFO     17% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal17
+12:00:54 INFO     17% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\normal17
+12:00:54 INFO     18% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample01_dent1
+12:00:54 INFO     18% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample01_dent1
+12:00:54 INFO     19% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample02_scratch1_dent1
+12:00:54 INFO     19% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample02_scratch1_dent1
+12:00:54 INFO     20% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample03_dent1
+12:00:54 INFO     20% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample03_dent1
+12:00:54 INFO     21% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample04_dent2
+12:00:54 INFO     21% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample04_dent2
+12:00:54 INFO     22% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample05_scratch1_dent2
+12:00:54 INFO     22% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample05_scratch1_dent2
+12:00:54 INFO     23% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample06_dent2_stain1
+12:00:54 INFO     23% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample06_dent2_stain1
+12:00:54 INFO     24% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample07_scratch1_dent1
+12:00:54 INFO     24% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample07_scratch1_dent1
+12:00:54 INFO     25% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample08_scratch1_stain1
+12:00:54 INFO     25% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample08_scratch1_stain1
+12:00:54 INFO     26% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample09_dent1_stain1
+12:00:54 INFO     26% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample09_dent1_stain1
+12:00:54 INFO     27% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample10_dent1_stain1
+12:00:54 INFO     27% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample10_dent1_stain1
+12:00:54 INFO     28% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample11_dent1
+12:00:54 INFO     28% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample11_dent1
+12:00:54 INFO     29% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample12_dent2
+12:00:54 INFO     29% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample12_dent2
+12:00:54 INFO     30% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample13_scratch1_dent2
+12:00:54 INFO     30% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample13_scratch1_dent2
+12:00:54 INFO     31% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample14_dent2
+12:00:54 INFO     31% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample14_dent2
+12:00:54 INFO     32% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample15_dent1_stain1
+12:00:54 INFO     32% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample15_dent1_stain1
+12:00:54 INFO     33% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample16_dent1_stain1
+12:00:54 INFO     33% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample16_dent1_stain1
+12:00:54 INFO     34% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample17_dent1
+12:00:54 INFO     34% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample17_dent1
+12:00:54 INFO     35% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample18_scratch1_dent1
+12:00:54 INFO     35% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample18_scratch1_dent1
+12:00:54 INFO     36% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample19_scratch2_dent1
+12:00:54 INFO     36% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample19_scratch2_dent1
+12:00:54 INFO     37% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample20_dent1_crack1
+12:00:54 INFO     37% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample20_dent1_crack1
+12:00:54 INFO     38% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample21_scratch2_dent1_crack1_stain1
+12:00:54 INFO     38% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample21_scratch2_dent1_crack1_stain1
+12:00:54 INFO     39% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample22_dent1_crack1_stain1
+12:00:54 INFO     39% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample22_dent1_crack1_stain1
+12:00:54 INFO     40% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample23_scratch1_dent3_crack1_stain1
+12:00:54 INFO     40% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample23_scratch1_dent3_crack1_stain1
+12:00:54 INFO     41% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample24_scratch2_dent1_stain1
+12:00:54 INFO     41% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample24_scratch2_dent1_stain1
+12:00:54 INFO     42% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample25_scratch3_dent2_crack1
+12:00:54 INFO     42% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample25_scratch3_dent2_crack1
+12:00:54 INFO     43% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample26_scratch1_dent1_crack1_stain1
+12:00:54 INFO     43% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample26_scratch1_dent1_crack1_stain1
+12:00:54 INFO     44% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample27_scratch2_dent2_stain1
+12:00:54 INFO     44% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample27_scratch2_dent2_stain1
+12:00:54 INFO     45% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample28_dent2
+12:00:54 INFO     45% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample28_dent2
+12:00:54 INFO     46% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample29_scratch1_dent1_stain1
+12:00:54 INFO     46% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample29_scratch1_dent1_stain1
+12:00:54 INFO     47% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample30_scratch2_stain1
+12:00:54 INFO     47% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample30_scratch2_stain1
+12:00:54 INFO     48% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample31_scratch1_dent1_crack1_stain2
+12:00:54 INFO     48% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample31_scratch1_dent1_crack1_stain2
+12:00:54 INFO     49% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample32_scratch2_dent2_crack1_stain1
+12:00:54 INFO     49% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample32_scratch2_dent2_crack1_stain1
+12:00:54 INFO     50% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample33_scratch1_dent1_stain1
+12:00:54 INFO     50% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample33_scratch1_dent1_stain1
+12:00:54 INFO     51% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample34_scratch1_dent1_stain1
+12:00:54 INFO     51% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample34_scratch1_dent1_stain1
+12:00:54 INFO     52% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample35_scratch2
+12:00:54 INFO     52% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample35_scratch2
+12:00:54 INFO     53% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample36_scratch1
+12:00:54 INFO     53% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample36_scratch1
+12:00:54 INFO     54% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample37_scratch1
+12:00:54 INFO     54% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample37_scratch1
+12:00:54 INFO     55% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample38_scratch2
+12:00:54 INFO     55% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample38_scratch2
+12:00:54 INFO     56% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample39_scratch2_stain1
+12:00:54 INFO     56% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample39_scratch2_stain1
+12:00:54 INFO     57% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample40_scratch2
+12:00:54 INFO     57% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample40_scratch2
+12:00:54 INFO     58% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample41_scratch4
+12:00:54 INFO     58% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample41_scratch4
+12:00:54 INFO     59% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample42_scratch4
+12:00:54 INFO     59% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample42_scratch4
+12:00:54 INFO     60% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample43_scratch1
+12:00:54 INFO     60% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample43_scratch1
+12:00:54 INFO     61% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample44_scratch1
+12:00:54 INFO     61% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample44_scratch1
+12:00:54 INFO     62% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample45_scratch4
+12:00:54 INFO     62% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample45_scratch4
+12:00:54 INFO     63% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample46_scratch1
+12:00:54 INFO     63% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample46_scratch1
+12:00:54 INFO     64% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample47_scratch3
+12:00:54 INFO     64% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample47_scratch3
+12:00:54 INFO     65% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample48_scratch1
+12:00:54 INFO     65% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample48_scratch1
+12:00:54 INFO     66% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample49_scratch2
+12:00:54 INFO     66% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample49_scratch2
+12:00:54 INFO     67% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample50_scratch3
+12:00:54 INFO     67% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample50_scratch3
+12:00:54 INFO     68% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample51_scratch1
+12:00:54 INFO     68% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample51_scratch1
+12:00:54 INFO     69% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample52_scratch2
+12:00:54 INFO     69% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample52_scratch2
+12:00:54 INFO     70% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample53_scratch2
+12:00:54 INFO     70% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample53_scratch2
+12:00:54 INFO     71% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample54_scratch1
+12:00:54 INFO     71% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample54_scratch1
+12:00:54 INFO     72% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample55_scratch2_stain1
+12:00:54 INFO     72% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample55_scratch2_stain1
+12:00:54 INFO     73% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample56_scratch2
+12:00:54 INFO     73% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample56_scratch2
+12:00:54 INFO     74% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample57_scratch3_stain1
+12:00:54 INFO     74% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample57_scratch3_stain1
+12:00:54 INFO     75% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample58_scratch1_stain1
+12:00:54 INFO     75% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample58_scratch1_stain1
+12:00:54 INFO     76% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample59_scratch2
+12:00:54 INFO     76% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample59_scratch2
+12:00:54 INFO     77% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample60_scratch1_stain1
+12:00:54 INFO     77% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample60_scratch1_stain1
+12:00:54 INFO     78% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample61_scratch1_stain1
+12:00:54 INFO     78% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample61_scratch1_stain1
+12:00:54 INFO     79% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample62_scratch1_stain2
+12:00:54 INFO     79% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample62_scratch1_stain2
+12:00:54 INFO     80% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample63_scratch2_crack1
+12:00:54 INFO     80% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample63_scratch2_crack1
+12:00:54 INFO     81% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample64_scratch3
+12:00:54 INFO     81% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample64_scratch3
+12:00:54 INFO     82% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample65_scratch1
+12:00:54 INFO     82% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample65_scratch1
+12:00:54 INFO     83% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample66_scratch1
+12:00:54 INFO     83% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample66_scratch1
+12:00:54 INFO     84% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample67_scratch1
+12:00:54 INFO     84% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample67_scratch1
+12:00:54 INFO     85% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample68_scratch2
+12:00:54 INFO     85% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample68_scratch2
+12:00:54 INFO     86% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample69_scratch2
+12:00:54 INFO     86% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample69_scratch2
+12:00:54 INFO     87% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample70_scratch1
+12:00:54 INFO     87% C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\sample70_scratch1
+12:00:54 INFO     Worker finished: scan_dataset fa1049c8ca7943a1a88410d6b3b452f0
+12:00:54 INFO     Task finished: fa1049c8ca7943a1a88410d6b3b452f0
+12:00:55 INFO     Loaded 87 MapSet(s): C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results
+12:00:57 INFO     Main editor
+12:00:57 INFO     Map: Albedo
+12:00:57 INFO     Opened MapSet: sample29_scratch1_dent1_stain1
+12:01:02 INFO     Tool: rectangle
+12:01:05 INFO     Main editor
+12:01:05 INFO     Map: Albedo
+12:01:05 INFO     Opened MapSet: sample35_scratch2
+12:01:45 INFO     Auto augmentation dialog
+12:02:23 INFO     0% AutoAugment queued
+12:02:23 INFO     Worker started: auto_augment 818bf797d2f8446bbe814e0793b5f428
+12:02:23 INFO     Task started: AutoAugment 818bf797d2f8446bbe814e0793b5f428
+12:02:23 INFO     AutoAugment started: target_map=albedo_map samples=213 poisson_mode=Boundary Mixed output=C:\Users\tnsmi\Desktop\TIPS\tips_detection_backup\assets\samples\results\exports\yolo_autoaugment
+12:02:23 INFO     0% Preparing inputs | Scanning target images and defect patches
+12:02:23 INFO     AutoAugment inputs: target_images=87 patches=180
+12:02:23 INFO     5% Generating Poisson samples | Preparing base records
+12:02:23 INFO     AutoAugment ROI created from reference image: mapset=sample19_scratch2_dent1 target_map=albedo_map
+12:02:24 INFO     AutoAugment ROI created from reference image: mapset=sample19_scratch2_dent1 target_map=albedo_map
+12:02:24 INFO     AutoAugment ROI created from reference image: mapset=sample19_scratch2_dent1 target_map=albedo_map
+12:02:24 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:02:25 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:02:25 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:02:25 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:02:26 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:02:26 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:02:26 INFO     AutoAugment ROI created from reference image: mapset=sample40_scratch2 target_map=albedo_map
+12:02:27 INFO     AutoAugment ROI created from reference image: mapset=sample40_scratch2 target_map=albedo_map
+12:02:27 INFO     AutoAugment ROI created from reference image: mapset=sample40_scratch2 target_map=albedo_map
+12:02:27 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:28 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:28 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:28 INFO     AutoAugment ROI created from reference image: mapset=normal08 target_map=albedo_map
+12:02:29 INFO     AutoAugment ROI created from reference image: mapset=normal08 target_map=albedo_map
+12:02:29 INFO     AutoAugment ROI created from reference image: mapset=normal08 target_map=albedo_map
+12:02:29 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:02:30 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:02:30 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:02:30 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:02:31 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:02:31 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:02:31 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:02:32 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:02:32 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:02:32 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:02:33 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:02:33 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:02:33 INFO     6% Generating Poisson samples | Poisson base: generated 10/213, attempts 10/639, failures [none]
+12:02:33 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:34 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:34 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:34 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:02:35 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:02:35 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:02:35 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:02:36 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:02:36 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:02:36 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:02:36 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:02:37 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:02:37 INFO     AutoAugment ROI created from reference image: mapset=sample53_scratch2 target_map=albedo_map
+12:02:37 INFO     AutoAugment ROI created from reference image: mapset=sample53_scratch2 target_map=albedo_map
+12:02:38 INFO     AutoAugment ROI created from reference image: mapset=sample53_scratch2 target_map=albedo_map
+12:02:38 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:02:38 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:02:39 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:02:39 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:02:39 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:02:40 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:02:40 INFO     AutoAugment ROI created from reference image: mapset=sample59_scratch2 target_map=albedo_map
+12:02:40 INFO     AutoAugment ROI created from reference image: mapset=sample59_scratch2 target_map=albedo_map
+12:02:41 INFO     AutoAugment ROI created from reference image: mapset=sample59_scratch2 target_map=albedo_map
+12:02:41 INFO     AutoAugment ROI created from reference image: mapset=sample05_scratch1_dent2 target_map=albedo_map
+12:02:41 INFO     AutoAugment ROI created from reference image: mapset=sample05_scratch1_dent2 target_map=albedo_map
+12:02:42 INFO     AutoAugment ROI created from reference image: mapset=sample05_scratch1_dent2 target_map=albedo_map
+12:02:42 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:02:42 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:02:42 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:02:43 INFO     8% Generating Poisson samples | Poisson base: generated 20/213, attempts 20/639, failures [none]
+12:02:43 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:02:43 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:02:44 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:02:44 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:02:44 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:02:45 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:02:45 INFO     AutoAugment ROI created from reference image: mapset=sample26_scratch1_dent1_crack1_stain1 target_map=albedo_map
+12:02:45 INFO     AutoAugment ROI created from reference image: mapset=sample26_scratch1_dent1_crack1_stain1 target_map=albedo_map
+12:02:46 INFO     AutoAugment ROI created from reference image: mapset=sample26_scratch1_dent1_crack1_stain1 target_map=albedo_map
+12:02:46 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:02:46 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:02:46 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:02:47 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:02:47 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:02:47 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:02:48 INFO     AutoAugment ROI created from reference image: mapset=sample18_scratch1_dent1 target_map=albedo_map
+12:02:48 INFO     AutoAugment ROI created from reference image: mapset=sample18_scratch1_dent1 target_map=albedo_map
+12:02:48 INFO     AutoAugment ROI created from reference image: mapset=sample18_scratch1_dent1 target_map=albedo_map
+12:02:49 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:02:49 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:02:49 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:02:50 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:02:50 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:02:50 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:02:51 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:02:51 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:02:51 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:02:52 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:02:52 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:02:52 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:02:52 INFO     9% Generating Poisson samples | Poisson base: generated 30/213, attempts 30/639, failures [none]
+12:02:53 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:02:53 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:02:53 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:02:54 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:02:54 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:02:54 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:02:55 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:02:55 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:02:55 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:02:56 INFO     AutoAugment ROI created from reference image: mapset=sample29_scratch1_dent1_stain1 target_map=albedo_map
+12:02:56 INFO     AutoAugment ROI created from reference image: mapset=sample29_scratch1_dent1_stain1 target_map=albedo_map
+12:02:56 INFO     AutoAugment ROI created from reference image: mapset=sample29_scratch1_dent1_stain1 target_map=albedo_map
+12:02:57 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:02:57 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:02:57 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:02:58 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:02:58 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:02:58 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:02:59 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:59 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:59 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:02:59 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:03:00 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:03:00 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:03:00 INFO     AutoAugment ROI created from reference image: mapset=sample68_scratch2 target_map=albedo_map
+12:03:01 INFO     AutoAugment ROI created from reference image: mapset=sample68_scratch2 target_map=albedo_map
+12:03:01 INFO     AutoAugment ROI created from reference image: mapset=sample68_scratch2 target_map=albedo_map
+12:03:01 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:03:02 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:03:02 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:03:02 INFO     11% Generating Poisson samples | Poisson base: generated 40/213, attempts 40/639, failures [none]
+12:03:02 INFO     AutoAugment ROI created from reference image: mapset=sample10_dent1_stain1 target_map=albedo_map
+12:03:03 INFO     AutoAugment ROI created from reference image: mapset=sample10_dent1_stain1 target_map=albedo_map
+12:03:03 INFO     AutoAugment ROI created from reference image: mapset=sample10_dent1_stain1 target_map=albedo_map
+12:03:03 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:03:04 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:03:04 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:03:04 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:03:05 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:03:05 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:03:05 INFO     AutoAugment ROI created from reference image: mapset=sample33_scratch1_dent1_stain1 target_map=albedo_map
+12:03:06 INFO     AutoAugment ROI created from reference image: mapset=sample33_scratch1_dent1_stain1 target_map=albedo_map
+12:03:06 INFO     AutoAugment ROI created from reference image: mapset=sample33_scratch1_dent1_stain1 target_map=albedo_map
+12:03:06 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:03:07 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:03:07 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:03:07 INFO     AutoAugment ROI created from reference image: mapset=sample45_scratch4 target_map=albedo_map
+12:03:08 INFO     AutoAugment ROI created from reference image: mapset=sample45_scratch4 target_map=albedo_map
+12:03:08 INFO     AutoAugment ROI created from reference image: mapset=sample45_scratch4 target_map=albedo_map
+12:03:08 INFO     AutoAugment ROI created from reference image: mapset=sample04_dent2 target_map=albedo_map
+12:03:08 INFO     AutoAugment ROI created from reference image: mapset=sample04_dent2 target_map=albedo_map
+12:03:09 INFO     AutoAugment ROI created from reference image: mapset=sample04_dent2 target_map=albedo_map
+12:03:09 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:03:10 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:03:10 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:03:10 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:03:11 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:03:11 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:03:11 INFO     AutoAugment ROI created from reference image: mapset=sample22_dent1_crack1_stain1 target_map=albedo_map
+12:03:12 INFO     AutoAugment ROI created from reference image: mapset=sample22_dent1_crack1_stain1 target_map=albedo_map
+12:03:12 INFO     AutoAugment ROI created from reference image: mapset=sample22_dent1_crack1_stain1 target_map=albedo_map
+12:03:12 INFO     12% Generating Poisson samples | Poisson base: generated 50/213, attempts 50/639, failures [none]
+12:03:12 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:03:13 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:03:13 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:03:13 INFO     AutoAugment ROI created from reference image: mapset=sample28_dent2 target_map=albedo_map
+12:03:14 INFO     AutoAugment ROI created from reference image: mapset=sample28_dent2 target_map=albedo_map
+12:03:14 INFO     AutoAugment ROI created from reference image: mapset=sample28_dent2 target_map=albedo_map
+12:03:14 INFO     AutoAugment ROI created from reference image: mapset=sample41_scratch4 target_map=albedo_map
+12:03:15 INFO     AutoAugment ROI created from reference image: mapset=sample41_scratch4 target_map=albedo_map
+12:03:15 INFO     AutoAugment ROI created from reference image: mapset=sample41_scratch4 target_map=albedo_map
+12:03:15 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:03:16 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:03:16 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:03:17 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:03:17 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:03:17 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:03:18 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:03:18 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:03:18 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:03:18 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:03:19 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:03:19 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:03:19 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:03:20 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:03:20 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:03:20 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:03:21 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:03:21 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:03:21 INFO     AutoAugment ROI created from reference image: mapset=sample55_scratch2_stain1 target_map=albedo_map
+12:03:21 INFO     AutoAugment ROI created from reference image: mapset=sample55_scratch2_stain1 target_map=albedo_map
+12:03:22 INFO     AutoAugment ROI created from reference image: mapset=sample55_scratch2_stain1 target_map=albedo_map
+12:03:22 INFO     13% Generating Poisson samples | Poisson base: generated 60/213, attempts 60/639, failures [none]
+12:03:22 INFO     AutoAugment ROI created from reference image: mapset=sample62_scratch1_stain2 target_map=albedo_map
+12:03:22 INFO     AutoAugment ROI created from reference image: mapset=sample62_scratch1_stain2 target_map=albedo_map
+12:03:23 INFO     AutoAugment ROI created from reference image: mapset=sample62_scratch1_stain2 target_map=albedo_map
+12:03:23 INFO     AutoAugment ROI created from reference image: mapset=sample24_scratch2_dent1_stain1 target_map=albedo_map
+12:03:23 INFO     AutoAugment ROI created from reference image: mapset=sample24_scratch2_dent1_stain1 target_map=albedo_map
+12:03:24 INFO     AutoAugment ROI created from reference image: mapset=sample24_scratch2_dent1_stain1 target_map=albedo_map
+12:03:24 INFO     AutoAugment ROI created from reference image: mapset=sample13_scratch1_dent2 target_map=albedo_map
+12:03:24 INFO     AutoAugment ROI created from reference image: mapset=sample13_scratch1_dent2 target_map=albedo_map
+12:03:25 INFO     AutoAugment ROI created from reference image: mapset=sample13_scratch1_dent2 target_map=albedo_map
+12:03:25 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:03:25 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:03:26 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:03:26 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:03:26 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:03:26 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:03:27 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:03:27 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:03:27 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:03:28 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:03:28 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:03:29 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:03:29 INFO     AutoAugment ROI created from reference image: mapset=sample38_scratch2 target_map=albedo_map
+12:03:29 INFO     AutoAugment ROI created from reference image: mapset=sample38_scratch2 target_map=albedo_map
+12:03:29 INFO     AutoAugment ROI created from reference image: mapset=sample38_scratch2 target_map=albedo_map
+12:03:30 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:03:30 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:03:30 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:03:31 INFO     AutoAugment ROI created from reference image: mapset=sample58_scratch1_stain1 target_map=albedo_map
+12:03:31 INFO     AutoAugment ROI created from reference image: mapset=sample58_scratch1_stain1 target_map=albedo_map
+12:03:31 INFO     AutoAugment ROI created from reference image: mapset=sample58_scratch1_stain1 target_map=albedo_map
+12:03:32 INFO     15% Generating Poisson samples | Poisson base: generated 70/213, attempts 70/639, failures [none]
+12:03:32 INFO     AutoAugment ROI created from reference image: mapset=sample32_scratch2_dent2_crack1_stain1 target_map=albedo_map
+12:03:32 INFO     AutoAugment ROI created from reference image: mapset=sample32_scratch2_dent2_crack1_stain1 target_map=albedo_map
+12:03:32 INFO     AutoAugment ROI created from reference image: mapset=sample32_scratch2_dent2_crack1_stain1 target_map=albedo_map
+12:03:33 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:33 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:33 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:34 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:03:34 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:03:34 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:03:35 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:03:35 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:03:35 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:03:36 INFO     AutoAugment ROI created from reference image: mapset=sample05_scratch1_dent2 target_map=albedo_map
+12:03:36 INFO     AutoAugment ROI created from reference image: mapset=sample05_scratch1_dent2 target_map=albedo_map
+12:03:36 INFO     AutoAugment ROI created from reference image: mapset=sample05_scratch1_dent2 target_map=albedo_map
+12:03:37 INFO     AutoAugment ROI created from reference image: mapset=sample52_scratch2 target_map=albedo_map
+12:03:37 INFO     AutoAugment ROI created from reference image: mapset=sample52_scratch2 target_map=albedo_map
+12:03:37 INFO     AutoAugment ROI created from reference image: mapset=sample52_scratch2 target_map=albedo_map
+12:03:38 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:03:38 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:03:38 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:03:39 INFO     AutoAugment ROI created from reference image: mapset=sample42_scratch4 target_map=albedo_map
+12:03:39 INFO     AutoAugment ROI created from reference image: mapset=sample42_scratch4 target_map=albedo_map
+12:03:39 INFO     AutoAugment ROI created from reference image: mapset=sample42_scratch4 target_map=albedo_map
+12:03:40 INFO     AutoAugment ROI created from reference image: mapset=sample46_scratch1 target_map=albedo_map
+12:03:40 INFO     AutoAugment ROI created from reference image: mapset=sample46_scratch1 target_map=albedo_map
+12:03:40 INFO     AutoAugment ROI created from reference image: mapset=sample46_scratch1 target_map=albedo_map
+12:03:41 INFO     AutoAugment ROI created from reference image: mapset=sample33_scratch1_dent1_stain1 target_map=albedo_map
+12:03:41 INFO     AutoAugment ROI created from reference image: mapset=sample33_scratch1_dent1_stain1 target_map=albedo_map
+12:03:41 INFO     AutoAugment ROI created from reference image: mapset=sample33_scratch1_dent1_stain1 target_map=albedo_map
+12:03:41 INFO     16% Generating Poisson samples | Poisson base: generated 80/213, attempts 80/639, failures [none]
+12:03:42 INFO     AutoAugment ROI created from reference image: mapset=sample25_scratch3_dent2_crack1 target_map=albedo_map
+12:03:42 INFO     AutoAugment ROI created from reference image: mapset=sample25_scratch3_dent2_crack1 target_map=albedo_map
+12:03:42 INFO     AutoAugment ROI created from reference image: mapset=sample25_scratch3_dent2_crack1 target_map=albedo_map
+12:03:43 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:03:43 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:03:43 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:03:44 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:44 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:44 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:45 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:03:45 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:03:45 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:03:46 INFO     AutoAugment ROI created from reference image: mapset=sample40_scratch2 target_map=albedo_map
+12:03:46 INFO     AutoAugment ROI created from reference image: mapset=sample40_scratch2 target_map=albedo_map
+12:03:46 INFO     AutoAugment ROI created from reference image: mapset=sample40_scratch2 target_map=albedo_map
+12:03:47 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:03:47 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:03:47 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:03:47 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:03:48 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:03:48 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:03:48 INFO     AutoAugment ROI created from reference image: mapset=sample23_scratch1_dent3_crack1_stain1 target_map=albedo_map
+12:03:49 INFO     AutoAugment ROI created from reference image: mapset=sample23_scratch1_dent3_crack1_stain1 target_map=albedo_map
+12:03:49 INFO     AutoAugment ROI created from reference image: mapset=sample23_scratch1_dent3_crack1_stain1 target_map=albedo_map
+12:03:49 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:50 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:50 INFO     AutoAugment ROI created from reference image: mapset=sample65_scratch1 target_map=albedo_map
+12:03:50 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:03:50 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:03:51 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:03:51 INFO     18% Generating Poisson samples | Poisson base: generated 90/213, attempts 90/639, failures [none]
+12:03:51 INFO     AutoAugment ROI created from reference image: mapset=normal10 target_map=albedo_map
+12:03:51 INFO     AutoAugment ROI created from reference image: mapset=normal10 target_map=albedo_map
+12:03:52 INFO     AutoAugment ROI created from reference image: mapset=normal10 target_map=albedo_map
+12:03:52 INFO     AutoAugment ROI created from reference image: mapset=sample52_scratch2 target_map=albedo_map
+12:03:52 INFO     AutoAugment ROI created from reference image: mapset=sample52_scratch2 target_map=albedo_map
+12:03:53 INFO     AutoAugment ROI created from reference image: mapset=sample52_scratch2 target_map=albedo_map
+12:03:53 INFO     AutoAugment ROI created from reference image: mapset=sample57_scratch3_stain1 target_map=albedo_map
+12:03:53 INFO     AutoAugment ROI created from reference image: mapset=sample57_scratch3_stain1 target_map=albedo_map
+12:03:54 INFO     AutoAugment ROI created from reference image: mapset=sample57_scratch3_stain1 target_map=albedo_map
+12:03:54 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:03:54 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:03:55 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:03:55 INFO     AutoAugment ROI created from reference image: mapset=sample47_scratch3 target_map=albedo_map
+12:03:55 INFO     AutoAugment ROI created from reference image: mapset=sample47_scratch3 target_map=albedo_map
+12:03:56 INFO     AutoAugment ROI created from reference image: mapset=sample47_scratch3 target_map=albedo_map
+12:03:56 INFO     AutoAugment ROI created from reference image: mapset=sample31_scratch1_dent1_crack1_stain2 target_map=albedo_map
+12:03:56 INFO     AutoAugment ROI created from reference image: mapset=sample31_scratch1_dent1_crack1_stain2 target_map=albedo_map
+12:03:57 INFO     AutoAugment ROI created from reference image: mapset=sample31_scratch1_dent1_crack1_stain2 target_map=albedo_map
+12:03:57 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:03:57 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:03:58 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:03:58 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:03:58 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:03:59 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:03:59 INFO     AutoAugment ROI created from reference image: mapset=sample10_dent1_stain1 target_map=albedo_map
+12:03:59 INFO     AutoAugment ROI created from reference image: mapset=sample10_dent1_stain1 target_map=albedo_map
+12:04:00 INFO     AutoAugment ROI created from reference image: mapset=sample10_dent1_stain1 target_map=albedo_map
+12:04:00 INFO     AutoAugment ROI created from reference image: mapset=sample64_scratch3 target_map=albedo_map
+12:04:00 INFO     AutoAugment ROI created from reference image: mapset=sample64_scratch3 target_map=albedo_map
+12:04:01 INFO     AutoAugment ROI created from reference image: mapset=sample64_scratch3 target_map=albedo_map
+12:04:01 INFO     19% Generating Poisson samples | Poisson base: generated 100/213, attempts 100/639, failures [none]
+12:04:01 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:04:01 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:04:01 INFO     AutoAugment ROI created from reference image: mapset=sample61_scratch1_stain1 target_map=albedo_map
+12:04:02 INFO     AutoAugment ROI created from reference image: mapset=sample06_dent2_stain1 target_map=albedo_map
+12:04:02 INFO     AutoAugment ROI created from reference image: mapset=sample06_dent2_stain1 target_map=albedo_map
+12:04:02 INFO     AutoAugment ROI created from reference image: mapset=sample06_dent2_stain1 target_map=albedo_map
+12:04:03 INFO     AutoAugment ROI created from reference image: mapset=sample41_scratch4 target_map=albedo_map
+12:04:03 INFO     AutoAugment ROI created from reference image: mapset=sample41_scratch4 target_map=albedo_map
+12:04:03 INFO     AutoAugment ROI created from reference image: mapset=sample41_scratch4 target_map=albedo_map
+12:04:04 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:04:04 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:04:04 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:04:05 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:04:05 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:04:05 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:04:06 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:04:06 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:04:07 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:04:07 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:04:07 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:04:08 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:04:08 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:04:08 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:04:08 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:04:09 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:04:09 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:04:09 INFO     AutoAugment ROI created from reference image: mapset=sample37_scratch1 target_map=albedo_map
+12:04:10 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:04:10 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:04:11 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:04:11 INFO     20% Generating Poisson samples | Poisson base: generated 110/213, attempts 110/639, failures [none]
+12:04:11 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:04:11 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:04:12 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:04:12 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:04:12 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:04:13 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:04:13 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:04:13 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:04:13 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:04:14 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:14 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:14 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:15 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:04:15 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:04:15 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:04:16 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:04:16 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:04:16 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:04:17 INFO     AutoAugment ROI created from reference image: mapset=sample27_scratch2_dent2_stain1 target_map=albedo_map
+12:04:17 INFO     AutoAugment ROI created from reference image: mapset=sample27_scratch2_dent2_stain1 target_map=albedo_map
+12:04:17 INFO     AutoAugment ROI created from reference image: mapset=sample27_scratch2_dent2_stain1 target_map=albedo_map
+12:04:18 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:04:18 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:04:18 INFO     AutoAugment ROI created from reference image: mapset=sample07_scratch1_dent1 target_map=albedo_map
+12:04:19 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:04:19 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:04:19 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:04:20 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:20 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:20 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:20 INFO     22% Generating Poisson samples | Poisson base: generated 120/213, attempts 120/639, failures [placement_failed=1]
+12:04:21 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:04:21 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:04:21 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:04:22 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:04:22 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:04:22 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:04:23 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:04:23 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:04:23 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:04:23 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:04:24 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:04:24 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:04:24 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:04:25 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:04:25 INFO     AutoAugment ROI created from reference image: mapset=sample54_scratch1 target_map=albedo_map
+12:04:25 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:04:26 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:04:26 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:04:26 INFO     AutoAugment ROI created from reference image: mapset=sample70_scratch1 target_map=albedo_map
+12:04:27 INFO     AutoAugment ROI created from reference image: mapset=sample70_scratch1 target_map=albedo_map
+12:04:27 INFO     AutoAugment ROI created from reference image: mapset=sample70_scratch1 target_map=albedo_map
+12:04:27 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:04:28 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:04:28 INFO     AutoAugment ROI created from reference image: mapset=normal04 target_map=albedo_map
+12:04:28 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:04:29 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:04:29 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:04:29 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:04:30 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:04:30 INFO     AutoAugment ROI created from reference image: mapset=sample66_scratch1 target_map=albedo_map
+12:04:30 INFO     23% Generating Poisson samples | Poisson base: generated 130/213, attempts 130/639, failures [placement_failed=1]
+12:04:30 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:04:31 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:04:31 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:04:31 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:04:32 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:04:32 INFO     AutoAugment ROI created from reference image: mapset=sample17_dent1 target_map=albedo_map
+12:04:32 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:04:33 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:04:33 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:04:33 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:04:34 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:04:34 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:04:34 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:04:34 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:04:35 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:04:35 INFO     AutoAugment ROI created from reference image: mapset=sample38_scratch2 target_map=albedo_map
+12:04:35 INFO     AutoAugment ROI created from reference image: mapset=sample38_scratch2 target_map=albedo_map
+12:04:36 INFO     AutoAugment ROI created from reference image: mapset=sample38_scratch2 target_map=albedo_map
+12:04:36 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:04:36 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:04:37 INFO     AutoAugment ROI created from reference image: mapset=sample60_scratch1_stain1 target_map=albedo_map
+12:04:37 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:04:37 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:04:38 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:04:38 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:04:39 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:04:39 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:04:39 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:04:40 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:04:40 INFO     AutoAugment ROI created from reference image: mapset=sample11_dent1 target_map=albedo_map
+12:04:40 INFO     25% Generating Poisson samples | Poisson base: generated 140/213, attempts 140/639, failures [placement_failed=1]
+12:04:41 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:04:41 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:04:41 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:04:42 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:42 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:42 INFO     AutoAugment ROI created from reference image: mapset=sample49_scratch2 target_map=albedo_map
+12:04:43 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:04:43 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:04:43 INFO     AutoAugment ROI created from reference image: mapset=normal17 target_map=albedo_map
+12:04:44 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:04:44 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:04:44 INFO     AutoAugment ROI created from reference image: mapset=sample08_scratch1_stain1 target_map=albedo_map
+12:04:45 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:04:45 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:04:45 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:04:46 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:04:46 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:04:47 INFO     AutoAugment ROI created from reference image: mapset=normal02 target_map=albedo_map
+12:04:47 INFO     AutoAugment ROI created from reference image: mapset=sample16_dent1_stain1 target_map=albedo_map
+12:04:47 INFO     AutoAugment ROI created from reference image: mapset=sample16_dent1_stain1 target_map=albedo_map
+12:04:48 INFO     AutoAugment ROI created from reference image: mapset=sample16_dent1_stain1 target_map=albedo_map
+12:04:48 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:04:48 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:04:49 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:04:49 INFO     AutoAugment ROI created from reference image: mapset=normal08 target_map=albedo_map
+12:04:50 INFO     AutoAugment ROI created from reference image: mapset=normal08 target_map=albedo_map
+12:04:50 INFO     AutoAugment ROI created from reference image: mapset=normal08 target_map=albedo_map
+12:04:50 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:04:51 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:04:51 INFO     AutoAugment ROI created from reference image: mapset=sample51_scratch1 target_map=albedo_map
+12:04:51 INFO     26% Generating Poisson samples | Poisson base: generated 150/213, attempts 150/639, failures [placement_failed=1]
+12:04:51 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:04:52 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:04:52 INFO     AutoAugment ROI created from reference image: mapset=normal06 target_map=albedo_map
+12:04:53 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:04:53 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:04:53 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:04:54 INFO     AutoAugment ROI created from reference image: mapset=sample24_scratch2_dent1_stain1 target_map=albedo_map
+12:04:54 INFO     AutoAugment ROI created from reference image: mapset=sample24_scratch2_dent1_stain1 target_map=albedo_map
+12:04:54 INFO     AutoAugment ROI created from reference image: mapset=sample24_scratch2_dent1_stain1 target_map=albedo_map
+12:04:55 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:04:55 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:04:55 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:04:56 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:04:56 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:04:57 INFO     AutoAugment ROI created from reference image: mapset=normal13 target_map=albedo_map
+12:04:57 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:04:57 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:04:58 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:04:58 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:04:59 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:04:59 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:04:59 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:05:00 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:05:00 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:05:00 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:05:01 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:05:01 INFO     AutoAugment ROI created from reference image: mapset=sample50_scratch3 target_map=albedo_map
+12:05:02 INFO     AutoAugment ROI created from reference image: mapset=sample39_scratch2_stain1 target_map=albedo_map
+12:05:02 INFO     AutoAugment ROI created from reference image: mapset=sample39_scratch2_stain1 target_map=albedo_map
+12:05:02 INFO     AutoAugment ROI created from reference image: mapset=sample39_scratch2_stain1 target_map=albedo_map
+12:05:02 INFO     28% Generating Poisson samples | Poisson base: generated 160/213, attempts 160/639, failures [placement_failed=1]
+12:05:03 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:05:03 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:05:03 INFO     AutoAugment ROI created from reference image: mapset=sample02_scratch1_dent1 target_map=albedo_map
+12:05:04 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:05:04 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:05:04 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:05:05 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:05:05 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:05:05 INFO     AutoAugment ROI created from reference image: mapset=sample09_dent1_stain1 target_map=albedo_map
+12:05:06 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:05:06 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:05:06 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:05:07 INFO     AutoAugment ROI created from reference image: mapset=sample55_scratch2_stain1 target_map=albedo_map
+12:05:07 INFO     AutoAugment ROI created from reference image: mapset=sample55_scratch2_stain1 target_map=albedo_map
+12:05:08 INFO     AutoAugment ROI created from reference image: mapset=sample55_scratch2_stain1 target_map=albedo_map
+12:05:08 INFO     AutoAugment ROI created from reference image: mapset=sample62_scratch1_stain2 target_map=albedo_map
+12:05:08 INFO     AutoAugment ROI created from reference image: mapset=sample62_scratch1_stain2 target_map=albedo_map
+12:05:09 INFO     AutoAugment ROI created from reference image: mapset=sample62_scratch1_stain2 target_map=albedo_map
+12:05:09 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:05:09 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:05:10 INFO     AutoAugment ROI created from reference image: mapset=sample34_scratch1_dent1_stain1 target_map=albedo_map
+12:05:10 INFO     AutoAugment ROI created from reference image: mapset=sample04_dent2 target_map=albedo_map
+12:05:10 INFO     AutoAugment ROI created from reference image: mapset=sample04_dent2 target_map=albedo_map
+12:05:11 INFO     AutoAugment ROI created from reference image: mapset=sample04_dent2 target_map=albedo_map
+12:05:11 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:05:11 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:05:12 INFO     AutoAugment ROI created from reference image: mapset=sample15_dent1_stain1 target_map=albedo_map
+12:05:12 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:05:13 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:05:13 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:05:13 INFO     29% Generating Poisson samples | Poisson base: generated 170/213, attempts 170/639, failures [placement_failed=1]
+12:05:13 INFO     AutoAugment ROI created from reference image: mapset=sample70_scratch1 target_map=albedo_map
+12:05:14 INFO     AutoAugment ROI created from reference image: mapset=sample70_scratch1 target_map=albedo_map
+12:05:14 INFO     AutoAugment ROI created from reference image: mapset=sample70_scratch1 target_map=albedo_map
+12:05:15 INFO     AutoAugment ROI created from reference image: mapset=sample13_scratch1_dent2 target_map=albedo_map
+12:05:15 INFO     AutoAugment ROI created from reference image: mapset=sample13_scratch1_dent2 target_map=albedo_map
+12:05:15 INFO     AutoAugment ROI created from reference image: mapset=sample13_scratch1_dent2 target_map=albedo_map
+12:05:16 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:05:16 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:05:16 INFO     AutoAugment ROI created from reference image: mapset=normal07 target_map=albedo_map
+12:05:17 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:05:17 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:05:17 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:05:18 INFO     AutoAugment ROI created from reference image: mapset=sample59_scratch2 target_map=albedo_map
+12:05:18 INFO     AutoAugment ROI created from reference image: mapset=sample59_scratch2 target_map=albedo_map
+12:05:19 INFO     AutoAugment ROI created from reference image: mapset=sample59_scratch2 target_map=albedo_map
+12:05:19 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:05:19 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:05:19 INFO     AutoAugment ROI created from reference image: mapset=normal09 target_map=albedo_map
+12:05:20 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:05:20 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:05:21 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:05:21 INFO     AutoAugment ROI created from reference image: mapset=sample48_scratch1 target_map=albedo_map
+12:05:21 INFO     AutoAugment ROI created from reference image: mapset=sample48_scratch1 target_map=albedo_map
+12:05:22 INFO     AutoAugment ROI created from reference image: mapset=sample48_scratch1 target_map=albedo_map
+12:05:22 INFO     AutoAugment ROI created from reference image: mapset=sample06_dent2_stain1 target_map=albedo_map
+12:05:22 INFO     AutoAugment ROI created from reference image: mapset=sample06_dent2_stain1 target_map=albedo_map
+12:05:23 INFO     AutoAugment ROI created from reference image: mapset=sample06_dent2_stain1 target_map=albedo_map
+12:05:23 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:05:23 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:05:24 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:05:24 INFO     30% Generating Poisson samples | Poisson base: generated 180/213, attempts 180/639, failures [placement_failed=1]
+12:05:24 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:05:24 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:05:25 INFO     AutoAugment ROI created from reference image: mapset=sample01_dent1 target_map=albedo_map
+12:05:25 INFO     AutoAugment ROI created from reference image: mapset=sample29_scratch1_dent1_stain1 target_map=albedo_map
+12:05:26 INFO     AutoAugment ROI created from reference image: mapset=sample29_scratch1_dent1_stain1 target_map=albedo_map
+12:05:26 INFO     AutoAugment ROI created from reference image: mapset=sample29_scratch1_dent1_stain1 target_map=albedo_map
+12:05:26 INFO     AutoAugment ROI created from reference image: mapset=sample46_scratch1 target_map=albedo_map
+12:05:27 INFO     AutoAugment ROI created from reference image: mapset=sample46_scratch1 target_map=albedo_map
+12:05:27 INFO     AutoAugment ROI created from reference image: mapset=sample46_scratch1 target_map=albedo_map
+12:05:27 INFO     AutoAugment ROI created from reference image: mapset=sample63_scratch2_crack1 target_map=albedo_map
+12:05:28 INFO     AutoAugment ROI created from reference image: mapset=sample63_scratch2_crack1 target_map=albedo_map
+12:05:28 INFO     AutoAugment ROI created from reference image: mapset=sample63_scratch2_crack1 target_map=albedo_map
+12:05:29 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:05:29 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:05:29 INFO     AutoAugment ROI created from reference image: mapset=normal11 target_map=albedo_map
+12:05:30 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:05:30 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:05:30 INFO     AutoAugment ROI created from reference image: mapset=normal05 target_map=albedo_map
+12:05:31 INFO     AutoAugment ROI created from reference image: mapset=sample47_scratch3 target_map=albedo_map
+12:05:31 INFO     AutoAugment ROI created from reference image: mapset=sample47_scratch3 target_map=albedo_map
+12:05:31 INFO     AutoAugment ROI created from reference image: mapset=sample47_scratch3 target_map=albedo_map
+12:05:32 INFO     AutoAugment ROI created from reference image: mapset=sample27_scratch2_dent2_stain1 target_map=albedo_map
+12:05:32 INFO     AutoAugment ROI created from reference image: mapset=sample27_scratch2_dent2_stain1 target_map=albedo_map
+12:05:32 INFO     AutoAugment ROI created from reference image: mapset=sample27_scratch2_dent2_stain1 target_map=albedo_map
+12:05:33 INFO     AutoAugment ROI created from reference image: mapset=sample19_scratch2_dent1 target_map=albedo_map
+12:05:33 INFO     AutoAugment ROI created from reference image: mapset=sample19_scratch2_dent1 target_map=albedo_map
+12:05:33 INFO     AutoAugment ROI created from reference image: mapset=sample19_scratch2_dent1 target_map=albedo_map
+12:05:34 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:05:34 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:05:34 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:05:35 INFO     32% Generating Poisson samples | Poisson base: generated 190/213, attempts 190/639, failures [placement_failed=1]
+12:05:35 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:05:35 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:05:35 INFO     AutoAugment ROI created from reference image: mapset=normal14 target_map=albedo_map
+12:05:36 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:05:36 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:05:36 INFO     AutoAugment ROI created from reference image: mapset=normal01 target_map=albedo_map
+12:05:37 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:05:37 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:05:37 INFO     AutoAugment ROI created from reference image: mapset=sample14_dent2 target_map=albedo_map
+12:05:38 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:05:38 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:05:38 INFO     AutoAugment ROI created from reference image: mapset=sample43_scratch1 target_map=albedo_map
+12:05:39 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:05:39 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:05:39 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:05:40 INFO     AutoAugment ROI created from reference image: mapset=sample31_scratch1_dent1_crack1_stain2 target_map=albedo_map
+12:05:40 INFO     AutoAugment ROI created from reference image: mapset=sample31_scratch1_dent1_crack1_stain2 target_map=albedo_map
+12:05:41 INFO     AutoAugment ROI created from reference image: mapset=sample31_scratch1_dent1_crack1_stain2 target_map=albedo_map
+12:05:41 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:05:41 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:05:42 INFO     AutoAugment ROI created from reference image: mapset=sample12_dent2 target_map=albedo_map
+12:05:42 INFO     AutoAugment ROI created from reference image: mapset=sample42_scratch4 target_map=albedo_map
+12:05:43 INFO     AutoAugment ROI created from reference image: mapset=sample42_scratch4 target_map=albedo_map
+12:05:43 INFO     AutoAugment ROI created from reference image: mapset=sample42_scratch4 target_map=albedo_map
+12:05:43 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:05:44 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:05:44 INFO     AutoAugment ROI created from reference image: mapset=normal16 target_map=albedo_map
+12:05:44 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:05:45 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:05:45 INFO     AutoAugment ROI created from reference image: mapset=normal03 target_map=albedo_map
+12:05:45 INFO     33% Generating Poisson samples | Poisson base: generated 200/213, attempts 200/639, failures [placement_failed=1]
+12:05:46 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:05:46 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:05:46 INFO     AutoAugment ROI created from reference image: mapset=sample20_dent1_crack1 target_map=albedo_map
+12:05:47 INFO     AutoAugment ROI created from reference image: mapset=sample63_scratch2_crack1 target_map=albedo_map
+12:05:47 INFO     AutoAugment ROI created from reference image: mapset=sample63_scratch2_crack1 target_map=albedo_map
+12:05:47 INFO     AutoAugment ROI created from reference image: mapset=sample63_scratch2_crack1 target_map=albedo_map
+12:05:48 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:05:48 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:05:48 INFO     AutoAugment ROI created from reference image: mapset=sample44_scratch1 target_map=albedo_map
+12:05:49 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:05:49 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:05:49 INFO     AutoAugment ROI created from reference image: mapset=sample35_scratch2 target_map=albedo_map
+12:05:50 INFO     AutoAugment ROI created from reference image: mapset=sample18_scratch1_dent1 target_map=albedo_map
+12:05:50 INFO     AutoAugment ROI created from reference image: mapset=sample18_scratch1_dent1 target_map=albedo_map
+12:05:50 INFO     AutoAugment ROI created from reference image: mapset=sample18_scratch1_dent1 target_map=albedo_map
+12:05:51 INFO     AutoAugment ROI created from reference image: mapset=sample28_dent2 target_map=albedo_map
+12:05:51 INFO     AutoAugment ROI created from reference image: mapset=sample28_dent2 target_map=albedo_map
+12:05:51 INFO     AutoAugment ROI created from reference image: mapset=sample28_dent2 target_map=albedo_map
+12:05:52 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:05:52 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:05:52 INFO     AutoAugment ROI created from reference image: mapset=sample67_scratch1 target_map=albedo_map
+12:05:53 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:05:53 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:05:54 INFO     AutoAugment ROI created from reference image: mapset=sample30_scratch2_stain1 target_map=albedo_map
+12:05:54 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:05:54 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:05:55 INFO     AutoAugment ROI created from reference image: mapset=normal12 target_map=albedo_map
+12:05:55 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:05:55 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:05:56 INFO     AutoAugment ROI created from reference image: mapset=sample69_scratch2 target_map=albedo_map
+12:05:56 INFO     35% Generating Poisson samples | Poisson base: generated 210/213, attempts 210/639, failures [placement_failed=1]
+12:05:56 INFO     AutoAugment ROI created from reference image: mapset=sample22_dent1_crack1_stain1 target_map=albedo_map
+12:05:56 INFO     AutoAugment ROI created from reference image: mapset=sample22_dent1_crack1_stain1 target_map=albedo_map
+12:05:57 INFO     AutoAugment ROI created from reference image: mapset=sample22_dent1_crack1_stain1 target_map=albedo_map
+12:05:57 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:05:58 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:05:58 INFO     AutoAugment ROI created from reference image: mapset=sample36_scratch1 target_map=albedo_map
+12:05:58 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:05:59 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:05:59 INFO     AutoAugment ROI created from reference image: mapset=normal15 target_map=albedo_map
+12:05:59 INFO     Poisson complete: generated 213/213, attempts 213/639, failures [placement_failed=1]
+12:05:59 INFO     35% Generating Poisson samples | Poisson base: generated 213/213, attempts 213/639, failures [placement_failed=1]
+12:05:59 INFO     35% Generating Poisson samples | Poisson complete: generated 213/213, attempts 213/639, failures [placement_failed=1]
+12:05:59 INFO     36% Shuffling and splitting dataset | Assigning base records to train, val, and test
+12:05:59 INFO     40% Writing train outputs | 0/240 base samples
+12:05:59 ERROR    Background task failed: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\worker\augmentation_worker.py", line 101, in _execute_auto_augment
+    image_out, _label_out = augmentation_service.write_auto_yolo_sample(options, split, staged_name, staged_image, staged_labels)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+
+12:05:59 INFO     Task failed: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+12:05:59 INFO     Worker finished: auto_augment 818bf797d2f8446bbe814e0793b5f428
+12:05:59 INFO     Task finished: 818bf797d2f8446bbe814e0793b5f428
+14:03:48 INFO     Waiting for background tasks to stop...

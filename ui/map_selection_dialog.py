@@ -1,7 +1,4 @@
-"""Dialog for selecting which detected map keys are loaded into a project.
-
-Author: TNS AI
-"""
+"""Dialog for selecting which detected map keys are loaded into a project."""
 
 from __future__ import annotations
 

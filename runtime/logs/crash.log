@@ -77,3 +77,10 @@ Traceback (most recent call last):
     def eventFilter(self, watched, event) -> bool:
     
 KeyboardInterrupt
+
+[2026-08-20T03:05:59.759891+00:00] Background task failed: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\worker\augmentation_worker.py", line 101, in _execute_auto_augment
+    image_out, _label_out = augmentation_service.write_auto_yolo_sample(options, split, staged_name, staged_image, staged_labels)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: write_auto_yolo_sample() missing 1 required positional argument: 'labels'

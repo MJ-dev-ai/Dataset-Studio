@@ -1,7 +1,4 @@
-"""Auto ROI reference image and contour utilities.
-
-Author: TNS AI
-"""
+"""Auto ROI reference image and contour utilities."""
 
 from __future__ import annotations
 

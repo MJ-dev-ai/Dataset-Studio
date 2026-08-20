@@ -1,7 +1,4 @@
-"""Transform panels and dialogs for image preprocessing.
-
-Author: TNS AI
-"""
+"""Transform panels and dialogs for image preprocessing."""
 
 from __future__ import annotations
 

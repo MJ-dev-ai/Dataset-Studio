@@ -4,8 +4,6 @@
 
 이미지 확인, MapSet 관리, 선택 영역 편집, 라벨링, Poisson 기반 합성, 전처리, 자동 증강, YOLO 데이터셋 export까지 데이터 제작 과정에서 반복되는 작업을 한 흐름으로 묶는 것을 목표로 합니다.
 
-![Dataset Studio main editor](assets/readme/main_ui.png)
-
 ## 프로젝트 주요 사항
 
 - PySide6 기반 Dataset Authoring GUI 구현
@@ -139,8 +137,6 @@ YOLO 객체 검출 데이터셋 제작을 위한 라벨링 기능을 포함합�
 ### Auto Augmentation
 
 부족한 class를 보강하기 위한 자동 증강 흐름을 별도 UI로 구성했습니다.
-
-![AutoAugment dialog](assets/readme/autoaugment_ui.png)
 
 지원 기능:
 
