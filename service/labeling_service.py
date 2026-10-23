@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import json
 
 import cv2
 import numpy as np
+import yaml
 
 @dataclass(frozen=True)
 class YoloLabel:
@@ -130,6 +132,59 @@ def normalize_catalog(items) -> LabelCatalog:
             positions[class_id] = len(result)
             result.append(value)
     return result
+
+
+def _read_class_catalog(path: Path) -> LabelCatalog:
+    """Read explicit IDs and names from editor JSON or YOLO YAML metadata."""
+    try:
+        text = path.read_text(encoding="utf-8-sig")
+        payload = json.loads(text) if path.suffix == ".json" else yaml.safe_load(text)
+        if path.suffix == ".json":
+            items = payload.get("labels", payload) if isinstance(payload, dict) else payload
+            if not isinstance(items, list):
+                raise ValueError("labels는 클래스 목록이어야 합니다.")
+            pairs = []
+            for index, item in enumerate(items):
+                if isinstance(item, dict):
+                    class_id = int(item.get("class_id", item.get("id", index)))
+                    name = item.get("class_name", item.get("name", f"class {class_id}"))
+                else:
+                    class_id, name = index, item
+                pairs.append((class_id, name))
+        else:
+            names = payload["names"]
+            if not isinstance(names, (dict, list)):
+                raise ValueError("names는 클래스 목록 또는 ID와 이름의 매핑이어야 합니다.")
+            pairs = list(names.items()) if isinstance(names, dict) else list(enumerate(names))
+        catalog = normalize_catalog(pairs)
+        if any(class_id < 0 for class_id, _name in catalog):
+            raise ValueError("클래스 ID는 0 이상이어야 합니다.")
+        return catalog
+    except (OSError, ValueError, TypeError, KeyError, yaml.YAMLError) as error:
+        raise ValueError(f"클래스 정의를 읽을 수 없습니다: {path}\n{error}") from error
+
+
+def load_class_catalog(root: Path, mapsets=(), check_cancelled=None) -> LabelCatalog:
+    """Keep every declared class, including unused classes, then discover missing IDs."""
+    root = Path(root)
+    root_metadata = next((path for path in (root / "labels.json", root / "data.yaml") if path.is_file()), None)
+    catalog = dict(_read_class_catalog(root_metadata)) if root_metadata else {}
+    observed = set()
+    for mapset in mapsets:
+        if check_cancelled:
+            check_cancelled()
+        if root_metadata is None:
+            metadata = next((path for path in (mapset.folder / "labels.json", mapset.folder / "data.yaml") if path.is_file()), None)
+            if metadata:
+                for class_id, name in _read_class_catalog(metadata):
+                    if class_id in catalog and catalog[class_id] != name:
+                        raise ValueError(f"클래스 ID {class_id}의 이름이 서로 다릅니다: {catalog[class_id]} / {name} ({metadata})")
+                    catalog[class_id] = name
+        label_path = mapset.label_path or mapset.folder / f"{mapset.name}.txt"
+        observed.update(label.class_id for label in load_txt(label_path))
+    for class_id in sorted(observed):
+        catalog.setdefault(class_id, f"class {class_id}")
+    return list(catalog.items())
 
 
 def update_catalog(

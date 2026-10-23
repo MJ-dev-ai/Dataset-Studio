@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "run_id": "261023-203700-d37a72",
+  "kind": "export",
+  "status": "partial",
+  "started_at": "2026-10-23T11:37:00.970287+00:00",
+  "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-49\\test_bad_labels_are_reported_w2\\out\\export_all_split1-0-0_seed0_a8ce7abf_261023-203700-d37a72",
+  "settings": {
+    "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-49\\test_bad_labels_are_reported_w2\\out",
+    "class_names": [
+      "표면: 균열",
+      "찍힘"
+    ],
+    "train_ratio": 1,
+    "val_ratio": 0,
+    "test_ratio": 0.0,
+    "map_keys": null,
+    "seed": 0,
+    "class_ids": [
+      2,
+      5
+    ]
+  },
+  "class_names": [
+    "표면: 균열",
+    "찍힘"
+  ],
+  "class_mapping": {
+    "2": 0,
+    "5": 1
+  },
+  "entries": [
+    {
+      "image": "albedo_map/images/train/동일_이름-13a3626370a211945b1a.png",
+      "label": "albedo_map/labels/train/동일_이름-13a3626370a211945b1a.txt",
+      "source_id": "13a3626370a211945b1a",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "kind": "failed",
+      "source": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-49\\test_bad_labels_are_reported_w2\\source\\0\\동일 이름",
+      "reason": "라벨 좌표가 유효한 0~1 범위를 벗어났습니다."
+    }
+  ],
+  "warnings": [],
+  "failed": 1,
+  "skipped": 0,
+  "images": 1,
+  "labels": 1,
+  "annotations": 1,
+  "poisson_samples": 0,
+  "original_sources": 2,
+  "split_images": {
+    "train": 1
+  },
+  "class_distribution": {
+    "1": 1
+  },
+  "failed_or_skipped": 1,
+  "sample_images": [
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-49\\test_bad_labels_are_reported_w2\\out\\export_all_split1-0-0_seed0_a8ce7abf_261023-203700-d37a72\\albedo_map\\images\\train\\동일_이름-13a3626370a211945b1a.png"
+  ],
+  "preview_image": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-49\\test_bad_labels_are_reported_w2\\out\\export_all_split1-0-0_seed0_a8ce7abf_261023-203700-d37a72\\albedo_map\\images\\train\\동일_이름-13a3626370a211945b1a.png",
+  "finished_at": "2026-10-23T11:37:00.990560+00:00"
+}

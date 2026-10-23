@@ -28,16 +28,20 @@ def changed_image_patch(before: QImage, after: QImage) -> ImageHistoryPatch | No
     """Return the smallest changed rectangle between two same-sized images."""
     if before.size() != after.size():
         raise ValueError("history images must have the same size")
-    before_rgba = _rgba_view(before)
-    after_rgba = _rgba_view(after)
-    changed = np.any(before_rgba != after_rgba, axis=2)
-    if not np.any(changed):
+    if before.cacheKey() == after.cacheKey():
         return None
-    ys, xs = np.nonzero(changed)
-    left = int(xs.min())
-    right = int(xs.max())
-    top = int(ys.min())
-    bottom = int(ys.max())
+    # Keep both QImages alive while viewing their buffers; compare one packed pixel.
+    before_rgba = before.convertToFormat(QImage.Format.Format_RGBA8888)
+    after_rgba = after.convertToFormat(QImage.Format.Format_RGBA8888)
+    before_pixels = np.frombuffer(before_rgba.constBits(), dtype=np.uint32).reshape(before.height(), -1)[:, :before.width()]
+    after_pixels = np.frombuffer(after_rgba.constBits(), dtype=np.uint32).reshape(after.height(), -1)[:, :after.width()]
+    changed = before_pixels != after_pixels
+    rows = np.flatnonzero(np.any(changed, axis=1))
+    if not rows.size:
+        return None
+    cols = np.flatnonzero(np.any(changed, axis=0))
+    left, right = int(cols[0]), int(cols[-1])
+    top, bottom = int(rows[0]), int(rows[-1])
     width = right - left + 1
     height = bottom - top + 1
     return ImageHistoryPatch(
@@ -84,11 +88,3 @@ def apply_history_entry(
         painter.end()
         restored[key] = result
     return restored
-
-
-def _rgba_view(image: QImage) -> np.ndarray:
-    converted = image.convertToFormat(QImage.Format.Format_RGBA8888)
-    bits = converted.bits()
-    bits.setsize(converted.sizeInBytes())
-    data = np.frombuffer(bytes(bits), dtype=np.uint8).reshape(converted.height(), converted.bytesPerLine())
-    return data[:, : converted.width() * 4].reshape(converted.height(), converted.width(), 4)

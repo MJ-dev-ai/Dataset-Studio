@@ -1,0 +1,9 @@
+{"schema":"openai.presentation.layout/v5","unit":"px","slide":{"id":"sl/y90nupkv","index":0,"layout":{"id":"ly/ux4ruhcv","name":"제목 슬라이드"},"backgroundColor":"rgba(239,245,252,1)","position":{"left":0,"top":0,"width":1280,"height":720}},
+"elements":[
+{"id":"im/jqxw72dk","kind":"image","name":"그림 9","position":{"left":0.34,"top":0,"width":1279.32,"height":720}},
+{"id":"sh/hcvqdkje","kind":"textbox","name":"TextBox 1543492501","position":{"left":57.71,"top":296.34,"width":625.42,"height":66.24},"text":"산자부 비전 PC 견적 비교 보고서","style":{"fontSize":46.67,"typeface":"Pretendard ExtraBold","color":"#102A56","bold":true,"alignment":"left"},"geometry":"rect"},
+{"id":"sh/o36l4zqx","kind":"textbox","name":"TextBox 97032010","position":{"left":57.71,"top":384.38,"width":251.63,"height":38.78},"text":"업체별 견적 비교 및 선정","style":{"fontSize":24,"typeface":"Pretendard Medium","color":"#506687","alignment":"left"},"geometry":"rect"},
+{"id":"sh/id47m50z","kind":"shape","name":"직선 연결선 1429528521","position":{"left":57.71,"top":574.46,"width":660.73,"height":0},"geometry":"line"},
+{"id":"sh/3ed8fa1k","kind":"textbox","name":"TextBox 1874383746","position":{"left":66.53,"top":585,"width":222.69,"height":96.94},"text":"01 CPU 별 견적 비교\n02 세부 견적\n03 ","style":{"fontSize":24,"typeface":"Pretendard SemiBold","color":"#114A9F","alignment":"left"},"geometry":"rect"},
+{"id":"im/ri9kvmxs","kind":"image","name":"그림 4","position":{"left":57.71,"top":74.28,"width":297.09,"height":86.4},"crop":{"left":0,"top":0,"right":0.58738,"bottom":0}}
+]}

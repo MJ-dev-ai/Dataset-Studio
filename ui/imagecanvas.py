@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from PySide6.QtCore import QPointF, QRect, QRectF, Qt, Signal
+from PySide6.QtCore import QEvent, QPointF, QRect, QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 from PySide6.QtWidgets import QWidget
 
@@ -38,6 +38,7 @@ class ImageCanvas(QWidget):
     image_changed = Signal()
     selection_changed = Signal(bool)
     annotations_changed = Signal()
+    annotation_selection_changed = Signal(int)
     view_changed = Signal(float, float, float)
     patch_dropped = Signal(str, QPointF)
     tool_error = Signal(str)
@@ -52,10 +53,16 @@ class ImageCanvas(QWidget):
         self.annotations: list[CanvasAnnotation] = []
         self.labels_visible = True
         self.selected_annotation_index = -1
+        self._annotation_undo = []
+        self._annotation_redo = []
+        self._annotation_before = None
         self.preview_pixmap = QPixmap()
         self.preview_annotations: list[CanvasAnnotation] | None = None
         self.patch_preview_pixmap = QPixmap()
         self.patch_preview_position = QPointF()
+        self.patch_preview_status = ""
+        self.healing_preview_pixmap = QPixmap()
+        self.healing_preview_status = ""
         self._tool_cursor_pos: QPointF | None = None
         self._undo: list[QImage] = []
         self._redo: list[QImage] = []
@@ -65,6 +72,7 @@ class ImageCanvas(QWidget):
         self._pan_origin = QPointF()
         self._background_color = QColor(theme_colors(DEFAULT_THEME)["canvas"])
         self.setMouseTracking(True)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setAcceptDrops(True)
 
     def set_theme(self, theme: str) -> None:
@@ -81,12 +89,16 @@ class ImageCanvas(QWidget):
         self.clear_selection()
         self.annotations.clear()
         self.selected_annotation_index = -1
+        self.reset_annotation_history()
+        self.annotation_selection_changed.emit(-1)
         self.clear_preview_image()
         self.image_changed.emit()
         self.update()
 
     def set_map_image(self, image: QImage | QPixmap, modified: bool = False) -> None:
         """Switch map pixels while preserving shared view, selection, and labels."""
+        if self.pixmap.size() != image.size():
+            self.reset_annotation_history()
         self.pixmap = QPixmap(image) if isinstance(image, QPixmap) else QPixmap.fromImage(image)
         self.image = self.pixmap.toImage()
         self._undo.clear()
@@ -210,20 +222,27 @@ class ImageCanvas(QWidget):
         return not self.preview_pixmap.isNull()
 
     def set_patch_preview(self, pixmap: QPixmap, x_pos: int, y_pos: int) -> None:
-        """Display a movable alpha-masked patch without committing image pixels."""
+        """Display a temporary patch rectangle without committing image pixels."""
         self.patch_preview_pixmap = QPixmap(pixmap)
         self.patch_preview_position = QPointF(float(x_pos), float(y_pos))
         self.update()
 
     def clear_patch_preview(self) -> None:
         """Remove the manual patch overlay."""
-        if not self.patch_preview_pixmap.isNull():
+        if not self.patch_preview_pixmap.isNull() or self.patch_preview_status:
             self.patch_preview_pixmap = QPixmap()
+            self.patch_preview_status = ""
             self.update()
 
     def has_patch_preview(self) -> bool:
         """Return whether a manual patch overlay is visible."""
         return not self.patch_preview_pixmap.isNull()
+
+    def clear_healing_preview(self) -> None:
+        """Discard temporary healing pixels without touching edit history."""
+        self.healing_preview_pixmap = QPixmap()
+        self.healing_preview_status = ""
+        self.update()
 
     def _push_undo(self) -> None:
         self._undo.append(self.pixmap.toImage())
@@ -349,9 +368,11 @@ class ImageCanvas(QWidget):
         bounds = self.selection_bounds().intersected(QRectF(self.pixmap.rect()))
         if bounds.isEmpty():
             return False
+        self.begin_annotation_edit()
         self.annotations.append(CanvasAnnotation(class_id, bounds, class_name))
         self.selected_annotation_index = len(self.annotations) - 1
-        self.annotations_changed.emit()
+        self.finish_annotation_edit()
+        self.annotation_selection_changed.emit(self.selected_annotation_index)
         self.update()
         return True
 
@@ -371,6 +392,11 @@ class ImageCanvas(QWidget):
         if rect.isNull() or rect.width() <= 0.0 or rect.height() <= 0.0:
             return False
         annotation = self.annotations[index]
+        if annotation.bounds == rect:
+            if notify:
+                self.finish_annotation_edit()
+            return False
+        self.begin_annotation_edit()
         self.annotations[index] = CanvasAnnotation(annotation.class_id, rect, annotation.class_name)
         if sync_selection and self.selected_annotation_index == index:
             path = QPainterPath()
@@ -378,7 +404,8 @@ class ImageCanvas(QWidget):
             self.selection_path = path
             self.selection_changed.emit(True)
         if notify:
-            self.annotations_changed.emit()
+            self.finish_annotation_edit()
+        self.annotation_selection_changed.emit(self.selected_annotation_index)
         self.update()
         return True
 
@@ -386,17 +413,22 @@ class ImageCanvas(QWidget):
         """Select an existing annotation and expose its bounds as the active selection."""
         if index < 0 or index >= len(self.annotations):
             self.selected_annotation_index = -1
+            self.clear_selection()
+            self.annotation_selection_changed.emit(-1)
             self.update()
             return False
         self.selected_annotation_index = index
         path = QPainterPath()
         path.addRect(self.annotations[index].bounds)
         self.set_selection(path)
+        self.annotation_selection_changed.emit(index)
         self.update()
         return True
 
     def annotation_at(self, image_point: QPointF) -> int:
         """Return the topmost annotation containing an image-space point."""
+        if not self.labels_visible:
+            return -1
         for index in range(len(self.annotations) - 1, -1, -1):
             if self.annotations[index].bounds.contains(image_point):
                 return index
@@ -404,22 +436,107 @@ class ImageCanvas(QWidget):
 
     def clear_annotation_selection(self) -> None:
         self.selected_annotation_index = -1
+        self.annotation_selection_changed.emit(-1)
         self.update()
 
     def set_labels_visible(self, visible: bool) -> None:
         self.labels_visible = bool(visible)
+        if not visible:
+            self.select_annotation(-1)
         self.update()
 
     def remove_annotation(self, index: int) -> bool:
         """Remove one annotation by stable list index."""
         if index < 0 or index >= len(self.annotations):
             return False
+        self.begin_annotation_edit()
         self.annotations.pop(index)
         self.selected_annotation_index = -1
         self.clear_selection()
-        self.annotations_changed.emit()
+        self.finish_annotation_edit()
+        self.annotation_selection_changed.emit(-1)
         self.update()
         return True
+
+    def _annotation_snapshot(self):
+        return ([CanvasAnnotation(a.class_id, QRectF(a.bounds), a.class_name) for a in self.annotations], self.selected_annotation_index)
+
+    def reset_annotation_history(self) -> None:
+        """Discard label history when the document or coordinate system changes."""
+        self._annotation_undo.clear()
+        self._annotation_redo.clear()
+        self._annotation_before = None
+
+    def begin_annotation_edit(self) -> None:
+        """Start one transaction; repeated drag previews reuse its initial state."""
+        if self._annotation_before is None:
+            self._annotation_before = self._annotation_snapshot()
+
+    def finish_annotation_edit(self) -> bool:
+        """Record one gesture only if label data changed; selection is not an edit."""
+        before, self._annotation_before = self._annotation_before, None
+        if before is None or before[0] == self.annotations:
+            return False
+        self._annotation_undo.append(before)
+        del self._annotation_undo[:-32]
+        self._annotation_redo.clear()
+        self.annotations_changed.emit()
+        return True
+
+    def cancel_annotation_edit(self) -> None:
+        """Restore an unfinished drag without creating a dirty label or history item."""
+        before, self._annotation_before = self._annotation_before, None
+        if before is not None:
+            self.annotations, index = before
+            self.select_annotation(index)
+
+    def undo_annotation(self, redo: bool = False) -> bool:
+        """Restore a committed label transaction without touching image pixels."""
+        self.cancel_annotation_edit()
+        source = self._annotation_redo if redo else self._annotation_undo
+        destination = self._annotation_undo if redo else self._annotation_redo
+        if not source:
+            return False
+        destination.append(self._annotation_snapshot())
+        self.annotations, index = source.pop()
+        self.select_annotation(index)
+        self.annotations_changed.emit()
+        return True
+
+    def update_annotation(self, index: int, bounds: QRectF, class_id: int, class_name: str) -> bool:
+        """Apply class and numeric bounds as one undoable object edit."""
+        if not 0 <= index < len(self.annotations):
+            return False
+        rect = bounds.normalized().intersected(QRectF(self.pixmap.rect()))
+        if rect.width() < 1 or rect.height() < 1:
+            return False
+        self.begin_annotation_edit()
+        self.annotations[index] = CanvasAnnotation(class_id, rect, class_name)
+        self.select_annotation(index)
+        changed = self.finish_annotation_edit()
+        self.update()
+        return changed
+
+    def move_annotation(self, dx: float, dy: float) -> bool:
+        """Nudge the selected box while retaining its size at image edges."""
+        index = self.selected_annotation_index
+        if not 0 <= index < len(self.annotations) or not self.labels_visible:
+            return False
+        rect = QRectF(self.annotations[index].bounds)
+        rect.moveTo(max(0, min(self.pixmap.width() - rect.width(), rect.x() + dx)), max(0, min(self.pixmap.height() - rect.height(), rect.y() + dy)))
+        return self.set_annotation_bounds(index, rect)
+
+    def cycle_annotation(self, backwards: bool = False, point: QPointF | None = None) -> bool:
+        """Cycle all objects, or just overlapping objects under a Ctrl-click."""
+        if not self.labels_visible:
+            return False
+        candidates = [i for i, a in enumerate(self.annotations) if point is None or a.bounds.contains(point)]
+        if not candidates:
+            return False
+        index = self.selected_annotation_index
+        offset = -1 if backwards else 1
+        position = candidates.index(index) + offset if index in candidates else (-1 if backwards else 0)
+        return self.select_annotation(candidates[position % len(candidates)])
 
     def yolo_lines(self) -> list[str]:
         width, height = max(1, self.pixmap.width()), max(1, self.pixmap.height())
@@ -437,7 +554,15 @@ class ImageCanvas(QWidget):
         del event
         painter = QPainter(self)
         painter.fillRect(self.rect(), self._background_color)
+        if self.pixmap.isNull():
+            painter.setPen(self.palette().text().color())
+            painter.drawText(self.rect(), Qt.AlignmentFlag.AlignCenter, "이미지 편집 · 결함 합성 · 라벨링\n\n파일 메뉴에서 이미지나 데이터셋 폴더를 여세요.\n왼쪽에서 도구를 고르면 위쪽에 해당 도구의 옵션이 나타납니다.")
         display_pixmap = self.preview_pixmap if not self.preview_pixmap.isNull() else self.pixmap
+        if self.patch_preview_status:
+            # Apply Blend reads committed pixels, not an uncommitted filter preview.
+            display_pixmap = self.pixmap
+        if self.healing_preview_status:
+            display_pixmap = self.healing_preview_pixmap if not self.healing_preview_pixmap.isNull() else self.pixmap
         if not display_pixmap.isNull():
             painter.save()
             painter.translate(self.pan_offset)
@@ -448,6 +573,16 @@ class ImageCanvas(QWidget):
             self.draw_overlay(painter)
             self.draw_tool_cursor(painter)
             painter.restore()
+        preview_status = self.healing_preview_status or self.patch_preview_status
+        if preview_status:
+            text = painter.fontMetrics().elidedText(
+                preview_status, Qt.TextElideMode.ElideRight, max(1, self.width() - 40),
+            )
+            height = painter.fontMetrics().height() + 12
+            rect = QRect(12, 12, min(self.width() - 24, painter.fontMetrics().horizontalAdvance(text) + 16), height)
+            painter.fillRect(rect, QColor(25, 28, 34, 225))
+            painter.setPen(QColor("#e2e8f0"))
+            painter.drawText(rect.adjusted(8, 0, -8, 0), Qt.AlignmentFlag.AlignVCenter, text)
         painter.end()
 
     def draw_overlay(self, painter: QPainter) -> None:
@@ -464,14 +599,25 @@ class ImageCanvas(QWidget):
             return
         annotations = self.preview_annotations if self.preview_annotations is not None else self.annotations
         for index, annotation in enumerate(annotations):
+            color = QColor.fromHsv((annotation.class_id * 137 + 15) % 360, 175, 240)
             painter.setPen(
                 QPen(
-                    QColor("#f59e0b") if index == self.selected_annotation_index else QColor("#ff4040"),
+                    QColor("#f59e0b") if index == self.selected_annotation_index else color,
                     max(3.0 / self.zoom, 1.0) if index == self.selected_annotation_index else max(2.0 / self.zoom, 1.0),
                 )
             )
             painter.drawRect(annotation.bounds)
-            painter.drawText(annotation.bounds.topLeft() + QPointF(2, 14), annotation.class_name or str(annotation.class_id))
+            painter.save()
+            font = painter.font()
+            font.setPixelSize(max(1, round(12 / self.zoom)))
+            painter.setFont(font)
+            text = f"{index + 1}. {annotation.class_name or str(annotation.class_id)}"
+            height = painter.fontMetrics().height()
+            label_rect = QRectF(annotation.bounds.left(), max(0, annotation.bounds.top() - height), painter.fontMetrics().horizontalAdvance(text) + 6 / self.zoom, height)
+            painter.fillRect(label_rect, QColor(20, 24, 30, 210))
+            painter.setPen(QColor("white"))
+            painter.drawText(label_rect.adjusted(3 / self.zoom, 0, 0, 0), Qt.AlignmentFlag.AlignVCenter, text)
+            painter.restore()
 
     def _draw_selection_handles(self, painter: QPainter) -> None:
         handles = self.selection_handle_rects()
@@ -485,6 +631,13 @@ class ImageCanvas(QWidget):
         painter.restore()
 
     def draw_tool_cursor(self, painter: QPainter) -> None:
+        if self.tool_manager is not None and self.tool_manager.current_mode.value == "bbox" and self._tool_cursor_pos is not None and not self.pixmap.isNull():
+            point = self._tool_cursor_pos
+            if QRectF(self.pixmap.rect()).contains(point):
+                painter.setPen(QPen(QColor(255, 255, 255, 110), 1 / self.zoom, Qt.PenStyle.DashLine))
+                painter.drawLine(QPointF(0, point.y()), QPointF(self.pixmap.width(), point.y()))
+                painter.drawLine(QPointF(point.x(), 0), QPointF(point.x(), self.pixmap.height()))
+            return
         if self.tool_manager is None or not self.tool_manager.show_cursor_circle:
             return
         if self._tool_cursor_pos is None or self.pixmap.isNull():
@@ -524,8 +677,39 @@ class ImageCanvas(QWidget):
         )
 
     def mousePressEvent(self, event):
+        self.setFocus(Qt.FocusReason.MouseFocusReason)
         if self.tool_manager is not None:
             self._run_tool_event("mouse_press_event", self.tool_manager.mouse_press_event, event)
+
+    def event(self, event):
+        if event.type() == QEvent.Type.KeyPress and event.key() in {Qt.Key.Key_Tab, Qt.Key.Key_Backtab} and self.tool_manager is not None and self.tool_manager.accepts_key(event):
+            self.tool_manager.key_press_event(event)
+            return True
+        if event.type() == QEvent.Type.ShortcutOverride and getattr(self, "tool_manager", None) is not None and self.tool_manager.accepts_key(event):
+            event.accept()
+            return True
+        return super().event(event)
+
+    def keyPressEvent(self, event):
+        if self.tool_manager is not None and self.tool_manager.accepts_key(event):
+            self._run_tool_event("key_press_event", self.tool_manager.key_press_event, event)
+            return
+        super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        if self.tool_manager is not None and event.key() == Qt.Key.Key_Space and not event.isAutoRepeat():
+            self.tool_manager.release_temporary_pan()
+            event.accept()
+            return
+        super().keyReleaseEvent(event)
+
+    def focusOutEvent(self, event):
+        if self.tool_manager is not None:
+            self.tool_manager.release_temporary_pan()
+            self.tool_manager.cancel_annotation_gesture()
+            if self.tool_manager.tool("healing_brush").is_editing:
+                self.tool_manager.cancel_healing_preview()
+        super().focusOutEvent(event)
 
     def mouseMoveEvent(self, event):
         if self.tool_manager is not None:

@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "run_id": "261023-201400-850c71",
+  "kind": "export",
+  "status": "complete",
+  "started_at": "2026-10-23T11:14:00.074602+00:00",
+  "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-45\\test_augmentation_summary_uses0\\out\\export_all_split1-0-0_seed0_237422e5_261023-201400-850c71",
+  "settings": {
+    "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-45\\test_augmentation_summary_uses0\\out",
+    "class_names": [
+      "표면: 균열",
+      "찍힘"
+    ],
+    "train_ratio": 1,
+    "val_ratio": 0,
+    "test_ratio": 0.0,
+    "map_keys": null,
+    "seed": 0,
+    "class_ids": [
+      2,
+      5
+    ]
+  },
+  "class_names": [
+    "표면: 균열",
+    "찍힘"
+  ],
+  "class_mapping": {
+    "2": 0,
+    "5": 1
+  },
+  "entries": [
+    {
+      "image": "albedo_map/images/train/동일_이름-1663dd41c859f96c5c13.png",
+      "label": "albedo_map/labels/train/동일_이름-1663dd41c859f96c5c13.txt",
+      "source_id": "1663dd41c859f96c5c13",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map/images/train/동일_이름-7e6202be3907dc85e39d.png",
+      "label": "albedo_map/labels/train/동일_이름-7e6202be3907dc85e39d.txt",
+      "source_id": "7e6202be3907dc85e39d",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map/images/train/동일_이름-e70ca6208f1d5637f693.png",
+      "label": "albedo_map/labels/train/동일_이름-e70ca6208f1d5637f693.txt",
+      "source_id": "e70ca6208f1d5637f693",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map/images/train/동일_이름-50c39ebc9746d5e8b12b.png",
+      "label": "albedo_map/labels/train/동일_이름-50c39ebc9746d5e8b12b.txt",
+      "source_id": "50c39ebc9746d5e8b12b",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map/images/train/동일_이름-3e47e3673d289ea88f09.png",
+      "label": "albedo_map/labels/train/동일_이름-3e47e3673d289ea88f09.txt",
+      "source_id": "3e47e3673d289ea88f09",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map/images/train/동일_이름-327ad575e71e4df94ce2.png",
+      "label": "albedo_map/labels/train/동일_이름-327ad575e71e4df94ce2.txt",
+      "source_id": "327ad575e71e4df94ce2",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map/images/train/동일_이름-a868907b423449e3e6a1.png",
+      "label": "albedo_map/labels/train/동일_이름-a868907b423449e3e6a1.txt",
+      "source_id": "a868907b423449e3e6a1",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    }
+  ],
+  "issues": [],
+  "warnings": [],
+  "failed": 0,
+  "skipped": 0,
+  "images": 7,
+  "labels": 7,
+  "annotations": 7,
+  "poisson_samples": 0,
+  "original_sources": 7,
+  "split_images": {
+    "train": 7
+  },
+  "class_distribution": {
+    "1": 7
+  },
+  "failed_or_skipped": 0,
+  "sample_images": [
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-45\\test_augmentation_summary_uses0\\out\\export_all_split1-0-0_seed0_237422e5_261023-201400-850c71\\albedo_map\\images\\train\\동일_이름-1663dd41c859f96c5c13.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-45\\test_augmentation_summary_uses0\\out\\export_all_split1-0-0_seed0_237422e5_261023-201400-850c71\\albedo_map\\images\\train\\동일_이름-7e6202be3907dc85e39d.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-45\\test_augmentation_summary_uses0\\out\\export_all_split1-0-0_seed0_237422e5_261023-201400-850c71\\albedo_map\\images\\train\\동일_이름-e70ca6208f1d5637f693.png"
+  ],
+  "preview_image": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-45\\test_augmentation_summary_uses0\\out\\export_all_split1-0-0_seed0_237422e5_261023-201400-850c71\\albedo_map\\images\\train\\동일_이름-1663dd41c859f96c5c13.png",
+  "finished_at": "2026-10-23T11:14:00.140859+00:00"
+}

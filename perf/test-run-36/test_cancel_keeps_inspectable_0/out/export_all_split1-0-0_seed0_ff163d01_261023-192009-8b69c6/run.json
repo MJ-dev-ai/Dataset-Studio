@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "run_id": "261023-192009-8b69c6",
+  "kind": "export",
+  "status": "interrupted",
+  "started_at": "2026-10-23T10:20:09.932572+00:00",
+  "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-36\\test_cancel_keeps_inspectable_0\\out\\export_all_split1-0-0_seed0_ff163d01_261023-192009-8b69c6",
+  "settings": {
+    "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-36\\test_cancel_keeps_inspectable_0\\out",
+    "class_names": [
+      "표면: 균열",
+      "찍힘"
+    ],
+    "train_ratio": 1,
+    "val_ratio": 0,
+    "test_ratio": 0.0,
+    "map_keys": null,
+    "seed": 0,
+    "class_ids": [
+      2,
+      5
+    ]
+  },
+  "class_names": [
+    "표면: 균열",
+    "찍힘"
+  ],
+  "class_mapping": {
+    "2": 0,
+    "5": 1
+  },
+  "entries": [
+    {
+      "image": "albedo_map/images/train/동일_이름-747a4147158fd2488e81.png",
+      "label": "albedo_map/labels/train/동일_이름-747a4147158fd2488e81.txt",
+      "source_id": "747a4147158fd2488e81",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    }
+  ],
+  "issues": [],
+  "warnings": [
+    "작업이 중단됐습니다."
+  ],
+  "failed": 0,
+  "skipped": 0,
+  "images": 1,
+  "labels": 1,
+  "annotations": 1,
+  "poisson_samples": 0,
+  "original_sources": 3,
+  "split_images": {
+    "train": 1
+  },
+  "class_distribution": {
+    "1": 1
+  },
+  "failed_or_skipped": 0,
+  "sample_images": [
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-36\\test_cancel_keeps_inspectable_0\\out\\export_all_split1-0-0_seed0_ff163d01_261023-192009-8b69c6\\albedo_map\\images\\train\\동일_이름-747a4147158fd2488e81.png"
+  ],
+  "preview_image": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-36\\test_cancel_keeps_inspectable_0\\out\\export_all_split1-0-0_seed0_ff163d01_261023-192009-8b69c6\\albedo_map\\images\\train\\동일_이름-747a4147158fd2488e81.png",
+  "finished_at": "2026-10-23T10:20:09.939460+00:00"
+}

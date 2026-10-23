@@ -1,0 +1,4 @@
+path: .
+train: images/train
+names:
+  0: "결함"

@@ -19,6 +19,30 @@ def clone_mode_from_text(value: str) -> int:
 	raise ValueError(f"Unsupported Poisson clone mode: {value}")
 
 
+def patch_mode_from_text(value: str) -> int | str | None:
+	"""Resolve the mode shared by live preview and Apply Blend."""
+	modes = {"Detail Preserve": None, "Boundary Mixed": "boundary_mixed", "Hard Paste": "hard_paste"}
+	return modes[value] if value in modes else clone_mode_from_text(value)
+
+
+def compose_patch_mode(
+	target: np.ndarray, patch: np.ndarray, mask: np.ndarray,
+	x_pos: int, y_pos: int, mode: int | str | None, map_key: str = "",
+) -> np.ndarray:
+	"""Compose preview and committed pixels with identical map-specific rules.
+
+	Inputs are borrowed read-only; every algorithm returns an owned result.
+	Normal maps skip Detail Preserve color adaptation in both paths.
+	"""
+	if mode == "boundary_mixed":
+		return boundary_mixed_blend(target, patch, mask, x_pos, y_pos)
+	if mode == "hard_paste":
+		return hard_paste(target, patch, mask, x_pos, y_pos)
+	if mode is None:
+		return detail_preserve_blend(target, patch, mask, x_pos, y_pos, adapt_color="normal" not in map_key.casefold())
+	return compose_patch(target, patch, mask, x_pos, y_pos, mode=mode, fallback=False)
+
+
 def apply_paint_strokes(
 	image: np.ndarray,
 	strokes: list[PaintStroke],
@@ -30,22 +54,35 @@ def apply_paint_strokes(
 	if image is None or image.size == 0:
 		raise ValueError("image is empty")
 	result = image.copy()
-	overlay = result.copy()
 	bgr = tuple(int(value) for value in color[:3])
 	thickness = max(1, int(size))
+	if not strokes:
+		return result
+	points = [(int(round(p[0])), int(round(p[1]))) for stroke in strokes for p in stroke]
+	padding = thickness + 2
+	left = max(0, min(p[0] for p in points) - padding)
+	top = max(0, min(p[1] for p in points) - padding)
+	right = min(image.shape[1], max(p[0] for p in points) + padding + 1)
+	bottom = min(image.shape[0], max(p[1] for p in points) + padding + 1)
+	if right <= left or bottom <= top:
+		return result
+	roi = result[top:bottom, left:right]
+	overlay = roi.copy()
 	for start, end in strokes:
 		cv2.line(
 			overlay,
-			(int(round(start[0])), int(round(start[1]))),
-			(int(round(end[0])), int(round(end[1]))),
+			(int(round(start[0])) - left, int(round(start[1])) - top),
+			(int(round(end[0])) - left, int(round(end[1])) - top),
 			bgr,
 			thickness=thickness,
 			lineType=cv2.LINE_8,
 		)
 	alpha = float(np.clip(opacity, 0.0, 1.0))
 	if alpha >= 1.0:
-		return overlay
-	return cv2.addWeighted(overlay, alpha, result, 1.0 - alpha, 0.0)
+		roi[:] = overlay
+	else:
+		roi[:] = cv2.addWeighted(overlay, alpha, roi, 1.0 - alpha, 0.0)
+	return result
 
 
 def apply_healing_strokes(
@@ -58,48 +95,66 @@ def apply_healing_strokes(
 	inplace: bool = False,
 	check_cancelled: Callable[[], None] | None = None,
 ) -> np.ndarray:
-	"""Apply circular NORMAL_CLONE dabs from source centers to target centers."""
+	"""Heal one sampled gesture with a union mask and one NORMAL_CLONE solve.
+
+	Sampling uses the unchanged source image. Opacity is applied once per
+	gesture, so repeated input events cannot darken overlapping brush marks.
+	Source/target offsets must remain fixed throughout the gesture.
+	"""
 	if image is None or image.size == 0:
 		raise ValueError("image is empty")
-	if not strokes:
-		return image if inplace else image.copy()
 	result = image if inplace else image.copy()
-	source_reference = image.copy() if source_image is None else source_image
-	if source_reference.shape != result.shape:
-		raise ValueError("source image size must match target image size")
-	radius = max(1, int(round(size / 2.0)))
-	step = max(1, int(round(radius * 0.6)))
-	alpha_scale = float(np.clip(opacity, 0.0, 1.0))
-	if alpha_scale <= 0.0:
+	if not strokes or opacity <= 0:
 		return result
-	last_dab: tuple[int, int, int, int] | None = None
-	for source_start, source_end, target_start, target_end in strokes:
-		if check_cancelled is not None:
-			check_cancelled()
-		distance = float(
-			np.hypot(
-				float(target_end[0]) - float(target_start[0]),
-				float(target_end[1]) - float(target_start[1]),
-			)
-		)
-		dab_count = max(1, int(np.ceil(distance / step))) if distance > 0.0 else 0
-		for index in range(dab_count + 1):
-			if check_cancelled is not None and index % 8 == 0:
-				check_cancelled()
-			t = index / dab_count if dab_count else 0.0
-			source_center = _interpolate_point(source_start, source_end, t)
-			target_center = _interpolate_point(target_start, target_end, t)
-			dab = (
-				int(round(source_center[0])),
-				int(round(source_center[1])),
-				int(round(target_center[0])),
-				int(round(target_center[1])),
-			)
-			if dab == last_dab:
-				continue
-			last_dab = dab
-			_apply_seamless_healing_dab(source_reference, result, source_center, target_center, radius, alpha_scale)
+	source = image if source_image is None else source_image
+	if source.shape != image.shape:
+		raise ValueError("source image size must match target image size")
+	if check_cancelled is not None:
+		check_cancelled()
+	region = _healing_stroke_region(strokes, size, image.shape[:2])
+	if region is None:
+		return result
+	mask, x, y, dx, dy = region
+	h, w = mask.shape
+	patch = source[y + dy:y + dy + h, x + dx:x + dx + w]
+	if check_cancelled is not None:
+		check_cancelled()
+	cloned = seamless_clone(patch, image, mask, (x + w // 2, y + h // 2), mode=cv2.NORMAL_CLONE)
+	if check_cancelled is not None:
+		check_cancelled()
+	roi = result[y:y + h, x:x + w]
+	alpha = min(1.0, float(opacity))
+	blended = cv2.addWeighted(cloned[y:y + h, x:x + w], alpha, roi, 1.0 - alpha, 0)
+	roi[mask > 0] = blended[mask > 0]
 	return result
+
+
+def _healing_stroke_region(strokes: list[HealingStroke], size: int, shape: tuple[int, int]):
+	"""Rasterize round brush coverage clipped to valid source AND target pixels."""
+	points = np.asarray(strokes, dtype=np.float64)
+	if points.ndim != 3 or points.shape[1:] != (4, 2) or not np.isfinite(points).all():
+		raise ValueError("Healing strokes must contain finite source and target point pairs")
+	offsets = points[:, :2] - points[:, 2:]
+	dx, dy = (int(round(v)) for v in offsets[0, 0])
+	if not np.allclose(offsets, offsets[0, 0], rtol=0, atol=1e-6):
+		raise ValueError("Healing source offset must remain fixed within one gesture")
+	radius = max(1, int(round(size / 2.0)))
+	targets = np.rint(points[:, 2:]).astype(np.int64)
+	height, width = shape
+	x = max(0, -dx, int(targets[:, :, 0].min()) - radius - 1)
+	y = max(0, -dy, int(targets[:, :, 1].min()) - radius - 1)
+	right = min(width, width - dx, int(targets[:, :, 0].max()) + radius + 2)
+	bottom = min(height, height - dy, int(targets[:, :, 1].max()) + radius + 2)
+	if right <= x or bottom <= y:
+		return None
+	mask = np.zeros((bottom - y, right - x), np.uint8)
+	for start, end in targets:
+		p1 = (int(start[0]) - x, int(start[1]) - y)
+		p2 = (int(end[0]) - x, int(end[1]) - y)
+		cv2.line(mask, p1, p2, 255, thickness=radius * 2, lineType=cv2.LINE_8)
+	# A sub-three-pixel overlap has no interior for Poisson reconstruction.
+	_, _, mw, mh = cv2.boundingRect(mask)
+	return (mask, x, y, dx, dy) if mw >= 3 and mh >= 3 else None
 
 
 def apply_healing_to_images(
@@ -135,102 +190,6 @@ def apply_healing_to_images(
 		if progress is not None:
 			progress(index, total, key)
 	return results
-
-
-def _interpolate_point(
-	start: tuple[float, float],
-	end: tuple[float, float],
-	t: float,
-) -> tuple[float, float]:
-	return (
-		float(start[0]) + (float(end[0]) - float(start[0])) * t,
-		float(start[1]) + (float(end[1]) - float(start[1])) * t,
-	)
-
-
-def _apply_seamless_healing_dab(
-	source: np.ndarray,
-	target: np.ndarray,
-	source_center: tuple[float, float],
-	target_center: tuple[float, float],
-	radius: int,
-	opacity: float,
-) -> None:
-	"""Clone one clipped circular source sample into its target-center position."""
-	height, width = target.shape[:2]
-	source_x = int(round(source_center[0]))
-	source_y = int(round(source_center[1]))
-	target_x = int(round(target_center[0]))
-	target_y = int(round(target_center[1]))
-	offsets = np.arange(-radius, radius + 1)
-	valid_x = offsets[
-		(0 <= source_x + offsets)
-		& (source_x + offsets < width)
-		& (0 <= target_x + offsets)
-		& (target_x + offsets < width)
-	]
-	valid_y = offsets[
-		(0 <= source_y + offsets)
-		& (source_y + offsets < height)
-		& (0 <= target_y + offsets)
-		& (target_y + offsets < height)
-	]
-	if valid_x.size == 0 or valid_y.size == 0:
-		return
-	x0_offset, x1_offset = int(valid_x[0]), int(valid_x[-1]) + 1
-	y0_offset, y1_offset = int(valid_y[0]), int(valid_y[-1]) + 1
-	source_roi = source[
-		source_y + y0_offset:source_y + y1_offset,
-		source_x + x0_offset:source_x + x1_offset,
-	]
-	target_roi = target[
-		target_y + y0_offset:target_y + y1_offset,
-		target_x + x0_offset:target_x + x1_offset,
-	]
-	if source_roi.size == 0 or target_roi.size == 0 or source_roi.shape != target_roi.shape:
-		return
-	mask = _centered_healing_circle_mask(valid_x, valid_y, radius)
-	if not np.any(mask > 0):
-		return
-	target_left = target_x + x0_offset
-	target_top = target_y + y0_offset
-	clone_center = (
-		target_left + source_roi.shape[1] // 2,
-		target_top + source_roi.shape[0] // 2,
-	)
-	try:
-		cloned = seamless_clone(
-			source_roi,
-			target,
-			mask,
-			clone_center,
-			mode=cv2.NORMAL_CLONE,
-		)
-	except (cv2.error, ValueError) as exc:
-		raise RuntimeError(
-			f"Healing Brush seamlessClone failed at target center ({target_x}, {target_y})"
-		) from exc
-	if opacity >= 1.0:
-		target[:] = cloned
-		return
-	cloned_roi = cloned[
-		target_top:target_top + source_roi.shape[0],
-		target_left:target_left + source_roi.shape[1],
-	]
-	blended_roi = cv2.addWeighted(cloned_roi, opacity, target_roi, 1.0 - opacity, 0.0)
-	target_roi[mask > 0] = blended_roi[mask > 0]
-
-
-def _centered_healing_circle_mask(
-	x_offsets: np.ndarray,
-	y_offsets: np.ndarray,
-	radius: int,
-) -> np.ndarray:
-	"""Build a binary circular seamlessClone mask around the dab center point."""
-	x_grid = x_offsets.astype(np.float32)[None, :]
-	y_grid = y_offsets.astype(np.float32)[:, None]
-	circle = x_grid * x_grid + y_grid * y_grid <= float(radius * radius)
-	return np.where(circle, 255, 0).astype(np.uint8)
 
 
 def apply_selection_fill(
@@ -281,10 +240,30 @@ def seamless_clone(
 	center: tuple[int, int],
 	mode: int = cv2.NORMAL_CLONE,
 ) -> np.ndarray:
-	"""Run OpenCV seamlessClone with validated, contiguous uint8 inputs."""
+	"""Clone at the full source center, correcting OpenCV's mask-bounds centering.
+
+	Keep pixels outside the selection exact and restrict the solver output to a
+	local destination. Padding preserves masks that touch the source image edge.
+	"""
 	source_u8, target_u8, mask_u8 = _prepare_clone_inputs(source, target, mask)
 	_validate_clone_geometry(source_u8, target_u8, mask_u8, center)
-	return cv2.seamlessClone(source_u8, target_u8, mask_u8, center, mode)
+	result = target_u8.copy()
+	if not np.any(mask_u8):
+		return result
+	left = int(center[0] - source_u8.shape[1] // 2)
+	top = int(center[1] - source_u8.shape[0] // 2)
+	height, width = source_u8.shape[:2]
+	x0, y0 = max(0, left - 2), max(0, top - 2)
+	x1, y1 = min(target_u8.shape[1], left + width + 2), min(target_u8.shape[0], top + height + 2)
+	mx, my, mw, mh = cv2.boundingRect(mask_u8)
+	clone_center = (left - x0 + mx + mw // 2, top - y0 + my + mh // 2)
+	source_pad = cv2.copyMakeBorder(source_u8, 1, 1, 1, 1, cv2.BORDER_REPLICATE)
+	mask_pad = cv2.copyMakeBorder(mask_u8, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=0)
+	cloned = cv2.seamlessClone(source_pad, target_u8[y0:y1, x0:x1].copy(), mask_pad, clone_center, mode)
+	roi = result[top:top + height, left:left + width]
+	cloned_roi = cloned[top - y0:top - y0 + height, left - x0:left - x0 + width]
+	roi[mask_u8 > 0] = cloned_roi[mask_u8 > 0]
+	return result
 
 def hard_paste(target: np.ndarray, patch: np.ndarray, mask: np.ndarray, x_pos: int, y_pos: int) -> np.ndarray:
 	"""Paste only masked patch pixels into a clipped target ROI."""

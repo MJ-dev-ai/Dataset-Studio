@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "run_id": "261023-203613-d2e969",
+  "kind": "augment",
+  "status": "complete",
+  "started_at": "2026-10-23T11:36:13.961914+00:00",
+  "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\out\\augment_albedo_map_Detail_Preserve_n3_size64_seed0_7ee6aaae_261023-203613-d2e969",
+  "settings": {
+    "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\out",
+    "defect_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\patches\\Stain",
+    "target_map_key": "albedo_map",
+    "class_names": [
+      "Scratch",
+      "Dent",
+      "Crack",
+      "Stain"
+    ],
+    "generate_samples": 3,
+    "max_same_class_per_image": 1,
+    "poisson_mode": "Detail Preserve",
+    "include_original": true,
+    "enable_poisson": true,
+    "enable_flip": true,
+    "enable_rotation": false,
+    "enable_random": false,
+    "random_multiplier": 1,
+    "apply_extra_augment": true,
+    "rotation_angles": [
+      45,
+      90,
+      135,
+      180,
+      225,
+      270,
+      315
+    ],
+    "jitter_x_min": -20,
+    "jitter_x_max": 20,
+    "jitter_y_min": -20,
+    "jitter_y_max": 20,
+    "brightness_min": -20,
+    "brightness_max": 20,
+    "contrast_min": -10,
+    "contrast_max": 10,
+    "outside_tolerance": 0.02,
+    "image_size": 64,
+    "train_ratio": 0.6,
+    "val_ratio": 0.2,
+    "test_ratio": 0.2,
+    "seed": 0,
+    "class_ids": null
+  },
+  "class_names": [
+    "Scratch",
+    "Dent",
+    "Crack",
+    "Stain"
+  ],
+  "class_mapping": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3
+  },
+  "entries": [
+    {
+      "image": "images/train/동일_이름-a0669bbbaebd8a8fd18b.png",
+      "label": "labels/train/동일_이름-a0669bbbaebd8a8fd18b.txt",
+      "source_id": "a0669bbbaebd8a8fd18b",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-a0669bbbaebd8a8fd18b_hflip.png",
+      "label": "labels/train/동일_이름-a0669bbbaebd8a8fd18b_hflip.txt",
+      "source_id": "a0669bbbaebd8a8fd18b",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-5ddfaa31f5f79023e982.png",
+      "label": "labels/train/동일_이름-5ddfaa31f5f79023e982.txt",
+      "source_id": "5ddfaa31f5f79023e982",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-5ddfaa31f5f79023e982_hflip.png",
+      "label": "labels/train/동일_이름-5ddfaa31f5f79023e982_hflip.txt",
+      "source_id": "5ddfaa31f5f79023e982",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-32a4712919eb8951edb2.png",
+      "label": "labels/train/동일_이름-32a4712919eb8951edb2.txt",
+      "source_id": "32a4712919eb8951edb2",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-32a4712919eb8951edb2_hflip.png",
+      "label": "labels/train/동일_이름-32a4712919eb8951edb2_hflip.txt",
+      "source_id": "32a4712919eb8951edb2",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/test/동일_이름-3b7e582f59ea550d5160.png",
+      "label": "labels/test/동일_이름-3b7e582f59ea550d5160.txt",
+      "source_id": "3b7e582f59ea550d5160",
+      "split": "test",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/val/동일_이름-8b265523a3161f4ceb13.png",
+      "label": "labels/val/동일_이름-8b265523a3161f4ceb13.txt",
+      "source_id": "8b265523a3161f4ceb13",
+      "split": "val",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/val/동일_이름-8b265523a3161f4ceb13_hflip.png",
+      "label": "labels/val/동일_이름-8b265523a3161f4ceb13_hflip.txt",
+      "source_id": "8b265523a3161f4ceb13",
+      "split": "val",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/test/동일_이름-3b7e582f59ea550d5160_poisson_000001.png",
+      "label": "labels/test/동일_이름-3b7e582f59ea550d5160_poisson_000001.txt",
+      "source_id": "3b7e582f59ea550d5160",
+      "split": "test",
+      "kind": "poisson",
+      "map_key": "albedo_map",
+      "annotations": 2,
+      "classes": [
+        1,
+        3
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-5ddfaa31f5f79023e982_poisson_000002.png",
+      "label": "labels/train/동일_이름-5ddfaa31f5f79023e982_poisson_000002.txt",
+      "source_id": "5ddfaa31f5f79023e982",
+      "split": "train",
+      "kind": "poisson",
+      "map_key": "albedo_map",
+      "annotations": 2,
+      "classes": [
+        1,
+        3
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-5ddfaa31f5f79023e982_poisson_000002_hflip.png",
+      "label": "labels/train/동일_이름-5ddfaa31f5f79023e982_poisson_000002_hflip.txt",
+      "source_id": "5ddfaa31f5f79023e982",
+      "split": "train",
+      "kind": "poisson",
+      "map_key": "albedo_map",
+      "annotations": 2,
+      "classes": [
+        1,
+        3
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-a0669bbbaebd8a8fd18b_poisson_000003.png",
+      "label": "labels/train/동일_이름-a0669bbbaebd8a8fd18b_poisson_000003.txt",
+      "source_id": "a0669bbbaebd8a8fd18b",
+      "split": "train",
+      "kind": "poisson",
+      "map_key": "albedo_map",
+      "annotations": 2,
+      "classes": [
+        1,
+        3
+      ]
+    },
+    {
+      "image": "images/train/동일_이름-a0669bbbaebd8a8fd18b_poisson_000003_hflip.png",
+      "label": "labels/train/동일_이름-a0669bbbaebd8a8fd18b_poisson_000003_hflip.txt",
+      "source_id": "a0669bbbaebd8a8fd18b",
+      "split": "train",
+      "kind": "poisson",
+      "map_key": "albedo_map",
+      "annotations": 2,
+      "classes": [
+        1,
+        3
+      ]
+    }
+  ],
+  "issues": [],
+  "warnings": [],
+  "failed": 0,
+  "skipped": 0,
+  "images": 14,
+  "labels": 14,
+  "annotations": 19,
+  "poisson_samples": 3,
+  "requested_poisson": 3,
+  "generation_diagnostics": {
+    "attempts": 3,
+    "successful": 3,
+    "reasons": {}
+  },
+  "original_sources": 5,
+  "source_splits": {
+    "32a4712919eb8951edb2": "train",
+    "5ddfaa31f5f79023e982": "train",
+    "a0669bbbaebd8a8fd18b": "train",
+    "8b265523a3161f4ceb13": "val",
+    "3b7e582f59ea550d5160": "test"
+  },
+  "poisson_output_images": 5,
+  "split_images": {
+    "train": 10,
+    "test": 2,
+    "val": 2
+  },
+  "class_distribution": {
+    "1": 14,
+    "3": 5
+  },
+  "failed_or_skipped": 0,
+  "sample_images": [
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\out\\augment_albedo_map_Detail_Preserve_n3_size64_seed0_7ee6aaae_261023-203613-d2e969\\images\\test\\동일_이름-3b7e582f59ea550d5160_poisson_000001.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\out\\augment_albedo_map_Detail_Preserve_n3_size64_seed0_7ee6aaae_261023-203613-d2e969\\images\\train\\동일_이름-5ddfaa31f5f79023e982_poisson_000002.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\out\\augment_albedo_map_Detail_Preserve_n3_size64_seed0_7ee6aaae_261023-203613-d2e969\\images\\train\\동일_이름-5ddfaa31f5f79023e982_poisson_000002_hflip.png"
+  ],
+  "preview_image": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-48\\test_augmentation_preserves_so0\\out\\augment_albedo_map_Detail_Preserve_n3_size64_seed0_7ee6aaae_261023-203613-d2e969\\images\\test\\동일_이름-3b7e582f59ea550d5160_poisson_000001.png",
+  "finished_at": "2026-10-23T11:36:14.124891+00:00"
+}

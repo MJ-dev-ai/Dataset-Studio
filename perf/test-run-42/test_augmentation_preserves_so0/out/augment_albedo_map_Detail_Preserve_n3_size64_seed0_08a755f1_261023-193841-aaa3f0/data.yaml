@@ -1,0 +1,9 @@
+path: "C:/Users/tnsmi/Downloads/Dataset-Editor/perf/test-run-42/test_augmentation_preserves_so0/out/augment_albedo_map_Detail_Preserve_n3_size64_seed0_08a755f1_261023-193841-aaa3f0"
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: "Scratch"
+  1: "Dent"
+  2: "Crack"
+  3: "Stain"

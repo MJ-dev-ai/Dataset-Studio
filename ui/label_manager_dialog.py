@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QFormLayout,
     QHBoxLayout,
     QLineEdit,
+    QLabel,
     QListWidget,
     QListWidgetItem,
     QMessageBox,
@@ -14,6 +15,7 @@ from PySide6.QtWidgets import (
     QSpinBox,
     QVBoxLayout,
 )
+from ui.themes import configure_dialog
 
 
 class LabelManagerDialog(QDialog):
@@ -23,13 +25,18 @@ class LabelManagerDialog(QDialog):
         super().__init__(window)
         self.window = window
         self._original_id: int | None = None
-        self.setWindowTitle("Label Class Manager")
+        self.setWindowTitle("클래스 관리")
         self.resize(520, 520)
         self._build_ui()
         self.refresh()
+        configure_dialog(self, 480)
 
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
+        hint = QLabel("추가·수정·삭제는 즉시 반영됩니다. 닫기는 변경을 취소하지 않습니다.", self)
+        hint.setWordWrap(True)
+        hint.setProperty("uiRole", "hint")
+        root.addWidget(hint)
         self.class_list = QListWidget(self)
         self.class_list.currentItemChanged.connect(self._class_selected)
         root.addWidget(self.class_list, 1)
@@ -38,15 +45,18 @@ class LabelManagerDialog(QDialog):
         self.class_id_spin = QSpinBox(self)
         self.class_id_spin.setRange(0, 9999)
         self.class_name_edit = QLineEdit(self)
-        self.class_name_edit.setPlaceholderText("Class name")
-        form.addRow("Class ID", self.class_id_spin)
-        form.addRow("Name", self.class_name_edit)
+        self.class_name_edit.setPlaceholderText("예: 표면 균열")
+        form.addRow("클래스 ID", self.class_id_spin)
+        form.addRow("이름", self.class_name_edit)
         root.addLayout(form)
 
         edit_buttons = QHBoxLayout()
-        self.new_button = QPushButton("New", self)
-        self.save_button = QPushButton("Add / Update", self)
-        self.delete_button = QPushButton("Delete", self)
+        self.new_button = QPushButton("새 클래스", self)
+        self.save_button = QPushButton("추가 / 수정", self)
+        self.save_button.setProperty("uiRole", "primary")
+        self.delete_button = QPushButton("삭제", self)
+        self.delete_button.setProperty("uiRole", "danger")
+        self.class_name_edit.textChanged.connect(lambda text: self.save_button.setEnabled(bool(text.strip())))
         self.new_button.clicked.connect(self._new_class)
         self.save_button.clicked.connect(self._save_class)
         self.delete_button.clicked.connect(self._delete_class)
@@ -56,8 +66,8 @@ class LabelManagerDialog(QDialog):
         root.addLayout(edit_buttons)
 
         order_buttons = QHBoxLayout()
-        self.up_button = QPushButton("Move Up", self)
-        self.down_button = QPushButton("Move Down", self)
+        self.up_button = QPushButton("위로", self)
+        self.down_button = QPushButton("아래로", self)
         self.up_button.clicked.connect(lambda: self._move(-1))
         self.down_button.clicked.connect(lambda: self._move(1))
         order_buttons.addWidget(self.up_button)
@@ -101,6 +111,7 @@ class LabelManagerDialog(QDialog):
         self._original_id = None
         self.class_id_spin.setValue(self.window.next_label_class_id())
         self.class_name_edit.clear()
+        self.save_button.setEnabled(False)
         self.class_name_edit.setFocus()
         self.delete_button.setEnabled(False)
         self.up_button.setEnabled(False)

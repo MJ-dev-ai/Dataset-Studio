@@ -1,0 +1,8 @@
+Pretendard v1.3.9 — Regular, Medium, SemiBold (unmodified OpenType fonts)
+Author: Kil Hyung-jin / orioncactus
+Source: https://github.com/orioncactus/pretendard/tree/v1.3.9/packages/pretendard/dist/public/static
+License: SIL Open Font License 1.1; see OFL.txt in this directory.
+
+These files are registered privately with Qt when Dataset Studio starts.
+No system font installation or network connection is needed at runtime.
+Include this directory, including OFL.txt, when distributing the application.

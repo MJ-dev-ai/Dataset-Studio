@@ -53,7 +53,9 @@ def apply_options(image: np.ndarray, options: PreprocessOptions | dict) -> tuple
 	contrast = int(config.contrast_shift)
 	if brightness or contrast:
 		alpha = 1.0 + float(contrast) / 100.0
-		result = np.clip(result.astype(np.float32) * alpha + float(brightness), 0, 255).astype(np.uint8)
+		# Preserve the existing float32/clipping/truncation semantics with 256 entries.
+		lut = np.clip(np.arange(256, dtype=np.float32) * alpha + float(brightness), 0, 255).astype(np.uint8)
+		result = cv2.LUT(result, lut)
 	angle = float(config.rotation_degrees)
 	if abs(angle) > 1e-6:
 		center = ((current_width - 1) * 0.5, (current_height - 1) * 0.5)

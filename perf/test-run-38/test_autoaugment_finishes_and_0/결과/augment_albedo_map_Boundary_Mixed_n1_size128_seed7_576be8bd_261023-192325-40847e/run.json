@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "run_id": "261023-192325-40847e",
+  "kind": "augment",
+  "status": "complete",
+  "started_at": "2026-10-23T10:23:25.513773+00:00",
+  "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결과\\augment_albedo_map_Boundary_Mixed_n1_size128_seed7_576be8bd_261023-192325-40847e",
+  "settings": {
+    "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결과",
+    "defect_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결함",
+    "target_map_key": "albedo_map",
+    "class_names": [
+      "결함",
+      "기존 라벨"
+    ],
+    "generate_samples": 1,
+    "max_same_class_per_image": 1,
+    "poisson_mode": "Boundary Mixed",
+    "include_original": true,
+    "enable_poisson": false,
+    "enable_flip": true,
+    "enable_rotation": true,
+    "enable_random": false,
+    "random_multiplier": 1,
+    "apply_extra_augment": true,
+    "rotation_angles": [
+      0,
+      90
+    ],
+    "jitter_x_min": -20,
+    "jitter_x_max": 20,
+    "jitter_y_min": -20,
+    "jitter_y_max": 20,
+    "brightness_min": -20,
+    "brightness_max": 20,
+    "contrast_min": -10,
+    "contrast_max": 10,
+    "outside_tolerance": 0.02,
+    "image_size": 128,
+    "train_ratio": 1.0,
+    "val_ratio": 0.0,
+    "test_ratio": 0.0,
+    "seed": 7,
+    "class_ids": null
+  },
+  "class_names": [
+    "결함",
+    "기존 라벨"
+  ],
+  "class_mapping": {
+    "0": 0,
+    "1": 1
+  },
+  "entries": [
+    {
+      "image": "images/train/원본-63396007554632cc8fc3_rot000.png",
+      "label": "labels/train/원본-63396007554632cc8fc3_rot000.txt",
+      "source_id": "63396007554632cc8fc3",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/원본-63396007554632cc8fc3_rot090.png",
+      "label": "labels/train/원본-63396007554632cc8fc3_rot090.txt",
+      "source_id": "63396007554632cc8fc3",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/원본-63396007554632cc8fc3_hflip_rot000.png",
+      "label": "labels/train/원본-63396007554632cc8fc3_hflip_rot000.txt",
+      "source_id": "63396007554632cc8fc3",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "images/train/원본-63396007554632cc8fc3_hflip_rot090.png",
+      "label": "labels/train/원본-63396007554632cc8fc3_hflip_rot090.txt",
+      "source_id": "63396007554632cc8fc3",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    }
+  ],
+  "issues": [],
+  "warnings": [],
+  "failed": 0,
+  "skipped": 0,
+  "images": 4,
+  "labels": 4,
+  "annotations": 4,
+  "poisson_samples": 0,
+  "requested_poisson": 0,
+  "generation_diagnostics": {
+    "attempts": 0,
+    "successful": 0,
+    "reasons": {}
+  },
+  "original_sources": 1,
+  "source_splits": {
+    "63396007554632cc8fc3": "train"
+  },
+  "poisson_output_images": 0,
+  "split_images": {
+    "train": 4
+  },
+  "class_distribution": {
+    "1": 4
+  },
+  "failed_or_skipped": 0,
+  "sample_images": [
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결과\\augment_albedo_map_Boundary_Mixed_n1_size128_seed7_576be8bd_261023-192325-40847e\\images\\train\\원본-63396007554632cc8fc3_rot000.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결과\\augment_albedo_map_Boundary_Mixed_n1_size128_seed7_576be8bd_261023-192325-40847e\\images\\train\\원본-63396007554632cc8fc3_rot090.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결과\\augment_albedo_map_Boundary_Mixed_n1_size128_seed7_576be8bd_261023-192325-40847e\\images\\train\\원본-63396007554632cc8fc3_hflip_rot000.png"
+  ],
+  "preview_image": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-38\\test_autoaugment_finishes_and_0\\결과\\augment_albedo_map_Boundary_Mixed_n1_size128_seed7_576be8bd_261023-192325-40847e\\images\\train\\원본-63396007554632cc8fc3_rot000.png",
+  "finished_at": "2026-10-23T10:23:25.561121+00:00"
+}

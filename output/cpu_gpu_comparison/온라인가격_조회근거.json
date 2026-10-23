@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-23",
+  "basis": "VAT 포함 단품, 배송비 제외, 일반 판매가; 검색 요약 대신 상품 페이지 재조회",
+  "CPU": [
+    [
+      "TR PRO 7975WX",
+      95566,
+      3989,
+      6085060,
+      "멀티팩 정품",
+      "다나와 / 컴오아시스",
+      5729,
+      "https://prod.danawa.com/info/?pcode=30143105"
+    ],
+    [
+      "TR PRO 9965WX",
+      92266,
+      4541,
+      4509840,
+      "멀티팩 정품",
+      "다나와 / 11번가",
+      6804,
+      "https://prod.danawa.com/info/?pcode=94690922"
+    ],
+    [
+      "TR 7960X",
+      83411,
+      4125,
+      1960880,
+      "멀티팩 정품",
+      "다나와 / 11번가",
+      5792,
+      "https://prod.danawa.com/info/?pcode=72593030"
+    ],
+    [
+      "TR PRO 7965WX",
+      82214,
+      4009,
+      4210650,
+      "멀티팩 정품",
+      "다나와 / G마켓",
+      5731,
+      "https://prod.danawa.com/info/?pcode=30143039"
+    ],
+    [
+      "TR PRO 9955WX",
+      66577,
+      4526,
+      2588270,
+      "멀티팩 정품",
+      "다나와 / 11번가",
+      6803,
+      "https://prod.danawa.com/info/?pcode=94691237"
+    ],
+    [
+      "Core i9-14900K",
+      58173,
+      4690,
+      765000,
+      "정품 박스",
+      "다나와 / 에프에이치디",
+      5717,
+      "https://prod.danawa.com/info/?pcode=28798964"
+    ],
+    [
+      "Xeon W5-3425",
+      36365,
+      3350,
+      2398000,
+      "Tray·주문 수입",
+      "컴퓨존",
+      5598,
+      "https://www.compuzone.co.kr/product/product_detail.htm?ProductNo=1137513"
+    ],
+    [
+      "Xeon Silver × 2",
+      null,
+      null,
+      null,
+      "모델명 미기재",
+      "정확한 모델 확인 필요",
+      null,
+      null
+    ]
+  ],
+  "GPU": [
+    [
+      "GeForce RTX 5090",
+      "RTX 5090",
+      104.9,
+      1792,
+      11187000,
+      "PALIT GAMEROCK / 이엠텍",
+      "에누리 / 하이마트",
+      "https://price.enuri.com/catalog/131695974"
+    ],
+    [
+      "RTX 5000 Ada",
+      "RTX 5000 Ada",
+      65.3,
+      576,
+      7205000,
+      "엔비디아코리아 정품",
+      "컴퓨존",
+      "https://www.compuzone.co.kr/product/product_detail.htm?ProductNo=1115947"
+    ],
+    [
+      "RTX PRO 4500 Blackwell",
+      "RTX PRO 4500",
+      51.0,
+      896,
+      8200000,
+      "엔비디아코리아 정품",
+      "컴퓨존",
+      "https://www.compuzone.co.kr/product/product_detail.htm?ProductNo=1294644"
+    ]
+  ]
+}

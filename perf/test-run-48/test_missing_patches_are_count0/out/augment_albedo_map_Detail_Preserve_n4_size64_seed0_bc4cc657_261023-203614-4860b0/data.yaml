@@ -1,0 +1,4 @@
+path: "C:/Users/tnsmi/Downloads/Dataset-Editor/perf/test-run-48/test_missing_patches_are_count0/out/augment_albedo_map_Detail_Preserve_n4_size64_seed0_bc4cc657_261023-203614-4860b0"
+train: images/train
+names:
+  0: "결함"

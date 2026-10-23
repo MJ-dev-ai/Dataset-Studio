@@ -20,9 +20,8 @@ class ExportWorker(BaseWorker):
 				self.payload["mapsets"],
 				options,
 				progress_callback=self._service_progress,
+				check_cancelled=self.check_cancelled,
 			)
-			if not yolo_export_service.validate_export(options.output_root):
-				raise RuntimeError("Export validation failed: image/label pairs are incomplete")
 			self._succeed(result)
 		except WorkerCancelled:
 			self._cancel()

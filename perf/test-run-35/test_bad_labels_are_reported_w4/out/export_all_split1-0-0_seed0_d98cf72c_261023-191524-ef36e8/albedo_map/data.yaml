@@ -1,0 +1,5 @@
+path: .
+train: images/train
+names:
+  0: "표면: 균열"
+  1: "찍힘"

@@ -1,0 +1,331 @@
+tests/test_autoaugment_resize_order.py::test_auto_yolo_resizes_after_poisson_before_staged_output_augment
+tests/test_autoaugment_staged_pipeline.py::test_staged_autoaugment_options_are_available
+tests/test_autoaugment_staged_pipeline.py::test_staged_pipeline_order_and_resize_after_poisson
+tests/test_autoaugment_staged_pipeline.py::test_stage_checkboxes_are_in_autoaugment_ui
+tests/test_autoaugment_staged_pipeline.py::test_autoaugment_reports_weighted_pipeline_stages
+tests/test_autoaugment_worker_ui.py::test_autoaugment_uses_yolo_worker_and_progress_panel
+tests/test_autoaugment_worker_ui.py::test_autoaugment_is_a_modeless_dialog_not_a_workspace_page
+tests/test_autoaugment_worker_ui.py::test_autoaugment_split_controls_use_one_horizontal_row
+tests/test_autoaugment_worker_ui.py::test_autoaugment_uses_persistent_target_map_and_preview_results_workspace
+tests/test_autoaugment_worker_ui.py::test_autoaugment_result_panel_has_split_and_annotation_statistics
+tests/test_autoaugment_worker_ui.py::test_autoaugment_workspace_follows_theme_with_green_success_accent
+tests/test_autoaugment_worker_ui.py::test_autoaugment_preview_rescales_with_the_window
+tests/test_autoaugment_worker_ui.py::test_poisson_samples_output_multiplier_ui_text
+tests/test_autoaugment_worker_ui.py::test_auto_yolo_generates_variants_after_poisson_resize
+tests/test_autoaugment_worker_ui.py::test_autoaugment_designer_uses_semantic_object_names
+tests/test_autoaugment_worker_ui.py::test_designer_files_do_not_own_runtime_stylesheets
+tests/test_defect_pool_clipboard_import.py::test_read_defect_pool_groups_exported_maps_by_class_and_id
+tests/test_editor_workflow.py::test_tool_keys_and_context_panels
+tests/test_editor_workflow.py::test_space_pan_restores_tool_and_brackets_sync
+tests/test_editor_workflow.py::test_text_input_keeps_undo_and_tool_letters
+tests/test_editor_workflow.py::test_polygon_backspace_enter_and_selection_intersection
+tests/test_editor_workflow.py::test_healing_alt_sample_and_patch_keyboard
+tests/test_editor_workflow.py::test_rotated_mask_does_not_pick_up_black_background[1]
+tests/test_editor_workflow.py::test_rotated_mask_does_not_pick_up_black_background[3]
+tests/test_label_catalog.py::test_catalog_edit_preserves_display_order
+tests/test_label_catalog.py::test_catalog_can_reorder_without_renumbering_ids
+tests/test_label_catalog.py::test_catalog_rejects_duplicate_id_during_edit
+tests/test_label_catalog.py::test_normalize_catalog_keeps_first_position_for_duplicates
+tests/test_logging_setup.py::test_pending_crash_log_is_durable_and_append_only
+tests/test_mapset_discovery_modes.py::test_subfolders_are_mapsets_and_missing_maps_are_allowed
+tests/test_mapset_discovery_modes.py::test_root_images_are_single_image_mapsets
+tests/test_mapset_discovery_modes.py::test_selected_image_becomes_single_image_mapset
+tests/test_mapset_editing_service.py::test_selection_fill_uses_same_mask_on_any_map_image
+tests/test_mapset_editing_service.py::test_selection_delete_clears_only_masked_pixels
+tests/test_mapset_editing_service.py::test_paint_strokes_replay_coordinate_operations
+tests/test_mapset_editing_service.py::test_healing_strokes_reconstruct_target_source_difference
+tests/test_mapset_editing_service.py::test_healing_to_images_reports_and_returns_keyed_results
+tests/test_mapset_editing_service.py::test_fast_healing_preview_uses_lightweight_composite
+tests/test_mapset_export.py::test_save_mapset_copy_preserves_maps_and_overrides_edited_pixels
+tests/test_mapset_export.py::test_save_mapset_copy_rejects_existing_destination
+tests/test_mapset_export.py::test_save_mapset_in_place_writes_all_maps_and_labels_as_one_unit
+tests/test_open_folder_discovery_flow.py::test_first_level_folders_are_mapsets_and_deeper_folders_are_ignored
+tests/test_open_folder_discovery_flow.py::test_root_level_images_are_single_image_mapsets
+tests/test_open_folder_discovery_flow.py::test_root_images_and_first_level_folders_are_both_mapsets
+tests/test_open_folder_discovery_flow.py::test_single_image_mapsets_are_detectable_for_dialog_skip
+tests/test_open_folder_discovery_flow.py::test_map_key_filter_keeps_selected_maps_across_mapsets
+tests/test_patch_clipboard.py::test_patch_clipboard_keeps_multiple_owned_patches
+tests/test_patch_clipboard.py::test_patch_clipboard_remove_does_not_renumber_other_clips
+tests/test_patch_clipboard.py::test_mapset_clip_keeps_corresponding_patch_for_every_map_key
+tests/test_photocraft_improvements.py::test_qt_roundtrip_owns_data_with_padded_rows
+tests/test_photocraft_improvements.py::test_lut_matches_old_float_arithmetic[12-20]
+tests/test_photocraft_improvements.py::test_lut_matches_old_float_arithmetic[-90--75]
+tests/test_photocraft_improvements.py::test_lut_matches_old_float_arithmetic[200-99]
+tests/test_photocraft_improvements.py::test_lut_matches_old_float_arithmetic[0--100]
+tests/test_photocraft_improvements.py::test_lut_matches_old_float_arithmetic[1-1]
+tests/test_photocraft_improvements.py::test_history_sees_alpha_changes_and_ignores_unchanged
+tests/test_photocraft_improvements.py::test_roi_paint_matches_full_frame[0]
+tests/test_photocraft_improvements.py::test_roi_paint_matches_full_frame[0.35]
+tests/test_photocraft_improvements.py::test_roi_paint_matches_full_frame[1]
+tests/test_photocraft_improvements.py::test_patch_cache_reuses_translation_but_invalidates_transform_and_source
+tests/test_photocraft_improvements.py::test_offcenter_poisson_keeps_landmark_and_mask[1]
+tests/test_photocraft_improvements.py::test_offcenter_poisson_keeps_landmark_and_mask[2]
+tests/test_photocraft_improvements.py::test_poisson_invalid_placement_still_rejected
+tests/test_poisson_placement.py::test_placement_keeps_active_patch_fully_inside_roi
+tests/test_poisson_placement.py::test_placement_avoids_existing_labels_with_a_gap
+tests/test_poisson_placement.py::test_placement_returns_none_when_no_collision_free_space_exists
+tests/test_save_all_action.py::test_save_all_action_is_in_file_menu_and_connected
+tests/test_save_labels_action.py::test_save_labels_action_is_in_file_menu_and_connected
+tests/test_startup_worker_methods.py::test_mainwindow_has_worker_progress_methods_and_valid_stack_page
+tests/test_themes.py::test_both_themes_define_text_and_selection_contrast
+tests/test_themes.py::test_theme_switch_changes_colors_not_widget_geometry
+tests/test_themes.py::test_input_controls_render_direction_arrows
+tests/test_themes.py::test_unknown_theme_is_rejected
+
+=================================== ERRORS ====================================
+____________ ERROR collecting tests/test_annotation_management.py _____________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_annotation_management.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_annotation_management.py:1: in <module>
+    from PyQt6.QtGui import QColor, QImage, QPainterPath, QPixmap
+E   ModuleNotFoundError: No module named 'PyQt6'
+_____________ ERROR collecting tests/test_augmentation_balance.py _____________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_augmentation_balance.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_augmentation_balance.py:6: in <module>
+    from service.augmentation_service import AutoYoloAugmentOptions, AugmentationApi
+E   ImportError: cannot import name 'AugmentationApi' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+______________ ERROR collecting tests/test_augmentation_cache.py ______________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_augmentation_cache.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_augmentation_cache.py:3: in <module>
+    from service.augmentation_service import BoundedImageCache
+E   ImportError: cannot import name 'BoundedImageCache' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+_________ ERROR collecting tests/test_autoaugment_policy_b_counts.py __________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_autoaugment_policy_b_counts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_autoaugment_policy_b_counts.py:3: in <module>
+    from service.augmentation_service import AugmentationApi, AutoYoloAugmentOptions
+E   ImportError: cannot import name 'AugmentationApi' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+_______ ERROR collecting tests/test_autoaugment_total_poisson_count.py ________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_autoaugment_total_poisson_count.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_autoaugment_total_poisson_count.py:3: in <module>
+    from service.augmentation_service import AugmentationApi, AutoYoloAugmentOptions
+E   ImportError: cannot import name 'AugmentationApi' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+_____________ ERROR collecting tests/test_boundary_mixed_blend.py _____________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_boundary_mixed_blend.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_boundary_mixed_blend.py:4: in <module>
+    from service.editing_service import PoissonApi
+E   ImportError: cannot import name 'PoissonApi' from 'service.editing_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py)
+________________ ERROR collecting tests/test_business_logic.py ________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_business_logic.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_business_logic.py:5: in <module>
+    from service.editing_service import PoissonApi, clone_mode_from_text
+E   ImportError: cannot import name 'PoissonApi' from 'service.editing_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py)
+____________ ERROR collecting tests/test_detail_preserve_blend.py _____________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_detail_preserve_blend.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_detail_preserve_blend.py:3: in <module>
+    from service.editing_service import PoissonApi
+E   ImportError: cannot import name 'PoissonApi' from 'service.editing_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\editing_service.py)
+_______________ ERROR collecting tests/test_dynamic_map_keys.py _______________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_dynamic_map_keys.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_dynamic_map_keys.py:4: in <module>
+    from service.augmentation_service import AugmentationApi
+E   ImportError: cannot import name 'AugmentationApi' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+________________ ERROR collecting tests/test_healing_worker.py ________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_healing_worker.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_healing_worker.py:3: in <module>
+    from worker.healing_worker import run_mapset_healing
+E   ModuleNotFoundError: No module named 'worker.healing_worker'
+_________________ ERROR collecting tests/test_imagecanvas.py __________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_imagecanvas.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_imagecanvas.py:1: in <module>
+    from PyQt6.QtGui import QColor, QImage, QPainterPath, QPixmap
+E   ModuleNotFoundError: No module named 'PyQt6'
+________________ ERROR collecting tests/test_manual_poisson.py ________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_manual_poisson.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_manual_poisson.py:2: in <module>
+    from PyQt6.QtCore import QPointF, Qt
+E   ModuleNotFoundError: No module named 'PyQt6'
+______________ ERROR collecting tests/test_map_switch_canvas.py _______________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_map_switch_canvas.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_map_switch_canvas.py:1: in <module>
+    from PyQt6.QtGui import QColor, QImage, QPainterPath, QPixmap
+E   ModuleNotFoundError: No module named 'PyQt6'
+________ ERROR collecting tests/test_poisson_failure_reason_format.py _________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_poisson_failure_reason_format.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_poisson_failure_reason_format.py:3: in <module>
+    from service.augmentation_service import AugmentationApi
+E   ImportError: cannot import name 'AugmentationApi' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+____________ ERROR collecting tests/test_poisson_samples_global.py ____________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_poisson_samples_global.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_poisson_samples_global.py:1: in <module>
+    from service.augmentation_service import AugmentationApi, AutoYoloAugmentOptions
+E   ImportError: cannot import name 'AugmentationApi' from 'service.augmentation_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\augmentation_service.py)
+___________________ ERROR collecting tests/test_qt_image.py ___________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_qt_image.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_qt_image.py:2: in <module>
+    from PyQt6.QtGui import QImage
+E   ModuleNotFoundError: No module named 'PyQt6'
+_________________ ERROR collecting tests/test_taskmanager.py __________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_taskmanager.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_taskmanager.py:3: in <module>
+    from PyQt6.QtCore import QCoreApplication, QEventLoop, QTimer
+E   ModuleNotFoundError: No module named 'PyQt6'
+_________________ ERROR collecting tests/test_yolo_export.py __________________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_yolo_export.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_yolo_export.py:3: in <module>
+    from service.yolo_export_service import YoloExportApi, YoloExportOptions
+E   ImportError: cannot import name 'YoloExportApi' from 'service.yolo_export_service' (C:\Users\tnsmi\Downloads\Dataset-Editor\service\yolo_export_service.py)
+____________ ERROR collecting tests/test_yolo_training_pipeline.py ____________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\tests\test_yolo_training_pipeline.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_yolo_training_pipeline.py:8: in <module>
+    from config.yolo_train_config import build_config
+E   ModuleNotFoundError: No module named 'config.yolo_train_config'
+_________ ERROR collecting training/scripts/visualize_result_test.py __________
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\training\scripts\visualize_result_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+training\scripts\visualize_result_test.py:6: in <module>
+    import torch
+E   ModuleNotFoundError: No module named 'torch'
+__ ERROR collecting training/workspace/curvature_validate/test_curvature.py ___
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\training\workspace\curvature_validate\test_curvature.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+training\workspace\curvature_validate\test_curvature.py:40: in <module>
+    import torch
+E   ModuleNotFoundError: No module named 'torch'
+_ ERROR collecting training/workspace/normal_validate/period_saves_old/test_normal.py _
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\training\workspace\normal_validate\period_saves_old\test_normal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+training\workspace\normal_validate\period_saves_old\test_normal.py:40: in <module>
+    import torch
+E   ModuleNotFoundError: No module named 'torch'
+_ ERROR collecting training/workspace/normal_validate/tests/test_bbox_image_generator.py _
+ImportError while importing test module 'C:\Users\tnsmi\Downloads\Dataset-Editor\training\workspace\normal_validate\tests\test_bbox_image_generator.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Python314\Lib\importlib\__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+training\workspace\normal_validate\tests\test_bbox_image_generator.py:3: in <module>
+    from bbox_image_generator import read_data_yaml
+E   ModuleNotFoundError: No module named 'bbox_image_generator'
+=========================== short test summary info ===========================
+ERROR tests/test_annotation_management.py
+ERROR tests/test_augmentation_balance.py
+ERROR tests/test_augmentation_cache.py
+ERROR tests/test_autoaugment_policy_b_counts.py
+ERROR tests/test_autoaugment_total_poisson_count.py
+ERROR tests/test_boundary_mixed_blend.py
+ERROR tests/test_business_logic.py
+ERROR tests/test_detail_preserve_blend.py
+ERROR tests/test_dynamic_map_keys.py
+ERROR tests/test_healing_worker.py
+ERROR tests/test_imagecanvas.py
+ERROR tests/test_manual_poisson.py
+ERROR tests/test_map_switch_canvas.py
+ERROR tests/test_poisson_failure_reason_format.py
+ERROR tests/test_poisson_samples_global.py
+ERROR tests/test_qt_image.py
+ERROR tests/test_taskmanager.py
+ERROR tests/test_yolo_export.py
+ERROR tests/test_yolo_training_pipeline.py
+ERROR training/scripts/visualize_result_test.py
+ERROR training/workspace/curvature_validate/test_curvature.py
+ERROR training/workspace/normal_validate/period_saves_old/test_normal.py
+ERROR training/workspace/normal_validate/tests/test_bbox_image_generator.py
+!!!!!!!!!!!!!!!!!! Interrupted: 23 errors during collection !!!!!!!!!!!!!!!!!!!
+73 tests collected, 23 errors in 2.36s

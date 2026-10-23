@@ -9,3 +9,17 @@ training/
 tests/
 *.md
 !README.md
+!docs/photocraft-comparison.md
+!tests/
+tests/*
+!tests/test_photocraft_improvements.py
+!tests/test_editor_workflow.py
+!tests/test_patch_preview.py
+!tests/test_healing_preview.py
+!tests/test_cvat_labeling.py
+!docs/cvat-comparison.md
+!docs/ui-photoshop-cvat-review.md
+!tests/test_ui_dialog_workflow.py
+!tests/test_autoaugment_output.py
+!tests/test_dataset_results.py
+perf/qt-settings/

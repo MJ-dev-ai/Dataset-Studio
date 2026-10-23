@@ -10,10 +10,9 @@ def qimage_to_bgr(image: QImage | QPixmap) -> np.ndarray:
     source = image.toImage() if isinstance(image, QPixmap) else image
     rgb = source.convertToFormat(QImage.Format.Format_RGB888)
     bits = rgb.bits()
-    bits.setsize(rgb.sizeInBytes())
     view = np.frombuffer(bits, dtype=np.uint8).reshape(rgb.height(), rgb.bytesPerLine())
     pixels = view[:, : rgb.width() * 3].reshape(rgb.height(), rgb.width(), 3)
-    return cv2.cvtColor(pixels, cv2.COLOR_RGB2BGR).copy()
+    return cv2.cvtColor(pixels, cv2.COLOR_RGB2BGR)
 
 
 def bgr_to_qpixmap(array: np.ndarray) -> QPixmap:

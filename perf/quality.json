@@ -1,0 +1,17 @@
+{
+  "expected_peak_xy": [
+    32,
+    43
+  ],
+  "before_peak_yx": [
+    48,
+    42
+  ],
+  "after_peak_yx": [
+    43,
+    32
+  ],
+  "uniform_selected_color": 200,
+  "rotated_edge_before_min": 54,
+  "rotated_edge_after_min": 200
+}

@@ -8,10 +8,14 @@ import numpy as np
 from pathlib import Path
 
 from ui.ui_loader import load_ui
-from PySide6.QtCore import QEvent, QRect, QRectF, QSettings, Qt, QTimer, Signal
-from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QImage, QKeySequence, QPainter, QPainterPath, QPixmap, QShortcut
+from PySide6.QtCore import QEvent, QRect, QRectF, QSettings, QSignalBlocker, Qt, QTimer, Signal
+from PySide6.QtGui import QAction, QActionGroup, QColor, QIcon, QImage, QPainter, QPainterPath, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
+    QAbstractSpinBox,
+    QComboBox,
+    QLineEdit,
+    QTextEdit,
     QDialog,
     QFileDialog,
     QInputDialog,
@@ -34,13 +38,11 @@ from config.settings import (
     IMAGE_DIALOG_FILTER,
     IMAGE_EXTENSIONS,
     LEFT_PROJECT_WIDTH_RATIO,
-    LEFT_TOOLS_WIDTH_RATIO,
     LOG_CONSOLE_MAX_BLOCKS,
     MAP_SPECS,
     PANEL_LAYOUT_DELAY_MS,
     RIGHT_PROPERTIES_WIDTH_RATIO,
     SETTINGS_ORGANIZATION,
-    TOP_OPTIONS_HEIGHT_RATIO,
     WORKER_SHUTDOWN_TIMEOUT_MS,
 )
 from config.flag import UiFlag
@@ -84,7 +86,8 @@ from ui.preprocess_dialog import (
 )
 from ui.patch_clipboard_widget import PatchClipboardWidget
 from ui.uisetup import UiSetup
-from ui.themes import THEME_NAMES, theme_colors, theme_stylesheet
+from ui.themes import THEME_NAMES, configure_application_font, theme_colors, theme_stylesheet
+from ui.dataset_result_dialog import DatasetResultDialog
 from service.preprocessing_service import PreprocessOptions
 from service.roi_service import roi_contour
 from core.qt_image import bgr_to_qpixmap, qimage_to_bgr
@@ -110,6 +113,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        configure_application_font(QApplication.instance())
         self.flag = UiFlag()
         self.project = None
         self.current_mapset: MapSet | None = None
@@ -119,6 +123,7 @@ class MainWindow(QMainWindow):
         self.map_sets: list[MapSet] = []
         self._project_root_item: QTreeWidgetItem | None = None
         self._panel_ratio_pending = False
+        self._panel_layout_initialized = False
         self.pixmap_cache = PixmapCache()
         self._active_task_ids: set[str] = set()
         self._shutdown_succeeded = False
@@ -163,6 +168,9 @@ class MainWindow(QMainWindow):
         self.apply_theme(self.current_theme, persist=False)
         self._connect_signals()
         self._queue_panel_ratio_update()
+        # Qt otherwise gives the first-show focus to the project tree, leaving
+        # canvas-scoped tool shortcuts inactive until the user clicks the canvas.
+        self.canvas.setFocus(Qt.FocusReason.OtherFocusReason)
 
     def _request_worker(self, operation: str, payload: object) -> str:
         """Request one feature worker and return its correlation identifier."""
@@ -211,6 +219,7 @@ class MainWindow(QMainWindow):
         if layout is None:
             return
         self.transform_properties = TransformPropertiesPanel(self.page_info)
+        self.transform_properties.setEnabled(not self.canvas.pixmap.isNull())
         self.transform_properties.preview_requested.connect(self.update_transform_preview)
         self.transform_properties.apply_requested.connect(self.apply_transform_options)
         self.transform_properties.reset_requested.connect(self.reset_transform_preview)
@@ -222,24 +231,45 @@ class MainWindow(QMainWindow):
         app = QApplication.instance()
         if app is not None:
             app.installEventFilter(self)
-        self.escape_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
-        self.escape_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-        self.escape_shortcut.activated.connect(self._activate_move_from_edit_tool)
 
     def _activate_move_from_edit_tool(self) -> None:
         self.tool_manager.cancel_current_tool(clear_canvas=True, fallback_mode=ToolMode.MOVE)
 
     def eventFilter(self, watched, event) -> bool:
-        if event.type() == QEvent.Type.KeyPress:
+        """Route tool letters across editor panels while preserving text and dialog input."""
+        if event.type() in {QEvent.Type.ShortcutOverride, QEvent.Type.KeyPress}:
+            if isinstance(watched, QWidget) and watched.window() is not self:
+                return False
             focus_widget = QApplication.focusWidget()
-            if focus_widget is not None and focus_widget.window() is not self:
-                return super().eventFilter(watched, event)
+            receiver = focus_widget if focus_widget is not None else watched
+            if not isinstance(receiver, QWidget) or receiver.window() is not self:
+                return False
+            if QApplication.activeModalWidget() is not None or QApplication.activePopupWidget() is not None:
+                return False
+            # Editors in item views and editable combos can own focus through a
+            # child widget. Read-only log views are not active text inputs.
+            input_widget = receiver
+            while input_widget is not None and input_widget is not self:
+                if isinstance(input_widget, (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox)) and not input_widget.isReadOnly():
+                    return False
+                if isinstance(input_widget, QComboBox) and input_widget.isEditable() and not input_widget.lineEdit().isReadOnly():
+                    return False
+                input_widget = input_widget.parentWidget()
             modifiers = event.modifiers() & (
                 Qt.KeyboardModifier.ControlModifier
                 | Qt.KeyboardModifier.ShiftModifier
                 | Qt.KeyboardModifier.AltModifier
                 | Qt.KeyboardModifier.MetaModifier
             )
+            tool_key = event.key() in ToolManager.TOOL_KEYS or event.key() == Qt.Key.Key_N
+            if tool_key and modifiers in {Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier} and self.workspaceStack.currentWidget() is self.editor_page:
+                event.accept()
+                if event.type() == QEvent.Type.KeyPress and not event.isAutoRepeat():
+                    self.canvas.setFocus(Qt.FocusReason.ShortcutFocusReason)
+                    self.canvas._run_tool_event("key_press_event", self.tool_manager.key_press_event, event)
+                return True
+            if event.type() != QEvent.Type.KeyPress or isinstance(focus_widget, (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox)):
+                return False
             if modifiers == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_Z:
                 self.undo_edit()
                 return True
@@ -253,7 +283,10 @@ class MainWindow(QMainWindow):
             ):
                 self.redo_edit()
                 return True
-        return super().eventFilter(watched, event)
+        # This application-level filter only consumes editor shortcuts. Returning
+        # False passes other events through without re-wrapping their native
+        # receiver in QObject.eventFilter (which can fail during window show).
+        return False
 
     def clear_active_selection_state(self) -> None:
         """Clear selection geometry and temporary points from the active selection tool."""
@@ -479,7 +512,9 @@ class MainWindow(QMainWindow):
             if button is not None:
                 button.setEnabled(available)
         if hasattr(self, "buttonSelectRemoveLabel"):
-            self.buttonSelectRemoveLabel.setEnabled(bool(self.canvas.annotations))
+            self.buttonSelectRemoveLabel.setEnabled(self.canvas.selected_annotation_index >= 0)
+        if hasattr(self, "annotationQuickAdd"):
+            self.annotationQuickAdd.setEnabled(available)
 
     def _on_canvas_view_changed(self, zoom: float, x_ratio: float, y_ratio: float) -> None:
         del x_ratio, y_ratio
@@ -499,6 +534,8 @@ class MainWindow(QMainWindow):
             self.buttonSelectClearPlacementMask.setEnabled(self.current_image_path is not None)
         self._refresh_current_project_tree_item()
         self._refresh_transform_properties()
+        if hasattr(self, "annotation_panel"):
+            self.annotation_panel.refresh()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -511,17 +548,20 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(PANEL_LAYOUT_DELAY_MS, self._apply_panel_ratio)
 
     def _apply_panel_ratio(self) -> None:
-        """Apply proportional dock sizes without replacing the .ui layout."""
+        """Apply bounded initial dock sizes once and preserve manual resizing afterwards."""
         self._panel_ratio_pending = False
+        if self._panel_layout_initialized or not self.isVisible():
+            return
+        self._panel_layout_initialized = True
 
         width = max(1, self.width())
         height = max(1, self.height())
 
-        left_tools = int(width * LEFT_TOOLS_WIDTH_RATIO)
-        left_project = int(width * LEFT_PROJECT_WIDTH_RATIO)
-        right_properties = int(width * RIGHT_PROPERTIES_WIDTH_RATIO)
-        bottom_logs = int(height * BOTTOM_LOGS_HEIGHT_RATIO)
-        top_options = int(height * TOP_OPTIONS_HEIGHT_RATIO)
+        left_tools = 44
+        left_project = max(210, min(280, int(width * LEFT_PROJECT_WIDTH_RATIO)))
+        right_properties = max(320, min(380, int(width * RIGHT_PROPERTIES_WIDTH_RATIO)))
+        bottom_logs = min(170, int(height * BOTTOM_LOGS_HEIGHT_RATIO))
+        top_options = 52
 
         dock_tools = getattr(self, "dockTools", None)
         dock_project = getattr(self, "dockProject", None)
@@ -571,6 +611,11 @@ class MainWindow(QMainWindow):
 
     def set_labels_visible(self, visible: bool) -> None:
         self.canvas.set_labels_visible(visible)
+        if hasattr(self, "annotation_panel"):
+            with QSignalBlocker(self.annotation_panel.visible_check):
+                self.annotation_panel.visible_check.setChecked(visible)
+        with QSignalBlocker(self.action_show_labels):
+            self.action_show_labels.setChecked(visible)
         self.set_status("Labels shown" if visible else "Labels hidden")
 
     def set_status(self, message: str) -> None:
@@ -604,7 +649,8 @@ class MainWindow(QMainWindow):
             },
         )
 
-        def apply(map_sets):
+        def apply(result):
+            map_sets = result["mapsets"]
             if project_payload is not None:
                 map_sets = self._apply_project_mapsets_to_discovery(map_sets, project_payload)
                 map_sets = self._apply_project_roi_contours_to_mapsets(map_sets, project_payload)
@@ -621,7 +667,7 @@ class MainWindow(QMainWindow):
             self._clear_mapset_history()
             self._apply_discovered_map_sets(map_sets)
             self.project = DatasetProject(folder, map_sets)
-            self._load_label_catalog(folder)
+            self._load_label_catalog(folder, result["class_catalog"])
             if project_payload is not None:
                 self._restore_project_state(project_payload)
                 self.set_status(f"Loaded project: {self.project_path}")
@@ -1356,6 +1402,16 @@ class MainWindow(QMainWindow):
         if self.add_annotation_with_class(class_id, class_name):
             self._last_label_class_id = class_id
 
+    def quick_add_annotation(self) -> bool:
+        """Create one box using the persistent drawing class, without a modal loop."""
+        class_id = self.annotationClassCombo.currentData()
+        if class_id is None:
+            self.set_status("먼저 오른쪽 '클래스 관리'에서 클래스를 등록해 주세요.")
+            return False
+        if not self.canvas.labels_visible:
+            self.set_labels_visible(True)
+        return self.add_annotation_with_class(class_id, self.class_name_for_id(class_id))
+
     def show_label_manager(self) -> None:
         if self.project_root_folder is None:
             QMessageBox.warning(self, "Label Class Manager", "Open a dataset project first.")
@@ -1372,25 +1428,25 @@ class MainWindow(QMainWindow):
                 return item_name
         return ""
 
-    def _load_label_catalog(self, root: Path) -> None:
-        path = root / "labels.json"
-        catalog = []
-        if path.is_file():
+    def _load_label_catalog(self, root: Path, catalog=None) -> None:
+        """Use the complete background scan catalog instead of the current image's IDs."""
+        if catalog is None:
             try:
-                payload = json.loads(path.read_text(encoding="utf-8"))
-                items = payload.get("labels", payload) if isinstance(payload, dict) else payload
-                for index, item in enumerate(items if isinstance(items, list) else []):
-                    if isinstance(item, dict):
-                        class_id = int(item.get("class_id", item.get("id", index)))
-                        class_name = str(item.get("class_name", item.get("name", f"class {class_id}"))).strip()
-                    else:
-                        class_id, class_name = index, str(item).strip()
-                    catalog.append((class_id, class_name))
-            except (OSError, ValueError, TypeError, json.JSONDecodeError):
-                catalog = []
+                catalog = labeling_service.load_class_catalog(root, self.map_sets)
+            except (OSError, ValueError) as error:
+                QMessageBox.warning(self, "클래스 불러오기 실패", str(error))
+                return
         self._label_catalog = normalize_catalog(catalog)
+        if hasattr(self, "annotation_panel"):
+            self.annotation_panel.refresh()
+        if hasattr(self, "augmentation_page") and not self.augmentation_page._running:
+            self.augmentation_page.set_class_catalog(self._label_catalog)
 
     def _save_label_catalog(self) -> None:
+        if hasattr(self, "augmentation_page") and not self.augmentation_page._running:
+            self.augmentation_page.set_class_catalog(self._label_catalog)
+        if hasattr(self, "annotation_panel"):
+            self.annotation_panel.refresh()
         if self.project_root_folder is None:
             return
         payload = {
@@ -1445,6 +1501,7 @@ class MainWindow(QMainWindow):
             class_name,
         )
         if original_id == class_id:
+            self.canvas.reset_annotation_history()
             self.canvas.annotations = [
                 CanvasAnnotation(item.class_id, item.bounds, class_name)
                 if item.class_id == class_id else item
@@ -1484,12 +1541,9 @@ class MainWindow(QMainWindow):
         return removed
 
     def remove_active_annotation(self) -> bool:
-        """Remove the selected label or the topmost label overlapping the active selection."""
+        """Delete only the explicitly selected object, never an unrelated overlap."""
         if self.canvas.selected_annotation_index >= 0:
             return self.remove_annotation(self.canvas.selected_annotation_index)
-        index = self._annotation_index_from_selection()
-        if index >= 0:
-            return self.remove_annotation(index)
         self.set_status("Select an existing label before removing it")
         return False
 
@@ -1568,14 +1622,15 @@ class MainWindow(QMainWindow):
             return False
         annotations = state.get("annotations", [])
         self._loading_labels = True
+        self.canvas.reset_annotation_history()
         try:
+            self._labels_modified = bool(state.get("modified", False))
             self.canvas.annotations = self._copy_annotations(annotations)
             self.canvas.selected_annotation_index = -1
             self.canvas.update()
             self._on_annotations_changed()
         finally:
             self._loading_labels = False
-        self._labels_modified = bool(state.get("modified", False))
         loaded_path = state.get("loaded_label_path")
         self._loaded_label_path = Path(loaded_path) if loaded_path is not None else None
         snapshot = state.get("loaded_label_snapshot")
@@ -1599,6 +1654,8 @@ class MainWindow(QMainWindow):
         return False
 
     def _load_current_yolo_labels(self, force_disk: bool = False) -> None:
+        self.canvas.reset_annotation_history()
+        self.canvas.select_annotation(-1)
         if (
             not force_disk
             and self.current_mapset is not None
@@ -1639,8 +1696,8 @@ class MainWindow(QMainWindow):
             self.canvas.update()
             self._labels_modified = False
         finally:
+            self._on_annotations_changed()
             self._loading_labels = False
-        self._on_annotations_changed()
         self._labels_modified = False
 
     def reload_current_yolo_labels(self) -> bool:
@@ -1841,6 +1898,14 @@ class MainWindow(QMainWindow):
 
     def undo_edit(self) -> bool:
         """Undo a MapSet edit, falling back to the canvas history when needed."""
+        if self.tool_manager.annotation_editing_context:
+            if self.canvas._annotation_before is not None:
+                self.tool_manager.cancel_annotation_gesture()
+                return True
+            self.tool_manager.cancel_annotation_gesture()
+            changed = self.canvas.undo_annotation()
+            self.set_status("라벨 편집 실행 취소" if changed else "실행 취소할 라벨 편집이 없습니다")
+            return changed
         if self.current_mapset is not None and self.undo_mapset_edit():
             return True
         if self.canvas.undo():
@@ -1852,7 +1917,12 @@ class MainWindow(QMainWindow):
         return False
 
     def redo_edit(self) -> bool:
-        """Redo a MapSet edit, falling back to the canvas history when needed."""
+        """Redo the focused annotation or image edit history."""
+        if self.tool_manager.annotation_editing_context:
+            self.tool_manager.cancel_annotation_gesture()
+            changed = self.canvas.undo_annotation(redo=True)
+            self.set_status("라벨 편집 다시 실행" if changed else "다시 실행할 라벨 편집이 없습니다")
+            return changed
         if self.current_mapset is not None and self.redo_mapset_edit():
             return True
         if self.canvas.redo():
@@ -1919,67 +1989,59 @@ class MainWindow(QMainWindow):
             processed[str(map_path.resolve())] = bgr_to_qpixmap(result).toImage()
         return self._commit_mapset_images(processed, "Brush applied to MapSet")
 
-    def apply_mapset_healing_strokes(
-        self,
-        strokes: list[HealingStroke],
-        size: int,
-        opacity: float,
-    ) -> bool:
-        """Start a worker that applies one healing gesture to every MapSet map."""
-        if self.current_mapset is None or not strokes:
+    def apply_mapset_healing_strokes(self, strokes: list[HealingStroke], size: int, opacity: float) -> bool:
+        """Commit the same healing gesture used by preview, with stale-image guards."""
+        if not strokes or self.canvas.pixmap.isNull() or opacity <= 0:
             return False
         if self._healing_task_id in self._active_task_ids:
             self.set_status("Healing Brush is already running")
             return False
         target_mapset = self.current_mapset
-        target_folder = str(target_mapset.folder.resolve())
-        history_before = self._take_mapset_history_before()
-        images: dict[str, np.ndarray] = {}
-        expected_shape = (self.canvas.pixmap.height(), self.canvas.pixmap.width())
-        for _map_key, map_path in target_mapset.maps:
-            source = self._load_editable_map_image(map_path)
-            if source is None:
-                continue
-            if source.shape[:2] != expected_shape:
-                self._pending_mapset_history_before = None
-                self.set_status("Healing Brush failed: MapSet maps do not share the current canvas coordinate system")
-                return False
-            images[str(map_path.resolve())] = source
-        if not images:
-            self._pending_mapset_history_before = None
-            self.set_status("Healing Brush failed: no MapSet images could be loaded")
+        target_folder = str(target_mapset.folder.resolve()) if target_mapset is not None else None
+        target_path = self.current_image_path
+        image_key = self.canvas.pixmap.cacheKey()
+        try:
+            if target_mapset is None:
+                images = {"canvas": qimage_to_bgr(self.canvas.pixmap)}
+                history_before = None
+            else:
+                snapshots = self._mapset_image_snapshots(target_mapset)
+                images = {str(target_mapset.map_paths[key].resolve()): image for key, image in snapshots.items()}
+                history_before = self._mapset_edit_snapshot(target_mapset)
+        except (OSError, ValueError, RuntimeError) as exc:
+            self.set_status(f"Healing Brush failed: {exc}")
             return False
-
-        task_id = self._request_worker(
-            "healing",
-            {
-                "images": images,
-                "strokes": list(strokes),
-                "size": size,
-                "opacity": opacity,
-            },
-        )
+        if not images:
+            return False
+        task_id = self._request_worker("healing", {"images": images, "strokes": list(strokes), "size": size, "opacity": opacity})
         self._healing_task_id = task_id
-        self.set_status(f"Applying Healing Brush to {len(images)} MapSet maps...")
+        self.set_status(f"힐링 브러시: {len(images)}개 이미지에 적용 중...")
 
         def apply_result(results: dict[str, np.ndarray]) -> None:
             current_folder = str(self.current_mapset.folder.resolve()) if self.current_mapset is not None else None
-            if current_folder != target_folder:
-                self.set_status("Healing Brush result discarded because the target MapSet changed")
+            if current_folder != target_folder or self.current_image_path != target_path or self.canvas.pixmap.cacheKey() != image_key:
+                self.tool_manager.healing_preview.clear()
+                self.set_status("힐링 결과를 폐기했습니다: 적용 중 대상 이미지가 변경되었습니다.")
                 return
-            processed = {
-                key: bgr_to_qpixmap(result).toImage()
-                for key, result in results.items()
-            }
-            self._push_mapset_history_entry(history_before, processed)
-            self._map_edit_states.update(processed)
-            current_key = str(self.current_image_path.resolve()) if self.current_image_path is not None else None
-            if current_key in processed:
-                view_state = self.canvas.view_state()
-                self.canvas.set_map_image(processed[current_key], modified=True)
-                self.canvas.apply_view_state(*view_state)
-                self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
-            self.set_status(f"Healing Brush applied to {len(processed)} MapSet maps")
+            changed = {key: result for key, result in results.items() if not np.array_equal(result, images[key])}
+            if not changed:
+                self.tool_manager.healing_preview.clear()
+                self.set_status("힐링 브러시: 변경된 픽셀이 없습니다.")
+                return
+            if target_mapset is None:
+                self.canvas.replace_pixmap(bgr_to_qpixmap(changed["canvas"]))
+            else:
+                processed = {key: bgr_to_qpixmap(result).toImage() for key, result in changed.items()}
+                self._push_mapset_history_entry(history_before, processed)
+                self._map_edit_states.update(processed)
+                current_key = str(self.current_image_path.resolve()) if self.current_image_path is not None else None
+                if current_key in processed:
+                    view_state = self.canvas.view_state()
+                    self.canvas.set_map_image(processed[current_key], modified=True)
+                    self.canvas.apply_view_state(*view_state)
+                    self._update_image_property_panel(self.current_image_path, self.canvas.pixmap)
+            self.tool_manager.healing_preview.clear()
+            self.set_status(f"힐링 브러시: {len(changed)}개 이미지에 적용했습니다.")
 
         self._task_handlers[task_id] = apply_result
         return True
@@ -2586,6 +2648,7 @@ class MainWindow(QMainWindow):
         return annotations
 
     def _apply_annotation_affine(self, matrix: np.ndarray, width: int, height: int) -> None:
+        self.canvas.reset_annotation_history()
         annotations = []
         for annotation in self.canvas.annotations:
             box = self._transform_rect(annotation.bounds, matrix, width, height)
@@ -2922,6 +2985,7 @@ class MainWindow(QMainWindow):
         if task_id == self._manual_poisson_task_id:
             self.set_status(f"Poisson failed: {message}")
         if task_id == self._healing_task_id:
+            self.tool_manager.healing_preview.clear()
             self.set_status(f"Healing Brush failed: {message}")
         if task_id == self._mapset_save_task_id:
             self.set_status(f"MapSet save failed: {message}")
@@ -2940,6 +3004,7 @@ class MainWindow(QMainWindow):
             if hasattr(self, "augmentation_page"):
                 self.augmentation_page.cancel_autoaugment_progress()
         if task_id == self._healing_task_id:
+            self.tool_manager.healing_preview.clear()
             self.set_status("Healing Brush cancelled")
         if task_id == self._save_all_task_id:
             self.set_status("Save All cancelled")
@@ -2956,6 +3021,7 @@ class MainWindow(QMainWindow):
             self._manual_poisson_task_id = None
             self.ui_setup.set_manual_poisson_running(False)
         if task_id == self._healing_task_id:
+            self.tool_manager.healing_preview.clear()
             self._healing_task_id = None
         if task_id == self._mapset_save_task_id:
             self._mapset_save_task_id = None
@@ -2970,7 +3036,10 @@ class MainWindow(QMainWindow):
     def _refresh_transform_properties(self) -> None:
         """Refresh current-image transform metadata in the Properties dock."""
         panel = getattr(self, "transform_properties", None)
-        if panel is None or self.canvas.pixmap.isNull():
+        if panel is None:
+            return
+        panel.setEnabled(not self.canvas.pixmap.isNull())
+        if self.canvas.pixmap.isNull():
             return
         mapset_name = self.current_mapset.name if self.current_mapset is not None else "-"
         map_name = "-"
@@ -2978,7 +3047,7 @@ class MainWindow(QMainWindow):
             map_name = self.map_switch_tabs.tabText(self.map_switch_tabs.currentIndex())
         elif self.current_image_path is not None:
             map_name = self.current_image_path.stem
-        state = "Unsaved" if self.canvas.is_modified or self._labels_modified else "Saved"
+        state = "미저장" if self.canvas.is_modified or self._labels_modified else "저장됨"
         panel.set_image_info(
             mapset_name,
             map_name,
@@ -2998,19 +3067,10 @@ class MainWindow(QMainWindow):
         if hasattr(self, "label_info_modified_value"):
             self.label_info_modified_value.setText("No")
         self._refresh_transform_properties()
-        if hasattr(self, "label_property_title"):
-            self.label_property_title.setText(path.name)
-        if hasattr(self, "label_property_subtitle"):
-            self.label_property_subtitle.setText(str(path.parent))
-        self._refresh_transform_properties()
+        if hasattr(self, "ui_setup"):
+            self.ui_setup._update_document_summary()
 
     def _update_mapset_property_panel(self, map_set: MapSet) -> None:
-        if hasattr(self, "label_property_title"):
-            self.label_property_title.setText(map_set.name)
-        if hasattr(self, "label_property_subtitle"):
-            self.label_property_subtitle.setText(
-                f"{len(map_set.maps)} map(s), {self._mapset_label_count(map_set)} label(s)"
-            )
         if hasattr(self, "label_info_file_value"):
             self.label_info_file_value.setText(map_set.name)
         if hasattr(self, "label_info_modified_value"):
@@ -3073,12 +3133,11 @@ class MainWindow(QMainWindow):
             "yolo_export",
             {"mapsets": self.project.mapsets, "options": options},
         )
-        self._task_handlers[task_id] = lambda result: QMessageBox.information(
-            self,
-            "Export Complete",
-            f"Exported images: {result.get('images', 0)}\n"
-            f"Exported labels: {result.get('labels', 0)}",
-        )
+        def show_export_result(result):
+            dialog = DatasetResultDialog(result, self)
+            dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
+            dialog.show()
+        self._task_handlers[task_id] = show_export_result
 
     def start_augmentation_preview(self, options) -> None:
         if self.project is None:
@@ -3129,7 +3188,6 @@ class MainWindow(QMainWindow):
             self.augmentation_page.set_autoaugment_running(True)
             QMessageBox.information(self, "Auto Augmentation", "AutoAugment is already running.")
             return
-        self._refresh_augmentation_summary_if_visible()
         self._append_log("0% AutoAugment queued")
         self.augmentation_page.begin_autoaugment_progress(options.output_root)
 
@@ -3142,13 +3200,14 @@ class MainWindow(QMainWindow):
         self.augmentation_page.set_autoaugment_running(True)
 
         def show(result):
-            self._append_log("100% AutoAugment complete")
+            state = "일부 완료" if result.get("status") == "partial" else "완료"
+            self._append_log(f"100% 자동 증강 {state}")
             if hasattr(self, "augmentation_page"):
-                self.augmentation_page.refresh_project_data()
                 self.augmentation_page.complete_autoaugment_progress(result)
             self.set_status(
-                f"AutoAugment complete: {result.get('images', 0)} images, "
-                f"{result.get('annotations', 0)} annotations"
+                f"자동 증강 {state}: 이미지 {result.get('images', 0)}, "
+                f"객체 {result.get('annotations', 0)}, 실패 {result.get('failed', 0)}, "
+                f"건너뜀 {result.get('skipped', 0)}"
             )
 
         self._task_handlers[task_id] = show
@@ -3181,6 +3240,8 @@ class MainWindow(QMainWindow):
             self._shutdown_succeeded = False
             self.shutdown_requested.emit(WORKER_SHUTDOWN_TIMEOUT_MS)
             if self._shutdown_succeeded:
+                self.tool_manager.patch_preview.close()
+                self.tool_manager.healing_preview.close()
                 event.accept()
             else:
                 QMessageBox.critical(

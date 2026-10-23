@@ -1,0 +1,5 @@
+path: "C:/Users/tnsmi/Downloads/Dataset-Editor/perf/test-run-44/test_saved_file_validation_det1/out/export_all_split1-0-0_seed0_8de92668_261023-195719-4d9bf1/albedo_map"
+train: images/train
+names:
+  0: "표면: 균열"
+  1: "찍힘"

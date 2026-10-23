@@ -1,0 +1,5 @@
+path: "C:/Users/tnsmi/Downloads/Dataset-Editor/perf/test-run-37/test_autoaugment_finishes_and_2/결과/augment_albedo_map_Boundary_Mixed_n1_size128_seed7_b3b7aaa0_261023-192221-e577e3"
+train: images/train
+names:
+  0: "결함"
+  1: "기존 라벨"

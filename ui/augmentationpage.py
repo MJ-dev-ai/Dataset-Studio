@@ -22,8 +22,12 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSpinBox,
     QSlider,
+    QProgressBar,
+    QGridLayout,
     QWidget,
 )
+from ui.themes import configure_dialog
+from ui.dataset_result_dialog import DatasetResultSummary, open_result_folder
 
 from config.settings import (
     ASSET_ROOT,
@@ -35,7 +39,7 @@ from config.settings import (
     AUTOAUGMENT_VALIDATION_PERCENT,
     DEFAULT_THEME,
 )
-from service import augmentation_service
+from service import augmentation_service, dataset_output
 from service.augmentation_service import AutoYoloAugmentOptions
 from core.image_io import read_image
 from core.qt_image import bgr_to_qpixmap
@@ -155,12 +159,21 @@ class _BalanceBarsAdapter:
 
     def __init__(self, labels, bars, show_expected: bool = True):
         """Bind class labels to their corresponding progress bars."""
-        self.labels = tuple(labels)
-        self.bars = tuple(bars)
+        self.labels = list(labels)
+        self.bars = list(bars)
         self.show_expected = show_expected
 
     def set_items(self, items: list[ClassBalanceItem]) -> None:
         """Render class-balance items into the bound rows."""
+        parent = self.labels[0].parentWidget()
+        grid = next((layout for layout in parent.findChildren(QGridLayout) if layout.indexOf(self.labels[0]) >= 0), None)
+        if grid is not None:
+            while len(self.labels) < len(items):
+                label, bar = QLabel(parent), QProgressBar(parent)
+                grid.addWidget(label, len(self.labels), 0)
+                grid.addWidget(bar, len(self.bars), 1)
+                self.labels.append(label)
+                self.bars.append(bar)
         maximum = max((item.expected_count for item in items), default=1)
         for index, (label, bar) in enumerate(zip(self.labels, self.bars)):
             if index >= len(items):
@@ -246,9 +259,44 @@ class AugmentationPage(QDialog):
         self._result_source_pixmap = QPixmap()
         self._result_sample_pixmaps: list[QPixmap] = []
         self._result_output_root: Path | None = None
+        self._running = False
         self._setup_ui()
         self._connect_signals()
         self._update_stage_enabled()
+        self._setup_dialog_presentation()
+        self._refresh_expected_counts()
+
+    def _setup_dialog_presentation(self) -> None:
+        """Keep settings and the preview/result area on one screen without tabs."""
+        self.setWindowTitle("자동 증강")
+        self.setMinimumSize(1080, 720)
+        self.resize(1280, 780)
+        self.workspace_layout.removeWidget(self.results_frame)
+        self.preview_group.setTitle("")
+        self.results_frame.hide()
+        self.preview_image_label.setMinimumSize(280, 180)
+        columns = self.dialog_layout.itemAt(0).layout()
+        columns.setStretch(0, 3)
+        columns.setStretch(1, 3)
+        self.result_browser = DatasetResultSummary(self.preview_frame, compact=True)
+        self.workspace_layout.addWidget(self.result_browser)
+        self.result_browser.hide()
+        self.progress_frame.setMaximumHeight(150)
+        for name, text in {"back_button": "닫기", "cancel_button": "작업 중단", "run_button": "생성 시작", "browse_defect_button": "찾아보기…", "browse_output_button": "찾아보기…", "open_output_button": "결과 폴더 열기", "details_button": "데이터 정보", "preview_image_label": "대상 맵을 선택하면 미리보기가 나타납니다.", "progress_status_label": "프로젝트와 대상 맵을 선택하세요."}.items():
+            getattr(self, name).setText(text)
+        self.preview_image_label.setWordWrap(True)
+        labels = {"target_map_label": "대상 맵", "sample_count_label": "합성 수량", "same_class_max_label": "동일 클래스 최대", "blend_mode_label": "합성 방식", "horizontal_flip_check": "좌우 반전", "rotation_check": "회전", "rotation_angles_label": "각도", "random_count_label": "무작위 배수", "jitter_x_label": "X 이동", "jitter_y_label": "Y 이동", "brightness_label": "밝기", "contrast_label": "대비", "defect_pool_label": "결함 폴더", "output_path_label": "저장 폴더", "image_size_label": "이미지 크기", "output_format_label": "형식", "seed_label": "시드", "split_label": "분할", "predicted_balance_title_label": "예상 클래스 분포", "planned_output_title_label": "예상 출력", "results_title_label": "생성 결과", "result_images_label": "전체 이미지", "result_annotations_label": "전체 라벨", "result_generated_label": "합성 샘플", "result_failed_label": "실패", "result_skipped_label": "건너뜀", "distribution_title_label": "최종 클래스 분포"}
+        for name, text in labels.items():
+            getattr(self, name).setText(text)
+        for field in (self.jitter_x_min_edit, self.jitter_x_max_edit, self.jitter_y_min_edit, self.jitter_y_max_edit, self.brightness_min_edit, self.brightness_max_edit, self.contrast_min_edit, self.contrast_max_edit):
+            field.setMinimumWidth(58)
+        self.poisson_settings_group.setTitle("1. 합성 샘플")
+        self.planned_output_title_label.setText("예상 출력 · 원본별 분할에 따라 변동")
+        self.planned_output_title_label.setWordWrap(True)
+        self.output_format_combo.setToolTip("YOLO 바운딩 박스 TXT와 PNG 이미지로 저장합니다.")
+        self.augment_group.setTitle("2. 변형 / 밝기")
+        self.output_group.setTitle("3. 저장 설정")
+        configure_dialog(self, 1080)
 
     def _setup_ui(self) -> None:
         """Load the Qt Designer form and bind it to the AutoAugment behavior."""
@@ -495,10 +543,11 @@ class AugmentationPage(QDialog):
         self.existing_masks_value.setText(str(summary.get("existing_masks", 0)))
         self.missing_masks_value.setText(str(summary.get("missing_masks", 0)))
         self._refresh_target_preview(project, target_map)
-        default_generate = self._default_generate_count(class_counts)
-        self.generate_slider.set_value(default_generate)
+        defaults_key = (str(project.root_path), target_map)
+        if getattr(self, "_defaults_key", None) != defaults_key:
+            self.generate_slider.set_value(self._default_generate_count(class_counts))
+            self._defaults_key = defaults_key
         self._refresh_expected_counts()
-        self._reset_result_values()
 
     def build_options(self) -> AutoYoloAugmentOptions:
         """Build selected-map AutoAugment options from the UI state."""
@@ -508,12 +557,16 @@ class AugmentationPage(QDialog):
         val = self.val_spin.value() / 100.0
         test = self.test_spin.value() / 100.0
         total = max(1e-6, train + val + test)
-        class_names = [name for _class_id, name in sorted(self._class_catalog, key=lambda item: item[0])]
+        catalog = sorted(getattr(self._main_window, "label_catalog", lambda: self._class_catalog)(), key=lambda item: item[0])
+        if not catalog:
+            catalog = [(value, f"class {value}") for value in sorted(self._class_counts)]
+        class_names = [name for _class_id, name in catalog]
         return AutoYoloAugmentOptions(
             output_root=Path(output),
             defect_root=Path(defect) if defect else None,
             target_map_key=self.target_map_combo.currentText(),
             class_names=class_names,
+            class_ids=[value for value, _name in catalog] if catalog else None,
             generate_samples=self.generate_slider.value(),
             max_same_class_per_image=self.same_class_spin.value(),
             poisson_mode=self.poisson_mode_combo.currentText(),
@@ -546,6 +599,13 @@ class AugmentationPage(QDialog):
         if hasattr(window, "start_auto_augmentation"):
             window.start_auto_augmentation(self.build_options())
 
+    def set_class_catalog(self, catalog) -> None:
+        """Update class definitions without resetting the user's generation settings."""
+        self._class_catalog = list(catalog)
+        for class_id, _name in catalog:
+            self._class_counts.setdefault(class_id, 0)
+        self._refresh_expected_counts()
+
     def cancel_augmentation(self) -> None:
         """Request cancellation for the running AutoAugment task."""
         window = self._main_window
@@ -554,9 +614,12 @@ class AugmentationPage(QDialog):
 
     def set_autoaugment_running(self, running: bool) -> None:
         """Reflect the shared AutoAugment task state in the page controls."""
-        self.run_button.setEnabled(not running)
+        self._running = running
+        self.run_button.setEnabled(not running and self._target_image_count > 0)
         self.cancel_button.setEnabled(running)
-        self.run_button.setText("Running..." if running else "Generate")
+        self.run_button.setText("생성 중…" if running else "생성 시작")
+        for group in (self.info_frame, self.poisson_settings_group, self.augment_group, self.output_group):
+            group.setEnabled(not running)
 
     def _reset_result_values(self) -> None:
         """Keep the Results panel visible while clearing only generated values."""
@@ -590,8 +653,12 @@ class AugmentationPage(QDialog):
 
     def begin_autoaugment_progress(self, output_root: Path) -> None:
         """Show and reset the file-operation style progress panel."""
+        self.result_browser.hide()
+        self.preview_group.show()
         self.progress_panel.show()
         self.progress_status_label.setText(f"Queued · Output: {output_root}")
+        self.progress_status_label.show()
+        self.progress_bar.show()
         self.progress_bar.setValue(0)
         self.results_content.show()
         self.set_autoaugment_running(True)
@@ -622,7 +689,8 @@ class AugmentationPage(QDialog):
         self.result_val_value.setText(str(split_images.get("val", 0)))
         self.result_test_value.setText(str(split_images.get("test", 0)))
         self.result_failed_value.setText(str(result.get("failed_or_skipped", 0)))
-        self.result_skipped_value.setText("0")
+        self.result_failed_value.setText(str(result.get("failed", 0)))
+        self.result_skipped_value.setText(str(result.get("skipped", 0)))
         catalog = dict(self._class_catalog)
         distribution = {
             int(class_id): int(count)
@@ -641,12 +709,15 @@ class AugmentationPage(QDialog):
         self.result_distribution_widget.set_items(distribution_items)
         self.result_output_value.setText(str(result.get("output_root", "")))
         self._result_output_root = Path(result["output_root"]) if result.get("output_root") else None
-        sample_paths = list(result.get("sample_images", []))
-        if not sample_paths and result.get("preview_image"):
-            sample_paths = [result["preview_image"]]
-        self._set_result_sample_images(sample_paths, int(result.get("images", 0)))
-        self.results_content.show()
+        self.result_browser.set_result(result)
+        self.preview_group.hide()
+        self.result_browser.show()
         self.set_autoaugment_running(False)
+        state = "완료" if result.get("status", "complete") == "complete" else "일부 완료 · 오류/진단 확인"
+        self.progress_status_label.setText(f"{state} · 이미지 {result.get('images', 0)} · 객체 {result.get('annotations', 0)}")
+        self.progress_status_label.setToolTip(result.get("output_root", ""))
+        self.progress_status_label.hide()
+        self.progress_bar.hide()
 
     def fail_autoaugment_progress(self, message: str) -> None:
         """Display a controlled failure state without blocking the GUI thread."""
@@ -754,8 +825,7 @@ class AugmentationPage(QDialog):
 
     def _open_result_output(self) -> None:
         """Open the generated dataset folder with the operating system file browser."""
-        if self._result_output_root is not None and self._result_output_root.exists():
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self._result_output_root)))
+        open_result_folder(self, self._result_output_root)
 
     def apply_theme(self, theme: str) -> None:
         """Refresh semantic widget roles after the application theme changes."""
@@ -773,6 +843,7 @@ class AugmentationPage(QDialog):
 
     def _refresh_expected_counts(self) -> None:
         """Refresh class balance and projected output counts from current settings."""
+        self.run_button.setEnabled(not self._running and self._target_image_count > 0)
         original = self._target_image_count
         poisson = self.generate_slider.value() if self.poisson_balance_check.isChecked() and original else 0
         base_count = original + poisson

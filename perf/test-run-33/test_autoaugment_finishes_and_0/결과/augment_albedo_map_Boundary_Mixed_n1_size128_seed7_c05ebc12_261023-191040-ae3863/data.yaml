@@ -1,0 +1,5 @@
+path: .
+train: images/train
+names:
+  0: "결함"
+  1: "기존 라벨"

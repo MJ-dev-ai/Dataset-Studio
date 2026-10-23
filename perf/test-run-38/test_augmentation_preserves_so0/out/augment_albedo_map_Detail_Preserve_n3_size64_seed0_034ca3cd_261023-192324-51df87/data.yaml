@@ -1,0 +1,7 @@
+path: "C:/Users/tnsmi/Downloads/Dataset-Editor/perf/test-run-38/test_augmentation_preserves_so0/out/augment_albedo_map_Detail_Preserve_n3_size64_seed0_034ca3cd_261023-192324-51df87"
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: "결함"
+  1: "기존"

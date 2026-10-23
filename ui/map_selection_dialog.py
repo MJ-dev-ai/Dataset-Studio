@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 	QVBoxLayout,
 	QWidget,
 )
+from ui.themes import configure_dialog
 
 
 class MapSelectionDialog(QDialog):
@@ -21,12 +22,12 @@ class MapSelectionDialog(QDialog):
 
 	def __init__(self, map_counts: dict[str, int], parent=None):
 		super().__init__(parent)
-		self.setWindowTitle("Select Maps to Load")
+		self.setWindowTitle("불러올 맵 선택")
 		self.resize(420, 520)
 		self._checks: dict[str, QCheckBox] = {}
 		layout = QVBoxLayout(self)
 
-		description = QLabel("Select the maps to load from the detected MapSets.", self)
+		description = QLabel("불러올 맵 종류를 선택하세요. 괄호 안은 발견된 이미지 수입니다.", self)
 		description.setWordWrap(True)
 		layout.addWidget(description)
 
@@ -45,8 +46,8 @@ class MapSelectionDialog(QDialog):
 		layout.addWidget(scroll, 1)
 
 		button_row = QHBoxLayout()
-		select_all = QPushButton("Select All", self)
-		clear_all = QPushButton("Clear All", self)
+		select_all = QPushButton("전체 선택", self)
+		clear_all = QPushButton("전체 해제", self)
 		select_all.clicked.connect(lambda: self._set_all_checked(True))
 		clear_all.clicked.connect(lambda: self._set_all_checked(False))
 		button_row.addWidget(select_all)
@@ -58,6 +59,19 @@ class MapSelectionDialog(QDialog):
 		buttons.accepted.connect(self.accept)
 		buttons.rejected.connect(self.reject)
 		layout.addWidget(buttons)
+		self.buttons = buttons
+		self.selection_hint = QLabel(self)
+		layout.insertWidget(layout.count() - 1, self.selection_hint)
+		for check in self._checks.values():
+			check.toggled.connect(self._update_selection_state)
+		self._update_selection_state()
+		configure_dialog(self, 440, "불러오기")
+
+	def _update_selection_state(self) -> None:
+		"""Keep confirmation disabled and explain why when no map is selected."""
+		count = len(self.selected_map_keys())
+		self.buttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(count > 0)
+		self.selection_hint.setText(f"{count}개 맵 종류 선택" if count else "하나 이상의 맵을 선택하세요.")
 
 	def selected_map_keys(self) -> set[str]:
 		"""Return checked map keys."""

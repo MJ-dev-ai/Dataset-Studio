@@ -7,7 +7,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QPainterPath, QPolygonF, QTransform
 
 
-SelectionCombineMode = Literal["replace", "add", "subtract"]
+SelectionCombineMode = Literal["replace", "add", "subtract", "intersect"]
 
 
 @dataclass
@@ -34,6 +34,8 @@ def normalize_selection_combine_mode(value: str) -> SelectionCombineMode:
         return "add"
     if normalized in {"subtract", "sub", "minus", "difference"}:
         return "subtract"
+    if normalized in {"intersect", "intersection"}:
+        return "intersect"
     return "replace"
 
 
@@ -52,6 +54,8 @@ class BaseSelectionTool:
         self.combine_mode = normalize_selection_combine_mode(mode)
 
     def combine_mode_from_modifiers(self, modifiers) -> SelectionCombineMode:
+        if modifiers & Qt.KeyboardModifier.ShiftModifier and modifiers & Qt.KeyboardModifier.AltModifier:
+            return "intersect"
         if modifiers & Qt.KeyboardModifier.ShiftModifier:
             return "add"
         if modifiers & Qt.KeyboardModifier.AltModifier:
@@ -79,6 +83,8 @@ class BaseSelectionTool:
             return self._base_selection.united(path)
         if self._active_combine_mode == "subtract":
             return self._base_selection.subtracted(path)
+        if self._active_combine_mode == "intersect":
+            return self._base_selection.intersected(path)
         return QPainterPath(path)
 
 

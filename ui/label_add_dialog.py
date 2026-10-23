@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QComboBox, QDialog, QDialogButtonBox, QFormLayout, QLabel, QVBoxLayout
+from ui.themes import configure_dialog
 
 
 class LabelAddDialog(QDialog):
@@ -9,10 +10,10 @@ class LabelAddDialog(QDialog):
 
     def __init__(self, catalog: list[tuple[int, str]], parent=None, initial_class_id: int | None = None):
         super().__init__(parent)
-        self.setWindowTitle("Add Label")
+        self.setWindowTitle("선택 영역에 라벨 추가")
         self.setMinimumWidth(360)
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("Choose a label class for the selected area.", self))
+        layout.addWidget(QLabel("선택 영역의 외접 사각형에 사용할 클래스를 고르세요.", self))
         form = QFormLayout()
         self.class_combo = QComboBox(self)
         selected_index = 0
@@ -22,7 +23,7 @@ class LabelAddDialog(QDialog):
                 selected_index = index
         if self.class_combo.count():
             self.class_combo.setCurrentIndex(selected_index)
-        form.addRow("Label", self.class_combo)
+        form.addRow("클래스", self.class_combo)
         layout.addLayout(form)
         self.buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,
@@ -32,6 +33,7 @@ class LabelAddDialog(QDialog):
         self.buttons.rejected.connect(self.reject)
         self.buttons.button(QDialogButtonBox.StandardButton.Ok).setEnabled(self.class_combo.count() > 0)
         layout.addWidget(self.buttons)
+        configure_dialog(self, 440, "라벨 추가")
 
     def selected_label(self) -> tuple[int, str] | None:
         value = self.class_combo.currentData(Qt.ItemDataRole.UserRole)

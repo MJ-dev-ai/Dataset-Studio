@@ -50,14 +50,7 @@ class EditingWorker(BaseWorker):
 				self.check_cancelled()
 				target, patch, mask, x_pos, y_pos = values
 				self.report(round((index - 1) / max(1, total) * 100), f"Applying Poisson to {map_key}")
-				if mode == "boundary_mixed":
-					result = editing_service.boundary_mixed_blend(target, patch, mask, x_pos, y_pos)
-				elif mode == "hard_paste":
-					result = editing_service.hard_paste(target, patch, mask, x_pos, y_pos)
-				elif mode is None:
-					result = editing_service.detail_preserve_blend(target, patch, mask, x_pos, y_pos, adapt_color="normal" not in map_key.casefold())
-				else:
-					result = editing_service.compose_patch(target, patch, mask, x_pos, y_pos, mode=mode, fallback=False)
+				result = editing_service.compose_patch_mode(target, patch, mask, x_pos, y_pos, mode, map_key)
 				results[map_key] = result
 			self.report(100, "Manual Poisson complete")
 			self._succeed(results)

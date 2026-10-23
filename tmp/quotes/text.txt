@@ -1,0 +1,953 @@
+
+FILE: [산자부] Advantech AIMB-788E Specsheet.pdf
+PAGE 1
+LGA1700 12th/13th/14th Generation
+Intel® Core™ i9/i7/i5/i3 & & Intel® Core™
+AIMB-788E
+Processor Series 2 ATX Motherboard
+with DP/HDMI/VGA, DDR5, USB 3.2, M.2
+NEW Features
+SPI USB 3.2 Gen 1
+DDR5 SATA 3.0  Intel® 12th/13th/14th generation Core™ i9/i7/i5/i3 & Pentium®/Celeron® & Intel®
+Core™ Processor Series 2 processor with Q670E/R680E chipset
+ Dual PCIe x16 expansion slots
+RS-232
+ DDR5 UDIMM up to 48GB per slot; 192 GB total
+RS-232/422/485  Seven PCIe slots or Dual M.2 M Key for NVMe RAID
+Intel Q670E/R680E
+USB Type-A
+PCH
+ Triple display DP/HDMI/VGA and dual GbE LAN
+Intel LGA1700 PCIe x16 (x8 link)
+Core i9/i7/i5/i3 CPU PCIe x8 (x4 link)  M.2, SATA RAID 0, 1, 5, 10, USB 3.2 Gen 1
+PCIe x4 PCIe x4 (00 ver.)
+M.2 M.2 (10 ver.)  Advantech iBMC remote out-of-band power management solution on DeviceOn
+PCIe x1
+USB3.2 G LA en N 1 1 Audio Note 1: Legacy platform is not supported.
+Note 2: dTPM 2.0 module is required to enable TPM technologies.
+RS-232
+VGA Note 3: Intel® Platform Trust Technology (Intel® PTT) ready for Windows 11.
+DP LAN2
+HDMIUSB 2.0USB 3.2 Gen 1 iBMC controller
+Specifications
+Core 9 Core 9 Core 7 Core 7 Core 5 Core 5 Core 5 Core 5 Core 5
+CPU
+273PE 273PTE 253PE 253PTE 223PE 223PTE 213PE 213PEF 213PTE
+Intel® Core™ P-core Base
+Processors Frequency 2.3 GHz 1.4 GHz 2.5 GHz 1.8 GHz 2.9 GHz 2.3 GHz 2.7 GHz 2.7 GHz 2.1 GHz
+Series 2 L3 Cache 36 MB 36 MB 33 MB 33 MB 24 MB 24 MB 24 MB 24 MB 24 MB
+(Bartlett Lake-S)
+(P-Core Only) Cores 12 12 10 10 8 8 8 8 8
+Processor Base
+65W 45W 65W 45W 65W 45W 65W 65W 45W
+Power
+CPU 251E 251TE 221E 221TE 211E 211TE 211EF 201E 201TE 300 300T
+P-core Base
+Intel® Core™ Frequency 2.1 GHz 1.4 GHz 2.7 GHz 1.8 GHz 2.7 GHz 1.7 GHz 2.7 GHz 3.6 GHz 2.9 GHz 3.9 GHz 3.4 GHz
+Processors
+L3 Cache 36 MB 36 MB 24 MB 24 MB 20 MB 20 MB 20 MB 12 MB 12 MB 6 MB 6 MB
+Series 2 (Bartlett
+Lake-S) Cores 24 24 14 14 10 10 10 4 4 2 2
+Processor Base
+65W 45W 65W 45W 65W 45W 65W 60W 45W 46W 35W
+Power
+CPU i9-14900 i9-14900T i7-14700 I7-14701E i7-14700T i5-14500 I5-14501E i5-14500T i5-14400 i5-14400T i5-14400F i3-14100 i3-14100T
+P-core Base
+2.0 GHz 1.1 GHz 2.1 GHz 2.6GHz 1.3GHz 2.6 GHz 3.3GHz 1.7 GHz 2.5 GHz 1.5 GHz 2.5 GHz 3.5 GHz 2.7 GHz
+Frequency
+14th Generation
+L3 Cache 36 MB 36 MB 33 MB 16MB 33 MB 24 MB 24MB 24 MB 20 MB 20 MB 20 MB 12 MB 12 MB
+Processors
+Cores 24 24 20 8 20 14 6 14 10 10 10 4 4
+Processor Base
+65 W 35 W 65 W 65W 35 W 65 W 65W 35 W 65 W 35 W 65 W 60 W 35 W
+Power
+i9- i7- i5- i3-
+CPU i9-13900(E) i7-13700(E) i5-13500(E) i5-13400(E) i3-13100(E)
+13900TE 13700T(E) 13500T(E) 13100T(E)
+P-core Base
+2.0 GHz 1.1 GHz 2.1 GHz 1.4 GHz 2.5 GHz 1.6 GHz 2.5 GHz 3.4 GHz 2.5 GHz
+13th Generation Frequency
+Processors L3 Cache 36 MB 36 MB 30 MB 30 MB 24 MB 24 MB 20MB 12 MB 12 MB
+Cores 24 24 16 16 14 14 10 4 4
+Processor Base 65 W 35 W 65 W 35 W 65 W 35 W 65W 60 W 35 W
+Power
+i9- i7- i5- i5- i3- Pentium Pentium Celeron Celeron
+CPU i9-12900(E) i7-12700(E) i5-12500(E) i3-12100(E)
+12900TE 12700TE 12400 12500TE 12100TE G7400E G7400TE G6900E G6900TE
+P-core Base
+2.4 GHz 1.1 GHz 2.1 GHz 1.4 GHz 3.0 GHz 2.5 GHz 1.9 GHz 3.3 GHz 2.1 GHz 3.6 GHz 3.0 GHz 3.0 GHz 2.4 GHz
+12th Generation Frequency
+Processors L3 Cache 30 MB 30 MB 25 MB 25 MB 18 MB 18 MB 18 MB 12 MB 12 MB 6 MB 6 MB 4 MB 4 MB
+Cores 16 16 12 12 6 6 6 4 4 2 2 2 2
+Processor Base
+65 W 35 W 65 W 35 W 65 W 65 W 35 W 60 W 35 W 46 W 35 W 46 W 35 W
+Power
+Socket LGA 1700
+Processor
+Chipset Q670E/R680E
+System
+BIOS AMI 256Mbit SPI Flash
+PCIe x1 1 (Gen 4)
+PCIe x4 2 (1 x Gen 4 x4 link, 1 x Gen 3 x4 link); 1 (AIMB-788E-10 version, 1 x Gen 4 x4 link)
+Expansion Slot
+PCIe x8 2 (1 x Gen 4 x4 link, 1 x Gen 3 x4 link)
+PCIe x16* 2 (1 x Gen 5 x8 link, 1 x Gen 4 x8 link)
+Technology Dual Channel DDR5** Non-ECC UDIMM; Dual Channel DDR5 ECC UDIMM (AIMB-788E-0R version)
+Memory Max Capacity 48GB per slot; 192 GB total
+Sockets 4 x 288-pin DIMM
+Controller Chipset integrated Intel UHD Graphics
+Graphics
+VRAM Shares system memory is subjected to OS
+* The PCIe x16 slot, from CPU, can only support graphic cards and storage cards according to the specification recommended by Intel. Other types of add-on cards might not work properly. For the compatible device list validated on the
+PCIe x16 slot, please refer to the user manual.
+** DDR5 runs at 4400 MT/s with one DIMM per channel, 4000 MT/s with two DIMMs in one channel, and 3600MT/s with two DIMMs per channel.
+Industrial Motherboards
+All product specifications are subject to change without notice. Last updated: 25-Aug-2026
+PAGE 2
+AIMB-788E
+Specifications (Cont.)
+Interface 10/100/1000 Mbps
+Ethernet Controller GbE LAN1: Intel I219-LM (PHY); GbE LAN2: Intel I210-AT
+Connector 2 x RJ-45
+Channel 4
+SATA
+RAID 0, 1, 5, 10
+VGA 1 (Resolution up to 1920 x 1200 @ 60Hz)
+HDMI 1 (Resolution up to 3840 x 2160 @ 60Hz)
+DisplayPort 1 (Resolution up to 4096 x 2304 @ 60Hz)
+Rear I/O Ethernet 2
+USB 8 (4 x USB 3.2 Gen 1, 4 x USB 2.0)
+Audio 2 (Line-out, Mic-in)
+Serial 1 (RS-232)
+Output System reset
+Watchdog Timer
+Interval Programmable 1 ~ 255 sec
+Power On Intel Core i 65W , DDR5 32 GB x 4
+Power
+Voltage +3.3 V +5 V +12 V +5 Vsb -12 V -5 V
+Requirement
+Current 1.54 A 1.96 A 0.07 A 0.08 A 0.04 A 0.01 A
+USB 5 (2 x USB 3.2 Gen 1 via pin header, 2 x USB 2.0 via pin header, 1 x USB 2.0 type A connector)
+Serial 5 (4 x RS-232, 1 x RS-232/422/485)
+Internal SATA 4
+Connectors M.2 1 (PCIe x4 Gen 4 M-key 2280 type); 2 (AIMB-788E-10 version, 1 x PCIe x4 Gen 4, 1 x PCIe x4 Gen 3 M-key 2280 type)
+SPI 1 (Optional dTPM 2.0 module available)
+GPIO 8-bit
+Operating Non-Operating
+Environment Temperature 0 ~ 60 °C (32 ~ 140 °F), depends on CPU loading and system thermal solution -40 ~ 85 °C
+Humidity 95%@ 40 °C, non-condensing 95% @ 60 °C, non-condensing
+Physical Dimension
+304.8 x 244 mm (12" x 9.6")
+Characteristics (L x H)
+Block Diagram
+HDMI HDMI Level Shifter DDI
+DP DDI
+VGA VGA Chrontel CH7517A-BF eDP
+Line Out, Mic In
+Intel Q670E/R680E PCH
+SPI Header
+H/W Monitor
+NCT7802Y 256 Mbit SPI BIOS
+Online Download www.advantech.com/products
+8
+x
+0.4
+IMD
+IPS
+DDR5
+Channel A
+DDR5
+LGA 1700 DDR5
+12th/13th/14th Channel B
+DDR5
+Gen Intel Core
+Processor & Intel®
+Core™ Processor PCIe x4 Gen 4 M.2 M-key or PCIe x4 Slot
+Series 2
+PCIe x8 Gen 5 PCIe x16 Slot
+PCIe x8 Gen 4 PCIe x16 Slot
+SATA 3.0 600 MB/s
+4 SATA 3.0 PCIe x4 Gen 3 PCIe x8 Slot
+W/SW RAID
+PCIe x4 Gen 3 PCIe x4 Slot or M.2 M-key
+Realtek ALC888S HD AUDIO PCIe x1 Gen 4 PCIe x1 Slot Audio Codec
+PCIe x4 Gen 4 PCIe x4 Slot
+2 USB 3.2 Gen 1 PCIe x4 Gen 4 PCIe x8 Slot (Rear) USB 3.2 Gen 1 5 Gbps GbE LAN1 : Intel I219-LM (PHY)
+2 USB 3.2 Gen 1 (Rear) PCIe x1 LAN2 : Intel I210-AT (NIC)
+2 USB 3.2 Gen 1 (Header) USB 3.2 Gen 1 5 Gbps
+SMBUS iBMC
+4 USB 2.0 (Rear) M487SIDAE
+2 USB 2.0 (Header) USB 2.0 480 Mbps
+1 USB 2.0 (Internal Type-A)
+Super I/O
+RS-232/422/485 (Header)
+NCT 6126D
+eSPI Bus
+RS-232 (Rear)
+eSPI Header 4 RS-232 ( Header)
+HW Monitor
+Watch Dog Timer
+Case Open
+8 bit GPIO
+SUBMS
+ISCN
+PAGE 3
+AIMB-788E
+Ordering Information
+USB 3.2 SATA SW
+Part number Chipset Memory Display USB 2.0 COM GbE LAN AMT M.2 iBMC
+Gen 1 3.0 RAID
+Non-ECC UDIMM DDR5
+AIMB-788E-00A1 Q670E VGA + HDMI + DP 6 7 6 2 Yes 1 4 Yes Yes
+up to 192 GB
+Non-ECC UDIMM DDR5
+AIMB-788E-10A1 Q670E VGA + HDMI + DP 6 7 6 2 Yes 2 4 Yes Yes
+up to 192 GB
+ECC UDIMM DDR5 up to
+AIMB-788E-0RA1 R680E VGA + HDMI + DP 6 7 6 2 Yes 1 4 Yes Yes
+192GB
+Non-ECC UDIMM DDR5
+AIMB-788E-00A1U Q670E VGA + HDMI + DP 6 7 6 2 Yes 1 4 Yes Yes
+up to 192 GB
+Packing List Optional Accessories
+Part Number Description Qty Part number Description
+1700003194 SATA data cable 2 1700002204 2-port USB 2.0 cable w/ BKT(27 cm)
+1960104181T051 I/O port bracket (for 2U chassis or higher) 1 1700028292-01 2-port USB 3.0 cable w/ BKT(30 cm)
+2041078800 Startup manual 1 CPU cooler for 2U, 4U, and wallmount chassis (for CPU
+1970005349T000
+Note: Driver CD is not provided. Please visit Advantech support website for driver download. Base Power=35~65W)
+CPU cooler for 2U, 4U, and wallmount chassis (for CPU
+1970005436T001
+Embedded OS Base Power=125W)
+1970005934N001 CPU cooler for 4U chassis (for CPU Base Power = 125W)
+Part Number Description 1701090401 Single COM port cable(40 cm)
+20706WLE1S0070 img W11 24EL AIMB-788E 64b 24H2 ENU 1701092300 Dual COM port cable(28.5 cm)
+20706WLH1S0070 img W11 24HL AIMB-788E 64b 24H2 ENU 1700022749-11/
+20706WLV1S0070 img W11 24VL AIMB-788E 64b 24H2 ENU 1700022749-12/ SATA power cable
+20706WX1ES0136 img W10 21EL AIMB-788E 64b 21H2 ENU 1700022749-13
+20706WX1HS0136 img W10 21HL AIMB-788E 64b 21H2 ENU PCA-TPMSPI-00A1 dTPM 2.0 SPI module to enable TPM and vPro technologies
+20706WX1VS0136 img W10 21VL AIMB-788E 64b 21H2 ENU Note: Purchasing AIMB-788's proprietary CPU cooler from Advantech is highly recommended. Other
+brands' CPU coolers are NOT compatible with AIMB-788. Especially the cooler type with fan aside is not
+allowed to use on AIMB-788 due to heat dissipation on MOSFET.
+I/O View
+AIMB-788E-00A1
+AIMB-788E-10A1
+AIMB-788E-0RA1
+Front View
+AIMB-788E-10A1
+Industrial Motherboards
+
+FILE: [산자부] Advantech IPS-730 Specsheet.pdf
+PAGE 1
+IPC-730
+Desktop/Wallmount Chassis with front
+I/O Interfaces for ATX/mATX Motherboard
+NEW Features
+ Built-in ATX 3.1 high wattage PSU, accommodating to the most demanding
+GPU applications
+ Great heat dissipation to ensure system performance and reliability
+ Optimized inner space to support oversized GPU cards
+ Front I/O for easy cabling and maintenance
+Specifications
+External Internal
+5.25" - 0
+Drive Bay
+3.5" - 2
+2.5" 2 (Optional) 2
+Fans 2 (Fan1: 12cm/238CFM; Fan2: 12cm/79CFM)
+Cooling
+Air Filter Yes
+LED Indicators Power status and HDD activity
+Miscellaneous
+Control Power switch and system reset button
+Operating Non-Operating
+Temperature 0 ~ 40 °C (32 ~ 104 °F) -20 ~ 60 °C (-4 ~ 140 °F)
+Environment Humidity 95% @ 40 °C, non-condensing 95% @ 60 °C, non-condensing
+Vibration (5 ~ 500 Hz) Random 1Grms Sine 2G
+Shock 10 G (with 11 ms duration, half sine wave)
+Dimensions (W x H x D) 365 x 206 x 450 mm (14.4" x 8.1" x 17.7")
+Physical Characteristics
+Weight 9.2 kg (20.3lb)
+Front View Rear View
+Industrial Chassis
+All product specifications are subject to change without notice. Last updated: 25-Oct-2024
+PAGE 2
+IPC-730
+Dimensions
+Unit: mm [inch]
+365 [14.37]
+Unit: mm [inch]
+Installation
+Ordering Information PSU Cable Outputs
+Part Number Power Supply Wattage 80 Plus Switch Type Molex 4P SATA
+PN ATX24P 12VHPWR CPU8P PCIe8P
+IPC-730-85A PS8-850ATX-GZ 850W Gold ATX (4x1) Power
+IPC-730-1K2A PS8-1K2ATX-PZ 1200W Platinum ATX IPC-730-85A 1 1 2 2 6 4
+IPC-730-1K2A 1 1 2 3 5 8
+Packing List
+Optional Accessories
+Item Description
+IPC-730 Industrial Computer Chassis PN Description
+1960002043T011 Mounting Bracket 98R17300001 Optional 2.5" x 2 HDD/SSD Tray
+1960004574T012 Mounting Bracket
+- User Manual
+Online Download www.advantech.com/products
+]11.8[
+602
+390 [15.35]
+450 [17.72]
+220.60 [8.69]
+236 [9.29]
+]49.0[
+42
+]11.11[
+02.282
+]49.0[
+42
+84.27
+35.251
+35.251
+]58.2[
+]10.6[
+]10.6[
+Max. card length: 390mm
+Max. card height: 180mm
+8Ø10
+8-Ø5.2
+6-Ø5.20
+379.60 [14.94]
+395 [15.55]
+
+FILE: [산자부] Advantech 견적서(261007).pdf
+PAGE 1
+견 적 서
+(주)티엔에스에이아이(TNSAI) DATE: 2026/10/07
+귀중
+OUR REF No. AKRQ138808 REV#: 1
+어드밴텍케이알(주)
+ATTN: 장민규연구원 님
+TEL: 01085671825 / 서울특별시 강서구 강서로
+463, 4층(마곡동, 새싹타워)
+E-mail:mgjang@tnsai.co.kr
+전화: 02-3663-9494
+FROM:김태은 선임 / 02-3660-9413 010-7272-2859 팩스: 02-3663-4955
+silver.kim@advantech.co.kr 대표이사 정 준 교
+No. Part No Description Qty Unit Price SubTotal
+1 IPC-730-BTO Computer system for IPC-730 series 1 10,000,000 10,000,000
+IPC-730-1K2A Wallmount chassis front I/O ATX MB w/ 1200W 1
+AIMB-788E-00A1 LGA1700 ATX Q670E/2PCIex16/7PCIe/DDR5/iBMC/HDMI 1
+XAKR-LN-I9-14900K (LN)CORE I9 3.2G 36M 24C 1700P I9-14900K 1
+1970005436T001 C.L R4 Intel.-Alder Lake-S 125W 90x90x69mm SC LG 1
+XAKR-
+SAM UDIMM DDR5 5600 32GB 4
+M323R4GB4DB0
+XWONFA-MZ-77E2T0 SAM SSD 870EVO 2.5” 2TB MZ-77E2T0 1
+209KW11248 Win 11 LTSC 2024 High End EP2-07318 COA 1
+968KW11248PTAA Win 11 LTSC 2024 High End EP2-07318 PTAA 1
+AGS-CTOS-SYS-B Standard Assembly+Functional Testing+Software 1
+Comments: List Price: KRW 12,116,022
+검사 성적서 동봉 Your Price: KRW 10,000,000
+RAM 32G*4EA = 총 128G 지원 * Tax(10.00 %): KRW 1,000,000
+SSD 2TB Total: KRW 11,000,000
+Win 11 LTSC 2024 High End 한글 지원
+예상 납기일: 10/30 납품 가능(단, 10/7 발주시) * Indicates an Estimated Value
+출고 전, 선입금 必
+*RTX5090 제외
+메메모모리리 및및 SSD 부부품품에에 적적용용되되는는 특특별별 조조건건
+견견적적서서 유유효효기기간간
+메모리 및 SSD 시장 가격 변동이 빠르므로 본 견적의 유효기간은 7일입니다. 기간이 경과할 경우 가격 및 납기 재확인
+이 필요합니다.
+가가격격 변변동동 조조항항
+메모리 및 SSD는 시장 변동성이 높은 제품입니다. 실제 거래 가격은 공급업체 출하 시점의 최신 원가를 기준으로 합니
+다. 출하 전 상위 공급망 가격이 조정될 경우, 당사는 가격을 조정할 권리를 보유합니다.
+수수요요예예측측 및및 배배정정 연연계계 조조항항
+물량 배정 및 공급 확보는 귀사가 제공하는 롤링 수요예측 및 확정 주문을 기준으로 진행됩니다. 예측의 정확성과 안
+정성은 공급 우선순위에 영향을 미칠 수 있습니다.
+Page 1 of 2
+PAGE 2
+(1)제품 납기 (Delivery Date) : 확정된 발주의 경우에만 납기를 알려드릴 수 있으며 예고 없이 변동될 수 있습니다.
+(최근 전세계적으로 반도체 부족과 공급 지연의 문제가 있어, 납기 사전 고지가 어려운 점 양해 바랍니다)
+(2)견적유효기간 (Validity Term) : 견적일로부터일7일* 유지보수 : 납품일로부터 무상 A/S 2년.
+(3)결제 조건 (Payment Conditions) : (계좌번호:기업은행 311-045123-04-012 어드밴텍케이알)
+(4)당사의 모든제품은 구매자의 주문에 의해 수입되므로 반품및 교환이 불가능하며, 배상책임한도는 납품가액을 상회하
+지않음을 원칙으로 합니다.
+(5)수출 통제 준수 (Export Compliance) : 어드밴텍은 국제 무역 제재 규약(OFAC)과 수출 통제 법령(EAR)을 엄격히 준수합
+니다. 규정에 위반되는 제재 대상국 반출 및 비인가 무기·군사적 전용 가능성(MEU)이 있는 경우 구매자에게는 사전 고지
+및 최종사용자 확인(EUS) 의무가 있으며, 미고지 및 임의 수출에 따른 책임은 수출행위자에게 귀속됩니다.
+Page 2 of 2
+
+FILE: [산자부] BARO AI 견적서 (261016).pdf
+PAGE 1
+9 47 Hanam-daero, Hanam-si,
+Gyeonggi-do, Republic of Korea
+Sales@baroai.com
+견 적 서
+등록번호 544-86-01217
+2026/10/16 상호명
+공 (주) 바로에이아이
+(법인명)
+TNS AI 대표 이용덕
+급
+장민규 연구원님 귀하
+주소 경기도 하남시 하남대로 947(풍산동) B-511호
+자
+업태 / 종목 제조업 / 컴퓨터 제조업
+아래와 같이 견적합니다.
+TEL / E-Mail 02-717-1089 / sales@baroai.com
+(￦ 44,300,000 원) / VAT포함
+Item Version Q'ty Unit Cost Amount
+POSEIDON B 1000 Alpha Workstation Type 1 40,272,727 40,272,727
+Total (VAT 미포함)
+합계
+공급가액 40,272,727 VAT 4,027,273 44,300,000
+(부가세 포함가)
+No 항목
+Features(일반적인 사항, 특징, 특색 등 기술)
+- GPU: 1x Nvidia Geforce RTX 5090 32GB
+- CPU: 2x Intel Xeon Silver Processor (Total 24 Core, 48 Threads)
+- Mem: 2x DDR5 64GB (Total 128GB)
+- Storage: NVMe 1TB
+- PSU: 1,600W Power Supply Unit
+1
+- 3 years warranty (SW upgrade & maintenance, HW Repair & maintenance, 분기별 1회 방문 점검)
+- 유저가 실시간 HW 모니터링 가능한 환경 제공
+- BARO Custom Made Water-cooling System 으로 열과 소음 완벽 해결
+- 병렬처리컴퓨터 시스템에 관련된 SW 최신 버전 인스톨
+- SW 원격 프로그램을 이용한 실시간 문제 해결
+Remarks(기타사항)
+- 소프트웨어 설치(딥러닝 개발에 필요한 최신 버젼 프로그램 설치)
+2
+Linux OS (Ubuntu)/CUDA 13.0/cuDNN 9.12.0/NCCL 2.27.7/Docker/Tensorflow/Pytorch
+※ 위 금액은 할인된 금액입니다.
+3 ※ 본 견적서는 견적일로부터 7일간 유효합니다.
+
+FILE: [산자부] 넥스버 견적서 (261013).pdf
+PAGE 1
+경기도 안양시 동안구 시민대로 230, A동 410호
+http://www.nexber.com
+견 적 서
+티엔에스에이아이 ㈜ 귀중
+하기와 같이 견적 합니다.
+주식회사 넥스버
+견적번호 : 261013-TNSAI-001 견적일자 : 2026년 10월 13일
+받으실분 : 장 민규 연구원님 (mgjang@tnsai.co.kr) 영업담당 : 김 한결 책임
+TEL/FAX : 010-8567-1825 연락처 : 010-7663-2820
+납 기 : 별도협의 이메일 : hgkim@nexber.com
+제 목 : AI Vision Inspection Server 금 액 : 일금 삼천이백칠십팔만원 정
+No. 품 명 규 격 수량 단 가 금 액
+1 AI Vision Inspection Server NB-052-1212H 1 29,800,000 29,800,000
+Intel® W790 Chipset 1
+8 x DIMM slots, DDR5, ECC Registered Memory
+5 x PCIe 5.0 x16 slots
+1 x M.2 SSD
+2 x 10GbE (RJ45 Type)
+2x USB 3.2, 4 x USB 3.1
+Dimensions (WxHxD)mm : 220 x 546 x 482 1
+SMPS : 1200W Gold Full Moduler ATX3.1 Std 1
+CPU : Intel Xeon W5-3425 (12C/24T, 3.2Ghz, 30MB) 1
+Memory : 32GB DDR5 5600Mhz ECC/REG *4EA (Total: 128GB) 4
+SSD : 2TB NVMe * 1 1
+VGA : NVIDIA Geforce RTX5090 D7 32GB * 1 (PCIe x16) 1
+Grabber Board : imaFlex CXP-12 Quad * 3 (PCIe x8) 비용 미 포함
+OS : Windows 11 IoT Enterprise LTSC 64bit Kor. 1
+소 계 ₩29,800,000
+부 가 세 ( V A T ) ₩2,980,000
+합 계 ₩32,780,000
+Remark : 1. 상기 견적가중 수입 제품은 환율 변동에 따라 재조정 될 수 있습니다.
+2. 지불 조건은 첫거래인 경우는 선입금이며, 이후는 익월말 현금 결제 입니다.
+3. 주문 제작 및 수입 품목의 경우 발주 후 1일이내 서면 통보시 취소 가능하며, 그 이후는 불가능 합니다.
+4. 제품하자 발생시 제주도를 비롯한 도서산간지역은 대상 제품의 당사 입고를 원칙으로 합니다.
+방문 요청시에는 출장비가 별도로 청구 됩니다.
+5. 제품의 분해,개조에 대해서는 A/S불가 하며 수리를 원하는 경우 별도의 금액이 발생 할 수 있습니다.
+6. 견적서 유효기간은 견적일로 부터 1주 입니다.
+7. 발주 진행시 납기 변동 관련 확인을 부탁드리겠습니다.
+※ 상기내용을 발주 합니다.
+(서명 완료시 정식 발주서와 동일한 효력이 있습니다.)
+부서명 : 발주자 : (인)
+
+FILE: [산자부] 미리내솔루션 견적서 (261014).pdf
+PAGE 1
+견 적 서
+견적번호:20261014-01 사업자 번호 : 547-88-02897
+견적일자:2026년 10월 14일 상 호 : 주식회사 미리내솔루션 (직인생략)
+수 신:TNS AI 대 표 자 : 진 종 태
+참 조:장민규 연구원 주 소 : 서울특별시 영등포구 선유로 3길
+10, 3층 311호 (문래동5가, 하우스디비즈)
+업태 및 종목 : 도소매외, 컴퓨터 및 주변기기
+견 적 금 액: 一金삼천오백이십삼만삼천원整 (\35,233,000, VAT포함)
+No. 구분(품번) 품명 및 세부사양 수량 소비자 단가 공급 단가 금액
+조립 워크스테이션 1 32,030,000 32,030,000
+CPU 1 x [AMD] 라이젠 스레드리퍼 PRO 7965WX (스톰 픽) (24코어/48스레드/4.2GHz) -
+M/B 1 x [ASUS] PRO WS WRX90E-SAGE SE STCOM (AMD WRX90/EEB) -
+RAM 8 x [삼성전자] 삼성 DDR5 PC5-44800 ECC/REG 서버용 [16GB] (5600) -
+GPU 1 x [ZOTAC] RTX 5090 SOLID OC 32GB GDDR7 GAMING -
+SSD 1 x [삼성전자] 공식인증 990 PRO M.2 NVMe 2280 [1TB] -
+SSD 1 x [삼성전자] 공식인증 990 PRO M.2 NVMe 2280 [2TB] -
+PSU 1 x [쿨러마스터] X Mighty Platinum 2000W ATX3.1 [블랙] -
+CASE 1 x [FRACTAL DESIGN] Define 7 XL 솔리드 [빅타워] -
+COOLER 1 x [NOCTUA] NH-U14S TR5-SP6 [CPU쿨러] -
+COOLER 3 x [ARCTIC] P14 Pro PST 서린 [시스템쿨러/140mm] [블랙] -
+OS Ubuntu 24.04 -
+-
+-
+-
+※ AS 정책 -
+- 무상 보증기간 : 납품일 기본 1년 -
+- 부품 보증기간 : 각 제조사 및 국내 유통사의 보증정책에 따름 -
+-
+※ 본 견적은 작성일 기준이며, 주요 부품의 시장가격 및 환율 변동성이 -
+큰 관계로 실제 발주 시점에는 견적 금액과 상당한 차이가 발생할 수 있습니다. -
+이에 발주 전 최종 금액을 재확인하여 주시기 바랍니다. -
+-
+-
+* 수 신 : 장민규 연구원님 합계(VAT별도) 32,030,000
+mgjang@tnsai.co.kr 부가세 3,203,000
+* 견 적 담 당 : 최한주 대리 02-704-5599/8072 010-3337-9058 chj@ryansys.kr 제안가 합계(VAT포함) 35,233,000
+[ REMARKS ]
+1. 견적 유효 기간 : 견적일로부터 7일
+2. 결제 조건 : 현 금
+* 딜리버리는 발주 후 4~6주 소요예정입니다.
+당사는 이 견적서상의 가격 및 조건들을 수용하며, 이 견적서를 귀사에 대한 공식 발주서로 대신하는데 동의합니다.
+
+FILE: [산자부] 미리내솔루션 견적서 (261016).pdf
+PAGE 1
+견 적 서
+견적번호:20261016-01 사업자 번호 : 547-88-02897
+견적일자:2026년 10월 16일 상 호 : 주식회사 미리내솔루션 (직인생략)
+수 신:TNS AI 대 표 자 : 진 종 태
+참 조:장민규 연구원 주 소 : 서울특별시 영등포구 선유로 3길
+10, 3층 311호 (문래동5가, 하우스디비즈)
+업태 및 종목 : 도소매외, 컴퓨터 및 주변기기
+견 적 금 액: 一金삼천이백일십칠만육천일백원整 (\32,176,100, VAT포함)
+No. 구분(품번) 품명 및 세부사양 수량 소비자 단가 공급 단가 금액
+조립 워크스테이션 1 29,251,000 29,251,000
+CPU 1 x [AMD] 라이젠 스레드리퍼 PRO 7965WX (스톰 픽) (24코어/48스레드/4.2GHz) 1 -
+M/B 1 x [ASUS] PRO WS WRX90E-SAGE SE STCOM (AMD WRX90/EEB) 1 -
+RAM 8 x [삼성전자] 삼성 DDR5 PC5-44800 ECC/REG 서버용 [16GB] (5600) 8 -
+GPU 1 x [ZOTAC] RTX 5090 SOLID OC 32GB GDDR7 GAMING 1 -
+SSD 1 x [삼성전자] 공식인증 990 PRO M.2 NVMe 2280 [1TB] 1 -
+SSD 1 x [삼성전자] 공식인증 990 PRO M.2 NVMe 2280 [2TB] 1 -
+PSU 1 x [쿨러마스터] X Mighty Platinum 2000W ATX3.1 [블랙] 1 -
+CASE 1 x [FRACTAL DESIGN] Define 7 XL 솔리드 [빅타워] 1 -
+COOLER 1 x [NOCTUA] NH-U14S TR5-SP6 [CPU쿨러] 1 -
+COOLER 3 x [ARCTIC] P14 Pro PST 서린 [시스템쿨러/140mm] [블랙] 3 -
+OS Ubuntu 24.04 -
+-
+-
+-
+※ AS 정책 -
+- 무상 보증기간 : 납품일 기본 1년 -
+- 부품 보증기간 : 각 제조사 및 국내 유통사의 보증정책에 따름 -
+-
+※ 본 견적은 작성일 기준이며, 주요 부품의 시장가격 및 환율 변동성이 -
+큰 관계로 실제 발주 시점에는 견적 금액과 상당한 차이가 발생할 수 있습니다. -
+이에 발주 전 최종 금액을 재확인하여 주시기 바랍니다. -
+-
+-
+* 수 신 : 장민규 연구원님 합계(VAT별도) 29,251,000
+mgjang@tnsai.co.kr 부가세 2,925,100
+* 견 적 담 당 : 최한주 대리 02-704-5599/8072 010-3337-9058 chj@ryansys.kr 제안가 합계(VAT포함) 32,176,100
+[ REMARKS ]
+1. 견적 유효 기간 : 견적일로부터 7일
+2. 결제 조건 : 현 금
+* 딜리버리는 발주 후 4~6주 소요예정입니다.
+당사는 이 견적서상의 가격 및 조건들을 수용하며, 이 견적서를 귀사에 대한 공식 발주서로 대신하는데 동의합니다.
+
+FILE: [산자부] 미리내솔루션 견적서 (261020).pdf
+PAGE 1
+견 적 서
+견적번호:20261020-01 사업자 번호 : 547-88-02897
+견적일자:2026년 10월 20일 상 호 : 주식회사 미리내솔루션 (직인생략)
+수 신:TNS AI 대 표 자 : 진 종 태
+참 조:장민규 연구원 주 소 : 서울특별시 영등포구 선유로 3길
+10, 3층 311호 (문래동5가, 하우스디비즈)
+업태 및 종목 : 도소매외, 컴퓨터 및 주변기기
+견 적 금 액: 一金이천칠백삼십이만사천원整 (\27,324,000, VAT포함)
+No. 구분(품번) 품명 및 세부사양 수량 소비자 단가 공급 단가 금액
+조립 워크스테이션 1 24,840,000 24,840,000
+CPU 1 x [AMD] 라이젠 스레드리퍼 7960X (스톰 픽)(24코어/48스레드/4.2GHz) -
+M/B 1 x [GIGABYTE] TRX50 AI TOP 피씨디렉트 (AMD TRX50/E-ATX) -
+RAM 4 x 32GB ECC RDIMM, DDR5-5600MHz, Dual Rank -
+GPU 1 x [ZOTAC] RTX 5090 SOLID OC 32GB GDDR7 GAMING -
+SSD(OS) 1 x [삼성전자] 공식인증 990 PRO M.2 NVMe 2280 [1TB] -
+SSD(DATA) 1 x [삼성전자] 공식인증 990 PRO M.2 NVMe 2280 [2TB] -
+PSU 1 x [마이크로닉스] WIZMAX G 80PLUS GOLD ATX 3.1 블랙 [1650W] -
+CASE 1 x [FRACTAL DESIGN] Define 7 XL 솔리드 [빅타워] -
+COOLER 1 x [NOCTUA] NH-U14S TR5-SP6 [CPU쿨러] -
+COOLER 3 x [ARCTIC] P14 Pro PST 서린 [시스템쿨러/140mm] [블랙] -
+OS Ubuntu 24.04 - -
+-
+-
+-
+※ AS 정책 -
+- 무상 보증기간 : 납품일 기본 1년 -
+- 부품 보증기간 : 각 제조사 및 국내 유통사의 보증정책에 따름 -
+-
+※ 본 견적은 작성일 기준이며, 주요 부품의 시장가격 및 환율 변동성이 -
+큰 관계로 실제 발주 시점에는 견적 금액과 상당한 차이가 발생할 수 있습니다. -
+이에 발주 전 최종 금액을 재확인하여 주시기 바랍니다. -
+-
+-
+* 수 신 : 장민규 연구원님 합계(VAT별도) 24,840,000
+mgjang@tnsai.co.kr 부가세 2,484,000
+* 견 적 담 당 : 최한주 대리 02-704-5599/8072 010-3337-9058 chj@ryansys.kr 제안가 합계(VAT포함) 27,324,000
+[ REMARKS ]
+1. 견적 유효 기간 : 견적일로부터 7일
+2. 결제 조건 : 현 금
+* 딜리버리는 발주 후 4~6주 소요예정입니다.
+당사는 이 견적서상의 가격 및 조건들을 수용하며, 이 견적서를 귀사에 대한 공식 발주서로 대신하는데 동의합니다.
+
+FILE: [산자부] 샵다나와 견적서 (261008).pdf
+PAGE 1
+2026-10-08
+샵다나와 기업 구매상담
+상품 견적서
+상호 TNS AI
+견적번호 공급자 상호 주식회사 엔코퍼레이션 대표자 남호영 (인)
+주소 등록번호 764-86-00393
+담당자 장민규 주소 서울특별시 용산구 청파로 74 전자랜드 신관 5층 506ㅡ506-1호
+연락처 010-8567-1825 담당팀 영업팀 연락처 010-4576-3305
+이메일 mgjang@tnsai.co.kr 담당자 이기용 부장 팩스 02-701-0390
+dlrldyd86@nate.com
+금액 (원)
+분류 품목 모델명 수량 (EA) 판매가 (원)
+VAT 포함
+CPU AMD 라이젠 스레드리퍼 PRO 9965WX (사마다 픽) (멀티팩 정품) 1 4 ,895,000 4 ,895,000
+CPU쿨러 SilverStone SST-XE360-TR5-V2 마이크로닉스 1 6 24,000 6 24,000
+메인보드 ASUS PRO WS WRX90E-SAGE SE 1 2 ,305,000 2 ,305,000
+RAM 삼성전자 DDR5-5600 ECC/REG (32GB) 4 2 ,800,000 11,200,000
+VGA PALIT 지포스 RTX 5090 GAMEROCK D7 32GB 이엠텍 1 11,200,000 11,200,000
+SSD 삼성전자 9100 PRO M.2 NVMe (2TB) 1 9 97,000 9 97,000
+CASE 3RSYS T3000 Quiet 1 2 55,000 2 55,000
+POWER SuperFlower SF-2200F14HP LEADEX TITANIUM ATX3.1 1 7 82,000 7 82,000
+기타 기본조립 + 테스트 1 5 5,000 5 5,000
+합 계 (VAT 포함) 세금계산서 32,313,000
+세부사항
+구분 내용 계약금
+견적 유효기간 견적 발행일로부터 1일 (납기는 최대 2주이내) 금액
+운영체제 운영체제 미포함 계약금
+A/S 기간 PC 기본 A/S (1년) / PC주요부품 외 소모품 및 주변기기 모니터등은 제조사 정책을 따름 잔금
+주의사항 본 상품은 조립PC (주문제작) 상품으로 불량으로 인한 환불 요청 시 불량 부품만 환불이 가능합니다. 입금일
+결제정보 국민은행 282401-04-308576 주식회사 엔코퍼레이션 이름 (인)
+※ 주 의 사 항 ※ 꼭! 읽어주세요
+1. 스레드리퍼(Threadripper) 사양 A/S 안내
+－방문 서비스 불가 : 스레드리퍼 사양은 고사양PC 특성상, 초기 불량을 포함한 모든 방문 A/S 및 현장 점검 서비스가 제공되지 않습니다.
+기술적인 정밀 점검을 위해 본사 입고 처리가 필수인 점 양해 부탁드립니다.
+－제품 회수 안내 : 서울 및 수도권은 최초 1회에 한해 퀵서비스로 회수하나, 그 외 지방 지역은 PC 전체를 본사로 보내주셔야 합니다.
+2. OS 및 소프트웨어 지원 제한
+－불법 프로그램 제한 : 정품 소프트웨어 외 불법 프로그램 사용으로 인한 오류와 불이익은 본사에서 책임지지 않습니다.
+－OS 호환성 : 리눅스(Linux) 계열 OS는 본사에서 테스트 및 기술 지원을 하지 않습니다. 호환 여부는 부품 제조사에 직접 문의하셔야 합니다.
+－윈도우(Windows)설치 : 정품 Windows 구매시 설치를 진행해 드리며, 미개봉 정품 패키지(제품 키 포함)를 동봉해 드립니다. (보관 필수)
+(※윈도우 외의 소프트웨어는 정품을 구매하셔도 설치를 해드리지 않습니다.)
+3. 초기 불량 및 A/S 규정 : 제품 수령 및 부품 박스 보관(필수)
+－모든 조립PC는 부팅 및 초기 테스트 완료 후 출고됩니다.
+수령 즉시 발생하는 하드웨어 불량을 포함한 모든 불량 증상은 발급해 드린 [A/S쿠폰]을 이용한 처리만 가능합니다. (정식 센터를 통한 순차 처리)
+납기일이 촉박하거나 PC사용이 급하신 분들은 위 규정을 고려하여 신중한 구매를 부탁드립니다.
+－박스 보관 : 동봉된 모든 부품 박스는 버리지 말고 보관해 주세요, 박스를 폐기하시면 교환 및 환불이 어려울 수 있습니다.
+－구성품 확인 : A/S쿠폰과 소형 부속품은 제품 박스 내부에 들어있습니다. 분실 시 재발급이 어려우니 개봉 후 반드시 확인해 주세요.
+－초기 불량 점검 : 빠른 처리를 위해 제품 수령 후 1주일 이내 반드시 이상 여부를 점검해 주시기 바랍니다.
+4. 모니터 및 기타 주의사항(배송)
+－배송 및 현장 지원 : 모든 PC/모니터등 제품은 지역에 따라 택배 또는 퀵서비스(선불)로 출고됩니다. 출장 설치 및 현장 지원은 별도 협의(비용 발생)가 필요합니다.
+－모니터 불량 : 모니터 자체 결함은 해당 모니터 제조사의 A/S 규정에 따라 처리됩니다.
+－디스플레이 연결 : 모니터를 2대 이상 쓰실 경우, 현재 모니터의 입력 단자와 PC의 그래픽 출력 단자 호환되는지 직접 확인하셔야 합니다.
+㈜커넥트웨이브 l 대표: 김정남 l 서울특별시 금천구 벚꽃로 298, 17층(가산동, 대륭포스트타워6차)
+사업자등록번호: 117-81-40065 l 통신판매업: 제2004-서울양천-00918호 l 부가통신사업: 제003081호
+고객센터: 1688-2470 (유료) l 이메일: cs@cowave.kr l Fax: 1688-2451
+Copyright ⓒ connectwave Co., Ltd. All Rights Reserved
+
+FILE: [산자부] 샵다나와 견적서 (261012).pdf
+PAGE 1
+2026-10-08
+샵다나와 기업 구매상담
+상품 견적서
+상호 TNS AI
+견적번호 공급자 상호 주식회사 엔코퍼레이션 대표자 남호영 (인)
+주소 등록번호 764-86-00393
+담당자 장민규 주소 서울특별시 용산구 청파로 74 전자랜드 신관 5층 506ㅡ506-1호
+연락처 010-8567-1825 담당팀 영업팀 연락처 010-4576-3305
+이메일 mgjang@tnsai.co.kr 담당자 이기용 부장 팩스 02-701-0390
+dlrldyd86@nate.com
+금액 (원)
+분류 품목 모델명 수량 (EA) 판매가 (원)
+VAT 포함
+CPU AMD 라이젠 스레드리퍼 PRO 9955WX (사마다 픽) (멀티팩 정품) 1 2 ,789,000 2 ,789,000
+CPU쿨러 SilverStone SST-XE360-TR5-V2 마이크로닉스 1 6 24,000 6 24,000
+메인보드 ASUS PRO WS WRX90E-SAGE SE 1 2 ,305,000 2 ,305,000
+RAM 삼성전자 DDR5-5600 ECC/REG (32GB) 4 2 ,800,000 11,200,000
+VGA PALIT 지포스 RTX 5090 GAMEROCK D7 32GB 이엠텍 1 11,200,000 11,200,000
+SSD 삼성전자 9100 PRO M.2 NVMe (2TB) 1 9 97,000 9 97,000
+CASE 3RSYS T3000 Quiet 1 2 55,000 2 55,000
+POWER SuperFlower SF-2200F14HP LEADEX TITANIUM ATX3.1 1 7 82,000 7 82,000
+기타 기본조립 + 테스트 1 5 5,000 5 5,000
+합 계 (VAT 포함) 세금계산서 30,207,000
+세부사항
+구분 내용 계약금
+견적 유효기간 견적 발행일로부터 1일 (납기는 최대 2주이내) 금액
+운영체제 운영체제 미포함 계약금
+A/S 기간 PC 기본 A/S (1년) / PC주요부품 외 소모품 및 주변기기 모니터등은 제조사 정책을 따름 잔금
+주의사항 본 상품은 조립PC (주문제작) 상품으로 불량으로 인한 환불 요청 시 불량 부품만 환불이 가능합니다. 입금일
+결제정보 국민은행 282401-04-308576 주식회사 엔코퍼레이션 이름 (인)
+※ 주 의 사 항 ※ 꼭! 읽어주세요
+1. 스레드리퍼(Threadripper) 사양 A/S 안내
+－방문 서비스 불가 : 스레드리퍼 사양은 고사양PC 특성상, 초기 불량을 포함한 모든 방문 A/S 및 현장 점검 서비스가 제공되지 않습니다.
+기술적인 정밀 점검을 위해 본사 입고 처리가 필수인 점 양해 부탁드립니다.
+－제품 회수 안내 : 서울 및 수도권은 최초 1회에 한해 퀵서비스로 회수하나, 그 외 지방 지역은 PC 전체를 본사로 보내주셔야 합니다.
+2. OS 및 소프트웨어 지원 제한
+－불법 프로그램 제한 : 정품 소프트웨어 외 불법 프로그램 사용으로 인한 오류와 불이익은 본사에서 책임지지 않습니다.
+－OS 호환성 : 리눅스(Linux) 계열 OS는 본사에서 테스트 및 기술 지원을 하지 않습니다. 호환 여부는 부품 제조사에 직접 문의하셔야 합니다.
+－윈도우(Windows)설치 : 정품 Windows 구매시 설치를 진행해 드리며, 미개봉 정품 패키지(제품 키 포함)를 동봉해 드립니다. (보관 필수)
+(※윈도우 외의 소프트웨어는 정품을 구매하셔도 설치를 해드리지 않습니다.)
+3. 초기 불량 및 A/S 규정 : 제품 수령 및 부품 박스 보관(필수)
+－모든 조립PC는 부팅 및 초기 테스트 완료 후 출고됩니다.
+수령 즉시 발생하는 하드웨어 불량을 포함한 모든 불량 증상은 발급해 드린 [A/S쿠폰]을 이용한 처리만 가능합니다. (정식 센터를 통한 순차 처리)
+납기일이 촉박하거나 PC사용이 급하신 분들은 위 규정을 고려하여 신중한 구매를 부탁드립니다.
+－박스 보관 : 동봉된 모든 부품 박스는 버리지 말고 보관해 주세요, 박스를 폐기하시면 교환 및 환불이 어려울 수 있습니다.
+－구성품 확인 : A/S쿠폰과 소형 부속품은 제품 박스 내부에 들어있습니다. 분실 시 재발급이 어려우니 개봉 후 반드시 확인해 주세요.
+－초기 불량 점검 : 빠른 처리를 위해 제품 수령 후 1주일 이내 반드시 이상 여부를 점검해 주시기 바랍니다.
+4. 모니터 및 기타 주의사항(배송)
+－배송 및 현장 지원 : 모든 PC/모니터등 제품은 지역에 따라 택배 또는 퀵서비스(선불)로 출고됩니다. 출장 설치 및 현장 지원은 별도 협의(비용 발생)가 필요합니다.
+－모니터 불량 : 모니터 자체 결함은 해당 모니터 제조사의 A/S 규정에 따라 처리됩니다.
+－디스플레이 연결 : 모니터를 2대 이상 쓰실 경우, 현재 모니터의 입력 단자와 PC의 그래픽 출력 단자 호환되는지 직접 확인하셔야 합니다.
+㈜커넥트웨이브 l 대표: 김정남 l 서울특별시 금천구 벚꽃로 298, 17층(가산동, 대륭포스트타워6차)
+사업자등록번호: 117-81-40065 l 통신판매업: 제2004-서울양천-00918호 l 부가통신사업: 제003081호
+고객센터: 1688-2470 (유료) l 이메일: cs@cowave.kr l Fax: 1688-2451
+Copyright ⓒ connectwave Co., Ltd. All Rights Reserved
+
+FILE: [산자부] 샵다나와 견적서 (261020).pdf
+PAGE 1
+2026-10-20
+샵다나와 기업 구매상담
+상품 견적서
+상호 TNS AI
+견적번호 공급자 상호 주식회사 엔코퍼레이션 대표자 남호영 (인)
+주소 등록번호 764-86-00393
+담당자 장민규 주소 서울특별시 용산구 청파로 74 전자랜드 신관 5층 506ㅡ506-1호
+연락처 010-8567-1825 담당팀 영업팀 연락처 010-4576-3305
+이메일 mgjang@tnsai.co.kr 담당자 이기용 팀장 팩스 02-701-0390
+dlrldyd86@nate.com
+분류 품목 모델명 수량 (EA) 단가 공급가액 세액 합계
+CPU AMD 라이젠 스레드리퍼 PRO 9965WX (사마다 픽) (멀티팩 정품) 1 4,450,000 4,450,000 4 45,000 4 ,895,000
+CPU쿨러 NOCTUA NH-U14S TR5-SP6 1 208,182 208,182 20,818 2 29,000
+메인보드 ASUS PRO WS WRX90E-SAGE SE 1 2,095,455 2,095,455 2 09,545 2 ,305,000
+RAM 삼성전자 DDR5-5600 ECC/REG (32GB) 2 2,545,455 5,090,909 5 09,091 5 ,600,000
+VGA NVIDIA RTX PRO 4500 Blackwell D7 32GB 1 8,289,091 8,289,091 8 28,909 9 ,118,000
+SSD 삼성전자 990 PRO M.2 NVMe (1TB) 1 386,364 386,364 38,636 4 25,000
+SSD 삼성전자 990 PRO M.2 NVMe (2TB) 1 765,455 765,455 76,545 8 42,000
+CASE 3RSYS T3000 Quiet 1 231,818 231,818 23,182 2 55,000
+POWER MSI MPG Ai1600TS 80PLUS티타늄 풀모듈러 ATX 3.1 1 590,000 590,000 59,000 6 49,000
+기타 기본조립 + 테스트 1 50,000 50,000 5 ,000 55,000
+세금계산서 19,611,818 22,157,273 2 ,215,727 24,373,000
+세부사항
+구분 내용 계약금
+견적 유효기간 견적서 발행일로부터 1일 (납기는 2주이내) 금액
+운영체제 운영체제 미포함 계약금
+A/S 기간 PC 기본 A/S (1년) / PC주요부품 외 소모품 및 주변기기 모니터등은 제조사 정책을 따름 잔금
+주의사항 본 상품은 조립PC (주문제작) 상품으로 불량으로 인한 환불 요청 시 불량 부품만 환불이 가능합니다. 입금일
+결제정보 국민은행 282401-04-308576 주식회사 엔코퍼레이션 이름 (인)
+※ 주 의 사 항 ※ 꼭! 읽어주세요
+1. 스레드리퍼(Threadripper) 사양 A/S 안내
+－방문 서비스 불가 : 스레드리퍼 사양은 고사양PC 특성상, 초기 불량을 포함한 모든 방문 A/S 및 현장 점검 서비스가 제공되지 않습니다.
+기술적인 정밀 점검을 위해 본사 입고 처리가 필수인 점 양해 부탁드립니다.
+－제품 회수 안내 : 서울 및 수도권은 최초 1회에 한해 퀵서비스로 회수하나, 그 외 지방 지역은 PC 전체를 본사로 보내주셔야 합니다.
+2. OS 및 소프트웨어 지원 제한
+－불법 프로그램 제한 : 정품 소프트웨어 외 불법 프로그램 사용으로 인한 오류와 불이익은 본사에서 책임지지 않습니다.
+－OS 호환성 : 리눅스(Linux) 계열 OS는 본사에서 테스트 및 기술 지원을 하지 않습니다. 호환 여부는 부품 제조사에 직접 문의하셔야 합니다.
+－윈도우(Windows)설치 : 정품 Windows 구매시 설치를 진행해 드리며, 미개봉 정품 패키지(제품 키 포함)를 동봉해 드립니다. (보관 필수)
+(※윈도우 외의 소프트웨어는 정품을 구매하셔도 설치를 해드리지 않습니다.)
+3. 초기 불량 및 A/S 규정 : 제품 수령 및 부품 박스 보관(필수)
+－모든 조립PC는 부팅 및 초기 테스트 완료 후 출고됩니다.
+수령 즉시 발생하는 하드웨어 불량을 포함한 모든 불량 증상은 발급해 드린 [A/S쿠폰]을 이용한 처리만 가능합니다. (정식 센터를 통한 순차 처리)
+납기일이 촉박하거나 PC사용이 급하신 분들은 위 규정을 고려하여 신중한 구매를 부탁드립니다.
+－박스 보관 : 동봉된 모든 부품 박스는 버리지 말고 보관해 주세요, 박스를 폐기하시면 교환 및 환불이 어려울 수 있습니다.
+－구성품 확인 : A/S쿠폰과 소형 부속품은 제품 박스 내부에 들어있습니다. 분실 시 재발급이 어려우니 개봉 후 반드시 확인해 주세요.
+－초기 불량 점검 : 빠른 처리를 위해 제품 수령 후 1주일 이내 반드시 이상 여부를 점검해 주시기 바랍니다.
+4. 모니터 및 기타 주의사항(배송)
+－배송 및 현장 지원 : 모든 PC/모니터등 제품은 지역에 따라 택배 또는 퀵서비스(선불)로 출고됩니다. 출장 설치 및 현장 지원은 별도 협의(비용 발생)가 필요합니다.
+－모니터 불량 : 모니터 자체 결함은 해당 모니터 제조사의 A/S 규정에 따라 처리됩니다.
+－디스플레이 연결 : 모니터를 2대 이상 쓰실 경우, 현재 모니터의 입력 단자와 PC의 그래픽 출력 단자 호환되는지 직접 확인하셔야 합니다.
+㈜커넥트웨이브 l 대표: 김정남 l 서울특별시 금천구 벚꽃로 298, 17층(가산동, 대륭포스트타워6차)
+사업자등록번호: 117-81-40065 l 통신판매업: 제2004-서울양천-00918호 l 부가통신사업: 제003081호
+고객센터: 1688-2470 (유료) l 이메일: cs@cowave.kr l Fax: 1688-2451
+Copyright ⓒ connectwave Co., Ltd. All Rights Reserved
+
+FILE: [산자부] 아싸컴 견적서 (261023).pdf
+PAGE 1
+주식회사 공이일공
+사업자등록번호 201-86-24045
+대표이사
+견적서_TNSAI_조립PC_261023
+상호(법인명) 주식회사 공이일공
+대표 유인찬 (인)
+사업장 주소 서울 구로구 디지털로 257 1층 아싸컴
+업태 제조,도매 및 소매업 종목 컴퓨터
+발급일 2026년 10월 23일
+발급대상 TNSAI E-mail B2B 문의 partner@assacom.com / 담당자 tidnfkd7@assacom.com
+발주담당 TNSAI 담당자정보 B2B 담당자 이호재 / 010-5875-7059
+아래와 같이 견적합니다.
+순번 구분 모델명 단위 수량 단가(부가세 포함) 공급가 총액 부가세 총액 합계(부가세 포함) 비고
+1 CPU 라이젠 스레드리퍼 프로9965WX (시마다 픽)(멀티팩 정품) ea 1 - - - -
+2 쿨러 써멀테이크 AW360 ea 1 - - - -
+3 메인보드 아수스 프로WS WRX90E-SAGE SE ea 1 - - - -
+4 메모리[RAM] ADATA DDR5-5600 CL46 ECC/REG (16GB) ea 8 - - - - 총: 128GB
+5 그래픽카드 RTX5090 PALIT GAMEROCK D7 32GB ea 1 - - - -
+6 SSD 1 삼성전자 1TB 990 PRO M.2 NVMe ea 1 - - - -
+7 SSD 2 삼성전자 2TB 990 PRO M.2 NVMe ea 1 - - - -
+8 파워 슈퍼플라워 SF-2000F14HP LEADEX PLATINUM ea 1 - - - -
+9 케이스 3RSYS T3000 Quiet ea 1 - - - -
+10 윈도우 미포함(FreeDos) ea 1 - - - -
+9 공임비 조립비, 1년 무상 AS (출장 포함) ea 1 - - - - 보증기간 1년간 3회에 한하여 하드웨어 문제시 출장 무상서비스
+조립PC 총합 set 1 ₩29,260,000 ₩29,260,000
+조립PC 총합 set 1 ₩29,260,000 -본 견적의 유효 기간은 발급일로부터 영업일 3일 입니다.
+-본 견적은 B2B전용 단가를 기반으로 책정되었습니다.
+-본 견적의 내용 변경 없이 납품이 진행될 경우, 본 문서는
+총 결제금액 (부가세 포함, 현금 결제 기준) ₩29,260,000 거래명세서로도 기능합니다.
+-납품 일정에 맞추어 납품이 진행됩니다.
+[ 보증정책 기준 ]
+- 납품 제품의 하자 발생 시, PC 부품(CPU, 메모리, 그래픽카드, SSD/HDD, 파워, 케이스등) 및 주변기기 A/S는 해당 제조사의 A/S 정책에 맞춰 진행됩니다.
+- 고객 과실이나 천재지변(화재, 염해&부식,가스,지진,홍수해,낙뢰등)으로 인한 제품파손 및 불량의 경우 A/S가 유상으로 처리되거나 불가할 수 있습니다.
+- 출장 업체의 지역별 사정으로 인해 현장 방문이 불가할 경우, 제품을 회수하여 보증기간 내 무상 A/S를 진행해 드립니다.
+PAGE 2
+주식회사 공이일공
+사업자등록번호 201-86-24045
+대표이사
+견적서_TNSAI_조립PC_261023
+상호(법인명) 주식회사 공이일공
+대표 유인찬 (인)
+사업장 주소 서울 구로구 디지털로 257 1층 아싸컴
+업태 제조,도매 및 소매업 종목 컴퓨터
+발급일 2026년 10월 23일
+발급대상 TNSAI E-mail B2B 문의 partner@assacom.com / 담당자 tidnfkd7@assacom.com
+발주담당 TNSAI 담당자정보 B2B 담당자 이호재 / 010-5875-7059
+아래와 같이 견적합니다.
+순번 구분 모델명 단위 수량 단가(부가세 포함) 공급가 총액 부가세 총액 합계(부가세 별도) 비고
+1 CPU 라이젠 스레드리퍼 프로9965WX (시마다 픽)(멀티팩 정품) ea 1 - - - -
+2 쿨러 써멀테이크 AW360 ea 1 - - - -
+3 메인보드 아수스 프로WS WRX90E-SAGE SE ea 1 - - - -
+4 메모리[RAM] ADATA DDR5-5600 CL46 ECC/REG (16GB) ea 8 - - - - 총: 128GB
+5 그래픽카드 RTX5090 PALIT GAMEROCK D7 32GB ea 1 - - - -
+6 SSD 1 삼성전자 1TB 990 PRO M.2 NVMe ea 1 - - - -
+7 SSD 2 삼성전자 2TB 990 PRO M.2 NVMe ea 1 - - - -
+8 파워 슈퍼플라워 SF-2000F14HP LEADEX PLATINUM ea 1 - - - -
+9 케이스 3RSYS T3000 Quiet ea 1 - - - -
+10 윈도우 미포함(FreeDos) ea 1 - - - -
+9 공임비 조립비, 1년 무상 AS (출장 포함) ea 1 - - - - 보증기간 1년간 3회에 한하여 하드웨어 문제시 출장 무상서비스
+조립PC 총합 set 1 ₩29,260,000 ₩26,600,000 ₩2,660,000 ₩26,600,000
+조립PC 총합 set 1 ₩26,600,000 -본 견적의 유효 기간은 발급일로부터 영업일 3일 입니다.
+-본 견적은 B2B전용 단가를 기반으로 책정되었습니다.
+-본 견적의 내용 변경 없이 납품이 진행될 경우, 본 문서는
+총 결제금액 (부가세 별도, 현금 결제 기준) ₩26,600,000 거래명세서로도 기능합니다.
+-납품 일정에 맞추어 납품이 진행됩니다.
+[ 보증정책 기준 ]
+- 납품 제품의 하자 발생 시, PC 부품(CPU, 메모리, 그래픽카드, SSD/HDD, 파워, 케이스등) 및 주변기기 A/S는 해당 제조사의 A/S 정책에 맞춰 진행됩니다.
+- 고객 과실이나 천재지변(화재, 염해&부식,가스,지진,홍수해,낙뢰등)으로 인한 제품파손 및 불량의 경우 A/S가 유상으로 처리되거나 불가할 수 있습니다.
+- 출장 업체의 지역별 사정으로 인해 현장 방문이 불가할 경우, 제품을 회수하여 보증기간 내 무상 A/S를 진행해 드립니다.
+
+FILE: [산자부] 여의시스템 견적서 (261014).pdf
+PAGE 1
+462-807 / 경기도 성남시 중원구 상대원동 434-7 / TEL : 031)737-8888(代) / FAX : 031)737-8800 / www.yoisys.com
+見 積 書
+(ICS사업부)
+티엔에스에이아이(주) 貴中 (주) 여 의 시 스 템
+참조 : 장 민 규 연구원님 귀하 대 표 이 사 성명기, 성제현
+일자 : 2026년 10월 14일
+T E L : 010-8567-1825 FILE : ICS2-P261014-552
+Mail : mgjang@tnsai.co.kr 담 당 자 : 박 경 호 매니저
+납기 : 8주 소요 전화 : 031)737-8888(#8833)
+유효기간 : 4일 핸 드 폰 : 010-2001-8492
+견적금액 : 일금 사천만원정 (₩40,000,000) 부가세별도
+품 목 / 사 양 수량 단 가 금 액
+1 WORKSTATION COMPUTER SYSTEM
+. MODEL: YOI-5U-7975WX 1 40,000,000 4 0,000,000
+. MAIN BOARD:
+AMD Socket sTR5 for Ryzen Threadripper PRO 9000&7000 WX-Series
+6 x PCIe 5.0 x16, 1 x PCIe 5.0 x16(x8 mode)
+2 x LAN Port : 10G
+1 x VGA
+. CASE: 5U Custom Chassis (F:80mm FAN x4, R:120mm FAN x1)
+. Dimension: (W)485.6 x (D)550 x (H)222mm
+. Power Supply: Seasonic PRIME PLATINUM PX-1600 풀모듈러 ATX3.1
+. CPU: AMD Threadripper Pro 7975WX (4.00~5.30Ghz/32Core/64T)
+. MEMORY: Samsung DDR5 32G 5600MHz ECC/REG ×4EA (Total:128GB)
+. SSD: Samsung 990 PRO M.2 2280 NVMe 1TB
+. HDD: WD Ultrastar 14TB (7200/512M)
+. VGA: NVIDIA RTX 5000 Ada Generation D6 32GB
+ＴＯＴＡＬ : 40,000,000
+결제조건 : 첫거래 선입금 3회 후 결제조건 재 협의
+납품장소 : 귀사지정장소
+하자보증 : 12개월 보증
+
+FILE: [산자부] 영재컴퓨터 견적서 (261015).xlsx
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'AI & Deep Learning Workstations', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'Extreme Liquid Cooling System', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'High Performance Server', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'Intel Platinum Technology Provider', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'AMD Workstation System Integrator', None, None, None, None, None, None, None, None, None, None, None)
+('YJMOD WORKSTATION', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '견적일자', None, None, '26.10.15', None, None, None, None, None, '※유효기한 : 견적일로부터  14일', None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '견적수신', None, None, '장민규 연구원님\nTNS AI', None, None, None, None, None, '담당자', None, None, '송기훈 실장', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '전화번호', None, None, None, None, None, None, None, None, '전화번호', None, None, '02-716-5232', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '메일주소', None, None, None, None, None, None, None, None, '메일주소', None, None, 'digiji1@naver.com\nsvr@yjmod.kr', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '(단위 : 원)', None, None, None, None)
+('견적금액(합계금액)', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 31452564, None, None, None, None, None, None, None, None, None, None, None, None)
+('MODEL NAME', None, None, None, None, 'CATEGORY', None, None, None, 'DESCRIPTION', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'QTY', None, None, 'UNIT PRICE', None, None, None, None, 'EXT. PRICE', None, None, None, None, None, None)
+('AI 영상검사\n워크스테이션\n1대\n\nTR PRO 7965WX\n24코어\n\nWRX90E-SAGE SE\nECC 128GB\n\nRTX 5090 32GB\n(수랭)\n\n1600W ATX3.1', None, None, None, None, 'CPU', None, None, None, 'AMD 라이젠 스레드리퍼 PRO 7965WX (스톰 픽) (멀티팩 정품)\n · 24코어 / 48스레드 · sTR5 · PCIe 5.0 128레인 · TDP 350W\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 4084670, None, None, None, None, 4084670, None, None, None, None, None, None)
+(None, None, None, None, None, 'CPU COOLER', None, None, None, 'NOCTUA NH-U14S TR5-SP6 (sTR5 전용 공랭 타워 쿨러)\n · 140mm NF-A15 팬 · 스레드리퍼 전용 풀커버 베이스 · 제조사 보증 6년\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 204000, None, None, None, None, 204000, None, None, None, None, None, None)
+(None, None, None, None, None, 'M/B', None, None, None, 'ASUS Pro WS WRX90E-SAGE SE (WRX90 · sTR5 · EEB)\n · PCIe 5.0 x16 슬롯 7개 · DDR5 ECC RDIMM 8채널 8슬롯\n · 10GbE x 2 · 원격관리(IPMI)\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 2132000, None, None, None, None, 2132000, None, None, None, None, None, None)
+(None, None, None, None, None, 'RAM', None, None, None, '삼성전자 DDR5-5600 ECC Registered DIMM 16GB (PC5-44800 · 서버용)\n ※ 16GB x 8 = 128GB · 8채널 전 슬롯 균등 구성\n ※ 계획하신 구성 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 8, None, None, 1080000, None, None, None, None, 8640000, None, None, None, None, None, None)
+(None, None, None, None, None, 'GPU', None, None, None, 'GIGABYTE AORUS 지포스 RTX 5090 XTREME 워터 블럭 D7 32GB\n360 GPU 수랭 적용', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 11000000, None, None, None, None, 11000000, None, None, None, None, None, None)
+(None, None, None, None, None, 'SSD (OS)', None, None, None, '삼성전자 990 PRO M.2 NVMe 1TB (PCIe 4.0 x4 · TLC · DRAM 캐시)\n · 운영체제 · 프로그램용 · 5년 보증\n ※ 계획하신 구성 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 389000, None, None, None, None, 389000, None, None, None, None, None, None)
+(None, None, None, None, None, 'SSD (DATA)', None, None, None, '삼성전자 990 PRO M.2 NVMe 2TB (PCIe 4.0 x4 · TLC · DRAM 캐시)\n · 검사 영상 데이터용 · 5년 보증\n ※ 계획하신 구성 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 579620, None, None, None, None, 579620, None, None, None, None, None, None)
+(None, None, None, None, None, 'PSU', None, None, None, '시소닉 PRIME PLATINUM PX-1600 ATX 3.1 (1600W · 80PLUS 플래티넘)\n · 풀모듈러 · 네이티브 12V-2x6 커넥터 · 무상 12년\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 736230, None, None, None, None, 736230, None, None, None, None, None, None)
+(None, None, None, None, None, 'CASE', None, None, None, 'Fractal Design Define 7 XL (빅타워 · E-ATX / SSI-EEB 대응)\n · 흡음재 내장 저소음 설계 · 확장슬롯 9개\n · 360mm 라디에이터 장착 공간 확보\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 360450, None, None, None, None, 360450, None, None, None, None, None, None)
+(None, None, None, None, None, '시스템 팬', None, None, None, 'NOCTUA NF-A14 PWM chromax.black.swap (140mm 저소음)\n · 전면 흡기 보강용 3개\n ※ 계획하신 추가 팬 3개에 해당합니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 3, None, None, 39090, None, None, None, None, 117270, None, None, None, None, None, None)
+(None, None, None, None, None, '조립 · 검수', None, None, None, '조립 · BIOS / IPMI 설정 · 케이블 정리\n · 프레임그래버 3장 장착 및 인식 확인\n · MemTest86 · CPU / GPU 장시간 번인 테스트 \n · 내부 조립 사진 제공 · 안심포장 배송', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 350000, None, None, None, None, 350000, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None)
+('공급가액', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 28593240, None, None, None, None, None, None)
+('세액', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 2859324, None, None, None, None, None, None)
+('합계 (VAT 포함)', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 31452564, None, None, None, None, None, None)
+('* 본 제품의 기본 보증기간은 1년입니다. 워런티팩에 따라 상이할 수 있습니다.\n* 모든 품질보증 규정은 제조사 및 수입사의 규정에 따릅니다.\n* 본 제품은 전자파 적합성평가를 받은 구성품으로 제작되었으며 완성품에 대해서는 평가를 받지 않은 제품입니다.\n* 제품 보증기간 경과 후에 발생하는 고장에 대해서는 실비로 수리해 드립니다.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '공급자', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '상  호', None, None, '㈜영재컴퓨터', None, None, None, None, None, '대표자', None, None, '고영은', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '등록번호', None, None, '128-87-18454', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '주 소', None, None, '서울시 강서구 개화동로7길 4-7', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '전화번호', None, None, 'TEL 02)716-5232 / FAX 02)719-8947', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+
+FILE: [산자부] 영재컴퓨터 견적서 (261020).xlsx
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'AI & Deep Learning Workstations', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'Extreme Liquid Cooling System', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'High Performance Server', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'Intel Platinum Technology Provider', None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'AMD Workstation System Integrator', None, None, None, None, None, None, None, None, None, None, None)
+('YJMOD WORKSTATION', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '견적일자', None, None, '26.10.20', None, None, None, None, None, '※유효기한 : 견적일로부터  07일', None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '견적수신', None, None, '장민규 연구원님\nTNS AI', None, None, None, None, None, '담당자', None, None, '송기훈 실장', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '전화번호', None, None, None, None, None, None, None, None, '전화번호', None, None, '02-716-5232', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '메일주소', None, None, None, None, None, None, None, None, '메일주소', None, None, 'digiji1@naver.com\nsvr@yjmod.kr', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '(단위 : 원)', None, None, None, None)
+('견적금액(합계금액)', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 28420227, None, None, None, None, None, None, None, None, None, None, None, None)
+('MODEL NAME', None, None, None, None, 'CATEGORY', None, None, None, 'DESCRIPTION', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 'QTY', None, None, 'UNIT PRICE', None, None, None, None, 'EXT. PRICE', None, None, None, None, None, None)
+('AI 영상검사\n워크스테이션\n1대\n\nECC 128GB\n\nRTX 5090 32GB\n(수랭)\n\n1600W ATX3.1', None, None, None, None, 'CPU', None, None, None, 'AMD 라이젠 스레드리퍼 7960X (스톰 픽) (멀티팩(정품))', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 1960000, None, None, None, None, 1960000, None, None, None, None, None, None)
+(None, None, None, None, None, 'CPU COOLER', None, None, None, 'NOCTUA NH-U14S TR5-SP6 (sTR5 전용 공랭 타워 쿨러)\n · 140mm NF-A15 팬 · 스레드리퍼 전용 풀커버 베이스 · 제조사 보증 6년\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 204000, None, None, None, None, 204000, None, None, None, None, None, None)
+(None, None, None, None, None, 'M/B', None, None, None, 'ASUS PRO WS TRX50-SAGE WiFi 아이보라', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 1340000, None, None, None, None, 1340000, None, None, None, None, None, None)
+(None, None, None, None, None, 'RAM', None, None, None, '삼성전자 DDR5-5600 ECC/REG (32GB)', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 4, None, None, 2200000, None, None, None, None, 8800000, None, None, None, None, None, None)
+(None, None, None, None, None, 'GPU', None, None, None, 'GIGABYTE AORUS 지포스 RTX 5090 XTREME 워터 블럭 D7 32GB\n360 GPU 수랭 적용', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 11000000, None, None, None, None, 11000000, None, None, None, None, None, None)
+(None, None, None, None, None, 'SSD (OS)', None, None, None, '삼성전자 990 PRO M.2 NVMe 1TB (PCIe 4.0 x4 · TLC · DRAM 캐시)\n · 운영체제 · 프로그램용 · 5년 보증\n ※ 계획하신 구성 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 389000, None, None, None, None, 389000, None, None, None, None, None, None)
+(None, None, None, None, None, 'SSD (DATA)', None, None, None, '삼성전자 990 PRO M.2 NVMe 2TB (PCIe 4.0 x4 · TLC · DRAM 캐시)\n · 검사 영상 데이터용 · 5년 보증\n ※ 계획하신 구성 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 579620, None, None, None, None, 579620, None, None, None, None, None, None)
+(None, None, None, None, None, 'PSU', None, None, None, '시소닉 PRIME PLATINUM PX-1600 ATX 3.1 (1600W · 80PLUS 플래티넘)\n · 풀모듈러 · 네이티브 12V-2x6 커넥터 · 무상 12년\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 736230, None, None, None, None, 736230, None, None, None, None, None, None)
+(None, None, None, None, None, 'CASE', None, None, None, 'Fractal Design Define 7 XL (빅타워 · E-ATX / SSI-EEB 대응)\n · 흡음재 내장 저소음 설계 · 확장슬롯 9개\n · 360mm 라디에이터 장착 공간 확보\n ※ 계획하신 모델 그대로입니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 360450, None, None, None, None, 360450, None, None, None, None, None, None)
+(None, None, None, None, None, '시스템 팬', None, None, None, 'NOCTUA NF-A14 PWM chromax.black.swap (140mm 저소음)\n · 전면 흡기 보강용 3개\n ※ 계획하신 추가 팬 3개에 해당합니다', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 3, None, None, 39090, None, None, None, None, 117270, None, None, None, None, None, None)
+(None, None, None, None, None, '조립 · 검수', None, None, None, '조립 · BIOS / IPMI 설정 · 케이블 정리\n · 프레임그래버 3장 장착 및 인식 확인\n · MemTest86 · CPU / GPU 장시간 번인 테스트 \n · 내부 조립 사진 제공 · 안심포장 배송', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 1, None, None, 350000, None, None, None, None, 350000, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 0, None, None, None, None, None, None)
+('공급가액', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 25836570, None, None, None, None, None, None)
+('세액', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 2583657, None, None, None, None, None, None)
+('합계 (VAT 포함)', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, 28420227, None, None, None, None, None, None)
+('* 본 제품의 기본 보증기간은 1년입니다. 워런티팩에 따라 상이할 수 있습니다.\n* 모든 품질보증 규정은 제조사 및 수입사의 규정에 따릅니다.\n* 본 제품은 전자파 적합성평가를 받은 구성품으로 제작되었으며 완성품에 대해서는 평가를 받지 않은 제품입니다.\n* 제품 보증기간 경과 후에 발생하는 고장에 대해서는 실비로 수리해 드립니다.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '공급자', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '상  호', None, None, '㈜영재컴퓨터', None, None, None, None, None, '대표자', None, None, '고영은', None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '등록번호', None, None, '128-87-18454', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '주 소', None, None, '서울시 강서구 개화동로7길 4-7', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, '전화번호', None, None, 'TEL 02)716-5232 / FAX 02)719-8947', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+
+FILE: [산자부] 비전 PC 견적 비교 261023.pptx
+ppt/slides/slide1.xml: 산자부 |   | 비 | 젼 |  PC |  견적 비교 |   | 보고서 | 업체별 |   | 견적 |   | 비교 |   | 및 선정 | 01  | CPU  | 별 견적 비교 | 02  | 세부 견적 | 03 
+ppt/slides/slide2.xml: 01 | 각  | CPU  | 별 견적 비교 | AMD  | Threadripper |  7960X, 7965WX, 9965WX
+ppt/slides/slide3.xml: VENDOR SYSTEM SPECIFICATIONS & PRICING | 업체 선정 시스템 사양 및 가격 | 업체별 주요 부품 및 견적 종합 비교 | 4 | CPU | GPU | 메인보드 | 메모리 | 저장장치 | 케이스 | 전원 | 가격 | ( | VAT 미포함 | ) | 납기 | 특이사항

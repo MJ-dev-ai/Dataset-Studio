@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "run_id": "261023-191236-928fc8",
+  "kind": "export",
+  "status": "complete",
+  "started_at": "2026-10-23T10:12:36.243239+00:00",
+  "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-34\\test_duplicate_names_and_rerun0\\선택한 저장 폴더\\export_all_split1-0-0_seed0_f0d095a9_261023-191236-928fc8",
+  "settings": {
+    "output_root": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-34\\test_duplicate_names_and_rerun0\\선택한 저장 폴더",
+    "class_names": [
+      "표면: 균열",
+      "찍힘"
+    ],
+    "train_ratio": 1,
+    "val_ratio": 0,
+    "test_ratio": 0.0,
+    "map_keys": null,
+    "seed": 0,
+    "class_ids": [
+      2,
+      5
+    ]
+  },
+  "class_names": [
+    "표면: 균열",
+    "찍힘"
+  ],
+  "class_mapping": {
+    "2": 0,
+    "5": 1
+  },
+  "entries": [
+    {
+      "image": "albedo_map-705abc14/images/train/동일_이름-a938fa9cc5e9cc30424f.png",
+      "label": "albedo_map-705abc14/labels/train/동일_이름-a938fa9cc5e9cc30424f.txt",
+      "source_id": "a938fa9cc5e9cc30424f",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map-705abc14/images/train/동일_이름-6f70844ea289930c914e.png",
+      "label": "albedo_map-705abc14/labels/train/동일_이름-6f70844ea289930c914e.txt",
+      "source_id": "6f70844ea289930c914e",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    },
+    {
+      "image": "albedo_map-705abc14/images/train/동일_이름-dcb61df3986aa83c9cee.png",
+      "label": "albedo_map-705abc14/labels/train/동일_이름-dcb61df3986aa83c9cee.txt",
+      "source_id": "dcb61df3986aa83c9cee",
+      "split": "train",
+      "kind": "original",
+      "map_key": "albedo_map",
+      "annotations": 1,
+      "classes": [
+        1
+      ]
+    }
+  ],
+  "issues": [],
+  "warnings": [],
+  "failed": 0,
+  "skipped": 0,
+  "images": 3,
+  "labels": 3,
+  "annotations": 3,
+  "poisson_samples": 0,
+  "original_sources": 3,
+  "split_images": {
+    "train": 3
+  },
+  "class_distribution": {
+    "1": 3
+  },
+  "failed_or_skipped": 0,
+  "sample_images": [
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-34\\test_duplicate_names_and_rerun0\\선택한 저장 폴더\\export_all_split1-0-0_seed0_f0d095a9_261023-191236-928fc8\\albedo_map-705abc14\\images\\train\\동일_이름-a938fa9cc5e9cc30424f.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-34\\test_duplicate_names_and_rerun0\\선택한 저장 폴더\\export_all_split1-0-0_seed0_f0d095a9_261023-191236-928fc8\\albedo_map-705abc14\\images\\train\\동일_이름-6f70844ea289930c914e.png",
+    "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-34\\test_duplicate_names_and_rerun0\\선택한 저장 폴더\\export_all_split1-0-0_seed0_f0d095a9_261023-191236-928fc8\\albedo_map-705abc14\\images\\train\\동일_이름-dcb61df3986aa83c9cee.png"
+  ],
+  "preview_image": "C:\\Users\\tnsmi\\Downloads\\Dataset-Editor\\perf\\test-run-34\\test_duplicate_names_and_rerun0\\선택한 저장 폴더\\export_all_split1-0-0_seed0_f0d095a9_261023-191236-928fc8\\albedo_map-705abc14\\images\\train\\동일_이름-a938fa9cc5e9cc30424f.png",
+  "finished_at": "2026-10-23T10:12:36.264961+00:00"
+}

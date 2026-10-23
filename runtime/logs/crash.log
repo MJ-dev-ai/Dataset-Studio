@@ -84,3 +84,17 @@ Traceback (most recent call last):
     image_out, _label_out = augmentation_service.write_auto_yolo_sample(options, split, staged_name, staged_image, staged_labels)
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+
+[2026-10-23T09:48:25.593838+00:00] Background task failed: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\worker\augmentation_worker.py", line 101, in _execute_auto_augment
+    image_out, _label_out = augmentation_service.write_auto_yolo_sample(options, split, staged_name, staged_image, staged_labels)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+
+[2026-10-23T09:50:36.176135+00:00] Background task failed: write_auto_yolo_sample() missing 1 required positional argument: 'labels'
+Traceback (most recent call last):
+  File "C:\Users\tnsmi\Downloads\Dataset-Editor\worker\augmentation_worker.py", line 101, in _execute_auto_augment
+    image_out, _label_out = augmentation_service.write_auto_yolo_sample(options, split, staged_name, staged_image, staged_labels)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: write_auto_yolo_sample() missing 1 required positional argument: 'labels'

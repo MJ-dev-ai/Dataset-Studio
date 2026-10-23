@@ -5,6 +5,7 @@ from PySide6.QtCore import Slot
 from core.mapset import discover_map_sets
 from core.patch_clipboard import read_defect_pool
 from service.project_service import export_defect_maps, save_mapset_copy, save_mapset_in_place
+from service.labeling_service import load_class_catalog
 from worker.base_worker import BaseWorker, WorkerCancelled
 
 
@@ -46,7 +47,8 @@ class ProjectWorker(BaseWorker):
 				cancelled=lambda: self.is_cancelled,
 				progress=lambda count, path: self.report(min(99, count), path),
 			)
-			self._succeed(mapsets)
+			catalog = load_class_catalog(self.payload["folder"], mapsets, self.check_cancelled)
+			self._succeed({"mapsets": mapsets, "class_catalog": catalog})
 		except WorkerCancelled:
 			self._cancel()
 		except Exception as error:

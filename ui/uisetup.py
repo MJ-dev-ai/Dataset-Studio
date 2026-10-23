@@ -8,19 +8,25 @@ from PySide6.QtGui import QAction, QColor, QIcon, QKeySequence, QPainter, QPixma
 from PySide6.QtWidgets import (
     QAbstractButton,
     QColorDialog,
+    QComboBox,
+    QLabel,
     QDockWidget,
+    QHBoxLayout,
     QMenu,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
+    QTabWidget,
     QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 from config.settings import DEFAULT_THEME
-from service.editing_service import clone_mode_from_text
-from tools.toolmanager import ToolMode
+from service.editing_service import patch_mode_from_text
+from tools.toolmanager import ToolManager, ToolMode
 from ui.themes import theme_colors
+from ui.annotation_panel import AnnotationPanel
 
 
 class UiSetup:
@@ -41,6 +47,7 @@ class UiSetup:
             ToolMode.ERASER: "pageOptionsBrush",
             ToolMode.FILL: "pageOptionsBrush",
             ToolMode.PATCH: "pageOptionsPaste",
+            ToolMode.BBOX: "pageOptionsSelect",
         }
         self.property_page_map: dict[ToolMode, str] = {
             ToolMode.MOVE: "page_info",
@@ -52,6 +59,7 @@ class UiSetup:
             ToolMode.ERASER: "page_info",
             ToolMode.FILL: "page_info",
             ToolMode.PATCH: "page_info",
+            ToolMode.BBOX: "page_info",
         }
 
     def setup(self) -> None:
@@ -75,7 +83,152 @@ class UiSetup:
         self._setup_properties_scroll_area()
         self._hide_label_tool_widgets()
         self._setup_initial_panel_state()
+        self._setup_editor_hints()
+        self._setup_annotation_panel()
+        self._setup_workspace_presentation()
+        self.window.canvas.selection_changed.connect(self._sync_selection_status)
         self.apply_theme(getattr(self.window, "current_theme", DEFAULT_THEME))
+
+    def _setup_workspace_presentation(self) -> None:
+        """Group resources, contextual settings and document status in stable locations."""
+        w = self.window
+        w.dockProject.setWindowTitle("리소스")
+        w.dockProperties.setWindowTitle("속성")
+        w.dockLogs.setWindowTitle("작업 기록")
+        # Native dock title painting can clip font descenders after QSS padding.
+        # These fixed docks have no title buttons; let a label size the header.
+        for dock in (w.dockProject, w.dockProperties, w.dockLogs):
+            header = QWidget(dock)
+            header.setObjectName("dockPanelHeader")
+            header_layout = QHBoxLayout(header)
+            header_layout.setContentsMargins(10, 7, 10, 7)
+            title = QLabel(dock.windowTitle(), header)
+            title.setProperty("uiRole", "panelTitle")
+            title.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+            header_layout.addWidget(title)
+            dock.windowTitleChanged.connect(title.setText)
+            dock.setTitleBarWidget(header)
+        w.dockLogs.hide()
+        w.dockOptions.setFixedHeight(52)
+        w.dockTools.setFixedWidth(44)
+        w.projectLayout.setContentsMargins(4, 4, 4, 4)
+        w.propertiesLayout.setContentsMargins(8, 8, 8, 8)
+        w.propertiesLayout.setSpacing(8)
+        w.label_property_title.hide()
+        w.label_property_subtitle.setWordWrap(True)
+        w.label_property_subtitle.setProperty("uiRole", "hint")
+        w.group_info_image.hide()
+        w.group_info_state.hide()
+        dataset_actions = {getattr(w, name) for name in ("buttonSelectExportDefect", "buttonSelectReloadLabels", "buttonSelectSetPlacementMask", "buttonSelectClearPlacementMask")}
+        for child in w.group_labeling.children():
+            if isinstance(child, QWidget) and child not in dataset_actions:
+                child.hide()
+        for hint in self.tool_hints.values():
+            hint.hide()
+        w.resourceTabs = QTabWidget(w.dockProjectContents)
+        w.resourceTabs.setDocumentMode(True)
+        for label in (w.lblProject, w.lblMasks):
+            label.hide()
+        for widget, title in ((w.treeProject, "데이터셋"), (w.listMasks, "패치 보관함")):
+            w.projectLayout.removeWidget(widget)
+            w.resourceTabs.addTab(widget, title)
+        w.projectLayout.addWidget(w.resourceTabs)
+        w.documentSummary = QLabel(w.editor_page)
+        w.documentSummary.setObjectName("documentSummary")
+        w.documentSummary.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        w.editor_page.layout().insertWidget(0, w.documentSummary)
+        w.editor_page.layout().setContentsMargins(0, 0, 0, 0)
+        w.centralwidget.layout().setContentsMargins(0, 0, 0, 0)
+        w.canvas.image_changed.connect(self._update_document_summary)
+        w.canvas.view_changed.connect(self._update_document_summary)
+        w.canvas.annotations_changed.connect(self._update_document_summary)
+        self._update_document_summary()
+        for name in ("labelOptionsNavigate", "labelOptionsSelect", "labelOptionsBrush", "labelOptionsPaste"):
+            getattr(w, name).setProperty("uiRole", "toolTitle")
+        for name, title in {"menuFile": "파일", "menuEdit": "편집", "menuImage": "이미지", "menuTools": "도구", "menuLabel": "라벨", "menuAugment": "증강", "menuView": "보기", "menuHelp": "도움말"}.items():
+            getattr(w, name).setTitle(title)
+        action_titles = {
+            "action_open_project": "프로젝트 열기…", "action_open_folder": "데이터셋 폴더 열기…", "action_open_image": "이미지 열기…",
+            "action_open_Images": "이미지를 MapSet으로 열기…", "action_save_project": "프로젝트 저장", "action_save_project_as": "프로젝트 다른 이름으로 저장…",
+            "action_save": "MapSet 저장", "action_save_all": "모두 저장", "action_save_as": "MapSet 다른 이름으로 저장…", "action_save_labels": "라벨 저장",
+            "action_export_mask": "선택 마스크 내보내기…", "action_export_defect": "결함 패치 내보내기…", "action_export_yolov8_dataset": "YOLO 데이터셋 내보내기…",
+            "action_exit": "종료", "action_undo": "실행 취소\tCtrl+Z", "action_redo": "다시 실행\tCtrl+Shift+Z",
+            "action_move_tool": "이동 / 보기", "action_rectangle_tool": "사각형 선택", "action_lasso_tool": "올가미", "action_polygon_tool": "다각형 선택",
+            "action_brush_tool": "브러시", "action_healing_brush_tool": "복원 브러시", "action_eraser_tool": "지우개", "action_fill_tool": "채우기", "action_point_tool": "패치 합성",
+            "action_show_labels": "라벨 표시", "action_label_browser": "클래스 관리…", "action_add_label_from_selection": "선택 영역에 라벨 추가…",
+            "action_remove_active_label": "선택 라벨 삭제", "action_reload_labels": "라벨 다시 불러오기", "action_copy_patch": "패치 복사", "action_paste_patch": "패치 붙여넣기",
+            "action_workspace_default": "편집 화면", "action_workspace_labeling": "라벨링 도구", "action_workspace_augmentation": "자동 증강…",
+        }
+        for name, title in action_titles.items():
+            self._set_action_text(name, title)
+        w.action_workspace_review.setVisible(False)
+        for name, title in {"optionsFit": "화면 맞춤", "optionsClearSelection": "선택 해제", "optionsFinishSelection": "선택 완료", "optionsAutoROI": "자동 ROI", "optionsResetTransform": "초기화", "optionsApplyPoisson": "합성 적용", "labelOptionsBrushSize": "크기", "label_brush_opacity": "불투명도", "labelOptionsPoissonMode": "합성 방식", "buttonSavePoissonMapSet": "새 MapSet으로 저장…"}.items():
+            getattr(w, name).setText(title)
+        w.group_paste_transform.setTitle("패치 위치 / 변형")
+        w.group_poisson_state.setTitle("합성 소스")
+        for name in ("optionsRotateLeft", "optionsRotateRight", "optionsScaleDown", "optionsScaleUp"):
+            getattr(w, name).setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
+        w.annotationQuickAdd.setProperty("uiRole", "primary")
+        for name, title in {"action_toggle_tools": "도구 막대", "action_toggle_project_pannel": "리소스 패널", "action_toggle_properties_pannel": "속성 패널", "action_toggle_logs": "작업 기록"}.items():
+            action = getattr(w, name)
+            action.setText(title)
+            action.setCheckable(True)
+        for action_name, dock in (("action_toggle_tools", w.dockTools), ("action_toggle_project_pannel", w.dockProject), ("action_toggle_properties_pannel", w.dockProperties), ("action_toggle_logs", w.dockLogs)):
+            action = getattr(w, action_name)
+            action.setChecked(not dock.isHidden())
+            dock.visibilityChanged.connect(action.setChecked)
+        self.actions["reset_panel_layout"] = QAction("패널 배치 초기화", w)
+        self.actions["reset_panel_layout"].triggered.connect(self._reset_panel_layout)
+        w.menuView.addAction(self.actions["reset_panel_layout"])
+        w.logToggle = QToolButton(w)
+        w.logToggle.setDefaultAction(w.action_toggle_logs)
+        w.logToggle.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        w.statusBar().addPermanentWidget(w.logToggle)
+        for name, text in {"buttonSelectExportDefect": "결함 패치 내보내기…", "buttonSelectReloadLabels": "라벨 다시 불러오기", "buttonSelectSetPlacementMask": "배치 가능 영역으로 지정", "buttonSelectClearPlacementMask": "배치 영역 해제", "label_paste_rotation": "회전", "label_paste_scale": "배율", "label_poisson_source": "소스", "label_poisson_target": "대상", "label_poisson_mask": "마스크", "label_poisson_ready": "준비"}.items():
+            getattr(w, name).setText(text)
+        w.double_paste_rotation.setSuffix("°")
+        w.optionsRotateLeft.setToolTip("왼쪽으로 회전")
+        w.optionsRotateRight.setToolTip("오른쪽으로 회전")
+        w.optionsScaleDown.setToolTip("패치 축소")
+        w.optionsScaleUp.setToolTip("패치 확대")
+
+    def _update_document_summary(self, *_args) -> None:
+        w = self.window
+        image = w.canvas.pixmap
+        if image.isNull():
+            text = "이미지를 열어 편집을 시작하세요 · 파일 → 이미지 열기 / 데이터셋 폴더 열기"
+        else:
+            name = w.current_image_path.name if w.current_image_path is not None else "이름 없는 이미지"
+            text = f"{name}    {image.width()} × {image.height()} px    {w.canvas.zoom:.0%}    라벨 {len(w.canvas.annotations)}개"
+        w.documentSummary.setText(text)
+        w.documentSummary.setToolTip(text)
+
+    def _reset_panel_layout(self) -> None:
+        """Reset only on explicit request; ordinary window resizing preserves dock widths."""
+        for dock in (self.window.dockTools, self.window.dockProject, self.window.dockProperties):
+            dock.show()
+        self.window._panel_layout_initialized = False
+        self.window._queue_panel_ratio_update()
+
+    def _setup_annotation_panel(self) -> None:
+        """Put draw parameters above the canvas and selected-object details beside it."""
+        self.window.annotationClassCombo = QComboBox(self.window)
+        self.window.annotationClassCombo.setAccessibleName("새 라벨 클래스")
+        self.window.annotationClassCombo.setMinimumWidth(140)
+        self.window.annotationClassCombo.setMaximumWidth(210)
+        self.window.annotationClassCombo.setToolTip("새 박스를 그릴 때 사용할 클래스 · W / N")
+        self.window.annotationClassCombo.currentIndexChanged.connect(lambda _index: setattr(self.window, "_last_label_class_id", self.window.annotationClassCombo.currentData()))
+        layout = self.window.layoutOptionsSelect
+        layout.insertWidget(1, QLabel("새 라벨", self.window))
+        layout.insertWidget(2, self.window.annotationClassCombo)
+        self.window.annotationQuickAdd = QPushButton("선택 → 라벨", self.window)
+        self.window.annotationQuickAdd.clicked.connect(self.window.quick_add_annotation)
+        layout.insertWidget(3, self.window.annotationQuickAdd)
+        self.window.annotation_panel = AnnotationPanel(self.window)
+        self.window.layout_page_info.insertWidget(0, self.window.annotation_panel)
+        self.window.group_labeling.setTitle("데이터셋 작업")
+        self.window.buttonSelectRemoveLabel.hide()
+        self.update_tool_ui(self.window.tool_manager.current_mode)
 
     def _setup_poisson_mode_controls(self) -> None:
         """Keep the compact toolbar and Properties clone-mode controls synchronized."""
@@ -91,9 +244,12 @@ class UiSetup:
                 combo.insertItem(0, "Detail Preserve")
             if combo.findText("Boundary Mixed") < 0:
                 combo.insertItem(0, "Boundary Mixed")
+            if combo.findText("Hard Paste") < 0:
+                combo.addItem("Hard Paste")
         toolbar_combo.setCurrentText(properties_combo.currentText())
         toolbar_combo.currentTextChanged.connect(properties_combo.setCurrentText)
         properties_combo.currentTextChanged.connect(toolbar_combo.setCurrentText)
+        toolbar_combo.currentTextChanged.connect(lambda _text: self.window.tool_manager.refresh_patch_preview())
         for name in ("button_poisson_apply", "optionsApplyPoisson"):
             button = getattr(self.window, name, None)
             if button is not None:
@@ -101,16 +257,13 @@ class UiSetup:
 
     def _setup_manual_poisson_controls(self) -> None:
         """Combine patch transforms and Poisson state into one functional panel."""
-        layout = getattr(self.window, "layout_page_poisson", None)
+        layout = getattr(self.window, "layout_page_info", None)
         transform_group = getattr(self.window, "group_paste_transform", None)
-        actions_group = getattr(self.window, "group_paste_actions", None)
         if layout is not None:
             if transform_group is not None:
                 layout.insertWidget(1, transform_group)
-            if actions_group is not None:
-                layout.insertWidget(2, actions_group)
             self.window.buttonSavePoissonMapSet = QPushButton(
-                "Save as New MapSet...", self.window.page_poisson
+                "Save as New MapSet...", self.window.page_info
             )
             layout.insertWidget(max(0, layout.count() - 1), self.window.buttonSavePoissonMapSet)
 
@@ -179,11 +332,17 @@ class UiSetup:
                 label.setText(text)
 
         ready = state.placement_active and patch is not None and mask is not None
+        self.window.label_info_paste_value.setText("배치 중" if ready else "없음")
         for name in ("button_poisson_apply", "optionsApplyPoisson", "button_paste_confirm", "optionsConfirmPaste"):
             button = getattr(self.window, name, None)
             if button is not None:
                 button.setEnabled(ready)
         self._update_patch_action_availability()
+
+    def _sync_selection_status(self, available: bool) -> None:
+        """Keep the Properties selection status tied to the canvas selection."""
+        bounds = self.window.canvas.selection_bounds()
+        self.window.label_info_selection_value.setText(f"{round(bounds.width())} × {round(bounds.height())}" if available else "없음")
 
     def set_manual_poisson_running(self, running: bool) -> None:
         """Lock commit and transform controls while the background blend runs."""
@@ -209,7 +368,7 @@ class UiSetup:
         stack_properties = getattr(self.window, "stack_properties", None)
 
         if isinstance(dock_properties, QDockWidget):
-            dock_properties.setMinimumSize(220, 120)
+            dock_properties.setMinimumSize(320, 120)
             dock_properties.setMinimumHeight(120)
 
         if isinstance(dock_contents, QWidget):
@@ -493,6 +652,7 @@ class UiSetup:
         menu.addAction(self.window.action_fill_tool)
         menu.addSeparator()
         menu.addAction(self.window.action_point_tool)
+        menu.addAction(self.window.action_labeling_tool)
         menu.addAction(self.window.action_poisson_editing)
         menu.addSeparator()
         menu.addAction(self.window.action_rotate_left)
@@ -763,6 +923,8 @@ class UiSetup:
     def _setup_tool_button_style(self) -> None:
         """Apply sizing only; colors are controlled by the active theme."""
         for button in self.window.findChildren(QToolButton):
+            if button.window() is not self.window:
+                continue
             button.setIconSize(QSize(20, 20))
             button.setMinimumSize(28, 28)
 
@@ -902,31 +1064,73 @@ class UiSetup:
             self.window.set_selection_combine_mode(combo.currentText())
 
     def _setup_top_patch_options(self) -> None:
-        layout = getattr(self.window, "layoutOptionsPaste", None)
-        if layout is None:
-            return
-        widgets = (
-            ("label_paste_x", "X", 34),
-            ("spin_paste_x", None, 76),
-            ("label_paste_y", "Y", 34),
-            ("spin_paste_y", None, 76),
-            ("label_paste_rotation", "Rot", 38),
-            ("double_paste_rotation", None, 82),
-            ("label_paste_scale", "Scale", 48),
-            ("double_paste_scale", None, 82),
-        )
-        insert_at = self._layout_index_of(layout, getattr(self.window, "optionsRotateLeft", None))
-        for name, text, width in widgets:
+        """Keep numeric transform inputs in Properties, quick actions in the top bar."""
+        self.window.optionsConfirmPaste.setText("단순 붙여넣기")
+        self.window.optionsConfirmPaste.setToolTip("색상 보정 없이 마스크 안의 픽셀을 그대로 붙입니다")
+        self.window.optionsApplyPoisson.setToolTip("선택한 합성 모드로 적용 · Enter")
+
+    def _setup_editor_hints(self) -> None:
+        """Expose tool choices and contextual keyboard hints in the existing layout."""
+        layout = self.window.toolboxFill.parentWidget().layout()
+        for name, text, icon, mode in [("toolboxPatch", "패치 합성 (K / Shift+J)", "point.png", ToolMode.PATCH), ("toolboxBBox", "바운딩 박스 (W)", "rectangle.svg", ToolMode.BBOX)]:
+            button = QToolButton(self.window)
+            button.setObjectName(name)
+            button.setCheckable(True)
+            button.setFixedSize(32, 32)
+            button.setToolTip(text)
+            button.setAccessibleName(text)
+            setattr(self.window, name, button)
+            layout.insertWidget(layout.indexOf(self.window.toolboxFill) + 1, button)
+            self._set_button_icon(name, icon)
+            self.button_icons[name] = icon
+        hints = {"toolboxMove": "이동 (V / H) · Space를 누른 채 드래그: 임시 이동", "toolboxRectangle": "사각형 선택 (M)", "toolboxLasso": "올가미 (L) · Shift+L: 다각형 전환", "toolboxPolygon": "다각형 (P) · Enter: 완료 · Backspace: 마지막 점 제거", "toolboxBrush": "브러시 (B) · 우클릭: 복원 브러시 (J) · [ / ]: 크기", "toolboxEraser": "지우개 (E)", "toolboxFill": "채우기 (G)"}
+        for name, hint in hints.items():
+            getattr(self.window, name).setToolTip(hint)
+        self.window.optionsClearSelection.setToolTip("선택 해제 · Ctrl+D")
+        self.window.optionsFinishSelection.setToolTip("다각형 선택 완료 · Enter")
+        self.tool_hints = {}
+        for page_name, layout_name in (("pageOptionsBrush", "layoutOptionsBrush"), ("pageOptionsPaste", "layoutOptionsPaste")):
+            hint = QLabel(self.window)
+            hint.setObjectName(f"{page_name}Hint")
+            getattr(self.window, layout_name).addWidget(hint)
+            self.tool_hints[page_name] = hint
+        combo = getattr(self.window, "comboOptionsSelectionMode", None)
+        if combo is not None:
+            combo.addItem("Intersect")
+            combo.setToolTip("Shift: 추가 · Alt: 빼기 · Shift+Alt: 교집합")
+        # The left toolbar already selects tools; avoid a second competing tool strip.
+        for name in ("optionsRectangle", "optionsLasso", "optionsPolygon", "optionsBrush", "optionsEraser", "optionsFill"):
             widget = getattr(self.window, name, None)
-            if not isinstance(widget, QWidget):
-                continue
-            if text is not None and hasattr(widget, "setText"):
-                widget.setText(text)
-            if hasattr(widget, "setMaximumWidth"):
-                widget.setMaximumWidth(width)
-            self._insert_widget(layout, widget, insert_at)
-            if insert_at >= 0:
-                insert_at += 1
+            if widget is not None:
+                widget.hide()
+        self.window.dockProject.setWindowTitle("프로젝트 / 패치 보관함")
+        self.window.dockProperties.setWindowTitle("현재 도구 / 속성")
+        self.window.dockOptions.setTitleBarWidget(QWidget(self.window.dockOptions))
+        self.window.dockOptions.titleBarWidget().setFixedHeight(0)
+        for name in ("spin_paste_x", "spin_paste_y", "double_paste_rotation", "double_paste_scale"):
+            field = getattr(self.window, name)
+            field.setMinimumWidth(0)
+            field.setMaximumWidth(126)
+            field.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.window.layout_page_info.insertWidget(0, self.window.group_labeling)
+        self.window.layout_page_info.insertWidget(0, self.window.group_poisson_state)
+        self.window.layout_page_info.insertWidget(0, self.window.group_paste_transform)
+        # Dataset actions belong to Properties; keep selection gestures compact.
+        for name in ("buttonSelectExportDefect", "buttonSelectRemoveLabel", "buttonSelectReloadLabels", "buttonSelectSetPlacementMask", "buttonSelectClearPlacementMask"):
+            self.window.group_labeling.layout().addWidget(getattr(self.window, name))
+        for name in ("buttonSelectAddLabel", "buttonSelectSaveLabels"):
+            getattr(self.window, name).hide()
+        shortcuts = {"action_move_tool": "V", "action_rectangle_tool": "M", "action_lasso_tool": "L", "action_polygon_tool": "P", "action_brush_tool": "B", "action_healing_brush_tool": "J", "action_eraser_tool": "E", "action_fill_tool": "G", "action_point_tool": "K"}
+        self.window.action_labeling_tool.setText("바운딩 박스 도구")
+        self.window.action_labeling_tool.setEnabled(True)
+        self.window.action_labeling_tool.setVisible(True)
+        shortcuts["action_labeling_tool"] = "W"
+        for name, key in shortcuts.items():
+            action = getattr(self.window, name)
+            action.setShortcut(key)
+            action.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
+            self.window.canvas.addAction(action)
+        self.update_tool_ui(self.window.tool_manager.current_mode)
 
     def _hide_right_side_tool_groups(self) -> None:
         for name in (
@@ -1029,10 +1233,6 @@ class UiSetup:
 
     def _setup_initial_panel_state(self) -> None:
         self.update_tool_ui(ToolMode.MOVE)
-        if hasattr(self.window, "label_property_title"):
-            self.window.label_property_title.setText("Dataset Editor")
-        if hasattr(self.window, "label_property_subtitle"):
-            self.window.label_property_subtitle.setText("Ready")
 
     def connect_actions(self) -> None:
         self._connect_file_actions()
@@ -1119,6 +1319,7 @@ class UiSetup:
 
     def _connect_tool_actions(self) -> None:
         action_to_tool = {
+            "action_labeling_tool": ToolMode.BBOX,
             "action_move_tool": ToolMode.MOVE,
             "action_rectangle_tool": ToolMode.RECT,
             "action_lasso_tool": ToolMode.LASSO,
@@ -1141,6 +1342,8 @@ class UiSetup:
             "toolboxBrush": ToolMode.BRUSH,
             "toolboxEraser": ToolMode.ERASER,
             "toolboxFill": ToolMode.FILL,
+            "toolboxPatch": ToolMode.PATCH,
+            "toolboxBBox": ToolMode.BBOX,
             "optionsRectangle": ToolMode.RECT,
             "optionsLasso": ToolMode.LASSO,
             "optionsPolygon": ToolMode.POLYGON,
@@ -1204,12 +1407,7 @@ class UiSetup:
             mode_combo = getattr(self.window, "combo_poisson_mode", None)
         mode_text = mode_combo.currentText() if mode_combo is not None else "Normal"
         try:
-            if mode_text == "Detail Preserve":
-                mode = None
-            elif mode_text == "Boundary Mixed":
-                mode = "boundary_mixed"
-            else:
-                mode = clone_mode_from_text(mode_text)
+            mode = patch_mode_from_text(mode_text)
             applied = self.window.start_manual_poisson(mode=mode, mode_name=mode_text)
         except (ValueError, RuntimeError) as exc:
             self.window.set_status(f"Poisson failed: {exc}")
@@ -1284,9 +1482,14 @@ class UiSetup:
         tool_mode = ToolMode.from_value(mode)
         self.window.tool_manager.activate(tool_mode)
         self.window.set_status(f"Tool: {tool_mode.value}")
+        self.window.canvas.setFocus(Qt.FocusReason.ShortcutFocusReason)
 
     def update_tool_ui(self, mode: ToolMode | str) -> None:
         tool_mode = ToolMode.from_value(mode)
+        if hasattr(self.window, "annotation_panel"):
+            self.window.annotation_panel.setVisible(tool_mode in ToolManager.SELECTION_MODES or tool_mode == ToolMode.BBOX)
+            self.window.annotationQuickAdd.setVisible(tool_mode != ToolMode.BBOX)
+            self.window.comboOptionsSelectionMode.setVisible(tool_mode != ToolMode.BBOX)
         self._set_stacked_page("toolOptionsStack", self.tool_page_map.get(tool_mode))
         self._set_stacked_page("stack_properties", self.property_page_map.get(tool_mode))
         self._update_tool_button_checks(tool_mode)
@@ -1294,11 +1497,36 @@ class UiSetup:
         if hasattr(self.window, "label_info_tool_value"):
             self.window.label_info_tool_value.setText(tool_mode.value)
         if hasattr(self.window, "label_property_subtitle"):
-            self.window.label_property_subtitle.setText(f"Active tool: {tool_mode.value}")
+            self.window.label_property_subtitle.setText({ToolMode.MOVE: "휠: 확대 / 축소 · Space: 화면 이동", ToolMode.RECT: "드래그: 선택 / 이동 · Ctrl+클릭: 겹친 라벨", ToolMode.LASSO: "드래그: 자유 선택 · Shift: 추가 · Alt: 빼기", ToolMode.POLYGON: "클릭: 점 추가 · Enter: 완료 · Backspace: 점 삭제", ToolMode.BRUSH: "드래그: 칠하기 · [ / ]: 크기", ToolMode.HEALING_BRUSH: "Alt+클릭: 소스 지정 · 드래그: 복원 · Esc: 취소", ToolMode.ERASER: "드래그: 지우기 · [ / ]: 크기", ToolMode.FILL: "클릭: 선택 영역 채우기", ToolMode.PATCH: "드래그 / 방향키: 위치 · Enter: 합성 · Esc: 취소", ToolMode.BBOX: "클래스 선택 후 드래그 · M: 객체 편집 · Tab: 다음 객체"}[tool_mode])
+        if hasattr(self.window, "label_property_title"):
+            self.window.label_property_title.setText({ToolMode.MOVE: "이동 / 보기", ToolMode.RECT: "사각형 선택", ToolMode.LASSO: "올가미 선택", ToolMode.POLYGON: "다각형 선택", ToolMode.BRUSH: "브러시", ToolMode.HEALING_BRUSH: "복원 브러시", ToolMode.ERASER: "지우개", ToolMode.FILL: "채우기", ToolMode.PATCH: "패치 합성", ToolMode.BBOX: "바운딩 박스"}[tool_mode])
+        for name in ("labelOptionsNavigate", "labelOptionsSelect", "labelOptionsBrush", "labelOptionsPaste"):
+            label = getattr(self.window, name, None)
+            if label is not None:
+                label.setText(self.window.label_property_title.text())
+        for page, hint in getattr(self, "tool_hints", {}).items():
+            hint.setText("Alt+클릭: 샘플 · [ / ]: 크기 · Esc: 획 취소" if page == "pageOptionsBrush" and tool_mode == ToolMode.HEALING_BRUSH else "[ / ]: 크기 · Space: 이동" if page == "pageOptionsBrush" else "방향키: 이동 · Enter: 합성 · Esc: 취소")
+        for name, visible in {
+            "group_labeling": tool_mode in ToolManager.SELECTION_MODES or tool_mode == ToolMode.BBOX,
+            "group_poisson_state": tool_mode == ToolMode.PATCH,
+            "group_paste_transform": tool_mode == ToolMode.PATCH,
+            "buttonSavePoissonMapSet": tool_mode == ToolMode.PATCH,
+            "optionsFinishSelection": tool_mode == ToolMode.POLYGON,
+            "comboOptionsSelectionMode": tool_mode in ToolManager.SELECTION_MODES,
+            "buttonOptionsBrushColor": tool_mode in {ToolMode.BRUSH, ToolMode.FILL},
+        }.items():
+            widget = getattr(self.window, name, None)
+            if widget is not None:
+                widget.setVisible(visible)
+        transform = getattr(self.window, "transform_properties", None)
+        if transform is not None:
+            transform.setVisible(tool_mode == ToolMode.MOVE)
 
     def _update_tool_button_checks(self, mode: ToolMode | str) -> None:
         tool_mode = ToolMode.from_value(mode)
         button_to_tool = {
+            "toolboxPatch": ToolMode.PATCH,
+            "toolboxBBox": ToolMode.BBOX,
             "toolboxMove": ToolMode.MOVE,
             "toolboxRectangle": ToolMode.RECT,
             "toolboxLasso": ToolMode.LASSO,
@@ -1315,6 +1543,7 @@ class UiSetup:
                 else:
                     button.setChecked(mapped_tool == tool_mode)
         action_to_tool = {
+            "action_labeling_tool": ToolMode.BBOX,
             "action_move_tool": ToolMode.MOVE,
             "action_rectangle_tool": ToolMode.RECT,
             "action_lasso_tool": ToolMode.LASSO,

@@ -11,6 +11,9 @@ from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen, QPixmap
 from core.geometry import HealingStroke, PaintStroke
 from core.patch_clipboard import PatchClip
 from core.qt_image import bgr_mask_to_qpixmap, qimage_to_bgr
+from service.editing_service import patch_mode_from_text
+from tools.patch_preview import PatchPreviewController
+from tools.healing_preview import HealingPreviewController
 from tools.label_tools import BBoxTool, BBoxPreview
 from tools.paint_tools import (
     BrushTool,
@@ -88,6 +91,7 @@ class ToolManager:
 
     SELECTION_MODES = frozenset({ToolMode.RECT, ToolMode.POLYGON, ToolMode.LASSO})
     PAINT_MODES = frozenset({ToolMode.BRUSH, ToolMode.ERASER})
+    TOOL_KEYS = {Qt.Key.Key_V: ToolMode.MOVE, Qt.Key.Key_H: ToolMode.MOVE, Qt.Key.Key_M: ToolMode.RECT, Qt.Key.Key_L: ToolMode.LASSO, Qt.Key.Key_P: ToolMode.POLYGON, Qt.Key.Key_B: ToolMode.BRUSH, Qt.Key.Key_J: ToolMode.HEALING_BRUSH, Qt.Key.Key_E: ToolMode.ERASER, Qt.Key.Key_G: ToolMode.FILL, Qt.Key.Key_K: ToolMode.PATCH, Qt.Key.Key_W: ToolMode.BBOX}
 
     def __init__(self, window):
         self.window = window
@@ -95,6 +99,7 @@ class ToolManager:
         self.mode_changed: Callable[[ToolMode], None] | None = None
         self.patch_state_changed: Callable[[PatchState], None] | None = None
         self.current_mode = ToolMode.MOVE
+        self._space_pressed = False
         self._tools = {
             ToolMode.RECT: RectSelectionTool(),
             ToolMode.POLYGON: PolygonSelectionTool(),
@@ -107,7 +112,12 @@ class ToolManager:
             ToolMode.BBOX: BBoxTool(),
         }
         self.canvas.set_tool_manager(self)
+        self.patch_preview = PatchPreviewController(self.canvas)
+        self.healing_preview = HealingPreviewController(self.canvas)
+        self._healing_source_identity = None
         self.canvas.image_changed.connect(self.refresh_patch_preview)
+        self.canvas.image_changed.connect(self._on_healing_image_changed)
+        self.canvas.image_changed.connect(self.cancel_annotation_gesture)
 
     # UI-visible state queried by ImageCanvas and UiSetup.
 
@@ -118,6 +128,24 @@ class ToolManager:
     @property
     def show_selection_handles(self) -> bool:
         return self.current_mode == ToolMode.RECT
+
+    @property
+    def annotation_editing_context(self) -> bool:
+        """Route Undo by the active editing tool, keeping pixel history separate."""
+        return self.current_mode == ToolMode.BBOX or (self.current_mode in self.SELECTION_MODES and bool(self.canvas.selected_annotation_index >= 0 or self.canvas._annotation_undo or self.canvas._annotation_redo))
+
+    def cancel_annotation_gesture(self) -> bool:
+        """Roll back a temporary box drag and discard an unfinished new box."""
+        rect = self.tool(ToolMode.RECT)
+        bbox = self.tool(ToolMode.BBOX)
+        active = rect.is_dragging_selection or bbox.start_pos is not None
+        self.canvas.cancel_annotation_edit()
+        if rect.is_dragging_selection:
+            rect.cancel_selection(False)
+        if bbox.start_pos is not None:
+            bbox.reset()
+            self.canvas.clear_selection()
+        return active
 
     @property
     def show_cursor_circle(self) -> bool:
@@ -134,7 +162,18 @@ class ToolManager:
         """Return the Healing Brush source-circle center while that tool is active."""
         if self.current_mode != ToolMode.HEALING_BRUSH:
             return None
-        return self.tool(ToolMode.HEALING_BRUSH).source_anchor
+        return self.tool(ToolMode.HEALING_BRUSH).sampling_position
+
+    def cancel_healing_preview(self) -> None:
+        """Cancel an unfinished gesture without changing pixels or Undo."""
+        self.tool(ToolMode.HEALING_BRUSH).reset()
+        self.healing_preview.clear()
+
+    def _on_healing_image_changed(self) -> None:
+        self.cancel_healing_preview()
+        identity = (str(self.window.current_image_path), self.canvas.pixmap.size())
+        if not self.canvas.is_modified or identity != self._healing_source_identity:
+            self.tool(ToolMode.HEALING_BRUSH).clear_source_anchor()
 
     def tool(self, mode: ToolMode | str):
         return self._tools[ToolMode.from_value(mode)]
@@ -278,10 +317,13 @@ class ToolManager:
 
     def clear_active_patch(self) -> None:
         self.tool(ToolMode.PATCH).clear_active_patch()
-        self.canvas.clear_patch_preview()
+        self.patch_preview.clear()
         self._notify_patch_state_changed()
 
     def refresh_patch_preview(self) -> None:
+        if self.current_mode != ToolMode.PATCH or self.canvas.pixmap.isNull():
+            self.patch_preview.clear()
+            return
         tool: PatchTool = self.tool(ToolMode.PATCH)
         target_size = self._patch_target_size()
         if target_size is not None:
@@ -291,13 +333,21 @@ class ToolManager:
         except (ValueError, cv2.error):
             preview = None
         if preview is None:
-            self.canvas.clear_patch_preview()
+            self.patch_preview.clear()
         else:
-            self.canvas.set_patch_preview(
-                bgr_mask_to_qpixmap(preview.patch, preview.mask),
-                preview.x_pos,
-                preview.y_pos,
+            combo = getattr(self.window, "optionsPoissonMode", None)
+            label = combo.currentText() if combo is not None else "Normal"
+            mode = patch_mode_from_text(label)
+            map_key = self.window._current_map_key() or tool.state.map_key
+            key = (
+                self.canvas.pixmap.cacheKey(), str(self.window.current_image_path),
+                map_key, id(preview.patch), id(preview.mask),
+                preview.x_pos, preview.y_pos, mode,
             )
+            if self.patch_preview.request(key, preview, mode, map_key, label):
+                self.canvas.set_patch_preview(
+                    bgr_mask_to_qpixmap(preview.patch, preview.mask), preview.x_pos, preview.y_pos,
+                )
         self._notify_patch_state_changed()
 
     def patch_mapset_composition_inputs(
@@ -310,6 +360,105 @@ class ToolManager:
     # converts widget coordinates once, calls the active tool, then applies the
     # result to canvas/window immediately.
 
+    def accepts_key(self, event) -> bool:
+        """Reserve editor keys only when the canvas owns keyboard focus."""
+        key, mods = event.key(), event.modifiers()
+        if mods & (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.MetaModifier):
+            return False
+        if mods & Qt.KeyboardModifier.ControlModifier:
+            return key in {Qt.Key.Key_A, Qt.Key.Key_D, Qt.Key.Key_T, Qt.Key.Key_0, Qt.Key.Key_1}
+        if key in {Qt.Key.Key_Tab, Qt.Key.Key_Backtab, Qt.Key.Key_Delete}:
+            return self.current_mode in {ToolMode.RECT, ToolMode.BBOX}
+        if key == Qt.Key.Key_N:
+            return True
+        return key in self.TOOL_KEYS or key in {Qt.Key.Key_Space, Qt.Key.Key_Escape, Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Backspace, Qt.Key.Key_BracketLeft, Qt.Key.Key_BracketRight, Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down}
+
+    def key_press_event(self, event) -> None:
+        """Use contextual editor shortcuts without stealing keys from text fields."""
+        key, mods = event.key(), event.modifiers()
+        if key == Qt.Key.Key_Escape and self.current_mode in {ToolMode.RECT, ToolMode.BBOX}:
+            if not self.cancel_annotation_gesture():
+                self.tool(ToolMode.RECT).cancel_selection(False)
+                self.canvas.select_annotation(-1)
+            event.accept()
+            return
+        if key == Qt.Key.Key_Escape and self.current_mode == ToolMode.HEALING_BRUSH:
+            self.cancel_healing_preview()
+            event.accept()
+            return
+        # Do not abandon a mouse gesture and leave a half-committed edit behind.
+        tool = self._tools.get(self.current_mode)
+        if getattr(tool, "is_editing", False) or getattr(tool, "is_drawing_rectangle", False) or getattr(tool, "is_dragging_selection", False) or getattr(tool, "is_drawing_lasso", False) or (self.current_mode == ToolMode.BBOX and tool.start_pos is not None):
+            return
+        if mods & Qt.KeyboardModifier.ControlModifier:
+            if key == Qt.Key.Key_D:
+                self.window.clear_active_selection_state()
+            elif key == Qt.Key.Key_A and not self.canvas.pixmap.isNull():
+                path = QPainterPath()
+                path.addRect(self._image_rect())
+                self.canvas.set_selection(path)
+            elif key == Qt.Key.Key_T and self.has_patch_preview():
+                self.activate(ToolMode.PATCH)
+            elif key == Qt.Key.Key_0:
+                self.canvas.fit_to_window()
+            elif key == Qt.Key.Key_1:
+                self.canvas.actual_size()
+        elif key == Qt.Key.Key_Space:
+            self._space_pressed = True
+            self.canvas.setCursor(Qt.CursorShape.OpenHandCursor)
+        elif key == Qt.Key.Key_N:
+            self.activate(ToolMode.BBOX)
+        elif key in {Qt.Key.Key_Tab, Qt.Key.Key_Backtab}:
+            self.canvas.cycle_annotation(key == Qt.Key.Key_Backtab or bool(mods & Qt.KeyboardModifier.ShiftModifier))
+        elif key == Qt.Key.Key_Delete:
+            self.window.remove_active_annotation()
+        elif key == Qt.Key.Key_Escape:
+            if self.current_mode == ToolMode.POLYGON and self.tool(ToolMode.POLYGON).points:
+                self.canvas.set_selection(QPainterPath(self.tool(ToolMode.POLYGON)._base_selection))
+            self.cancel_current_tool(clear_canvas=False, fallback_mode=None)
+            self.patch_preview.clear()
+        elif key in {Qt.Key.Key_Return, Qt.Key.Key_Enter}:
+            if not event.isAutoRepeat():
+                if self.current_mode == ToolMode.POLYGON:
+                    self.finish_polygon_selection()
+                elif self.current_mode == ToolMode.PATCH and self.has_patch_preview():
+                    self.window.ui_setup._apply_poisson()
+        elif key == Qt.Key.Key_Backspace and self.current_mode == ToolMode.POLYGON:
+            polygon = self.tool(ToolMode.POLYGON)
+            if polygon.points:
+                polygon.points.pop()
+                self.canvas.set_selection(polygon.preview_polygon() or QPainterPath(polygon._base_selection))
+        elif key in {Qt.Key.Key_BracketLeft, Qt.Key.Key_BracketRight} and self.show_cursor_circle:
+            current = self.tool(self.current_mode).options.size
+            size = max(1, min(1000, current + (1 if key == Qt.Key.Key_BracketRight else -1) * max(1, round(current * .1))))
+            self.set_paint_size(size)
+            spin = getattr(self.window, "spinOptionsBrushSize", None)
+            if spin is not None:
+                spin.setValue(size)
+        elif self.current_mode == ToolMode.PATCH and key in {Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down}:
+            step = 10 if mods & Qt.KeyboardModifier.ShiftModifier else 1
+            dx = step * ((key == Qt.Key.Key_Right) - (key == Qt.Key.Key_Left))
+            dy = step * ((key == Qt.Key.Key_Down) - (key == Qt.Key.Key_Up))
+            self.set_patch_position(self.patch_state.x_pos + dx, self.patch_state.y_pos + dy)
+        elif self.current_mode in {ToolMode.RECT, ToolMode.BBOX} and key in {Qt.Key.Key_Left, Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Down}:
+            step = 10 if mods & Qt.KeyboardModifier.ShiftModifier else 1
+            self.canvas.move_annotation(step * ((key == Qt.Key.Key_Right) - (key == Qt.Key.Key_Left)), step * ((key == Qt.Key.Key_Down) - (key == Qt.Key.Key_Up)))
+        elif key in self.TOOL_KEYS and not event.isAutoRepeat():
+            mode = self.TOOL_KEYS[key]
+            if mods & Qt.KeyboardModifier.ShiftModifier and key == Qt.Key.Key_L:
+                mode = ToolMode.POLYGON if self.current_mode != ToolMode.POLYGON else ToolMode.LASSO
+            elif mods & Qt.KeyboardModifier.ShiftModifier and key == Qt.Key.Key_J:
+                mode = ToolMode.PATCH if self.current_mode != ToolMode.PATCH else ToolMode.HEALING_BRUSH
+            self.activate(mode)
+        event.accept()
+
+    def release_temporary_pan(self) -> None:
+        """Restore the active tool on Space release or canvas focus loss."""
+        if self._space_pressed:
+            self._space_pressed = False
+            self.canvas.end_pan()
+            self._activate_current_mode()
+
     def image_pos(self, widget_pos) -> QPointF:
         return QPointF(
             (widget_pos.x() - self.canvas.pan_offset.x()) / max(self.canvas.zoom, 1e-6),
@@ -318,7 +467,7 @@ class ToolManager:
 
     def mouse_press_event(self, event) -> None:
         self._update_cursor_position(event)
-        if event.button() == Qt.MouseButton.MiddleButton:
+        if event.button() == Qt.MouseButton.MiddleButton or (self._space_pressed and event.button() == Qt.MouseButton.LeftButton):
             self.canvas.begin_pan(event.position())
             event.accept()
             return
@@ -364,7 +513,7 @@ class ToolManager:
 
     def mouse_release_event(self, event) -> None:
         self._update_cursor_position(event)
-        if self.canvas.is_panning and event.button() == Qt.MouseButton.MiddleButton:
+        if self.canvas.is_panning and event.button() in {Qt.MouseButton.MiddleButton, Qt.MouseButton.LeftButton}:
             self.canvas.end_pan()
             self.activate()
             event.accept()
@@ -411,12 +560,16 @@ class ToolManager:
         elif self.current_mode in self.PAINT_MODES or self.current_mode in {ToolMode.HEALING_BRUSH, ToolMode.FILL, ToolMode.BBOX}:
             self.canvas.setCursor(Qt.CursorShape.CrossCursor)
             if self.current_mode == ToolMode.HEALING_BRUSH and not self.tool(ToolMode.HEALING_BRUSH).has_source_anchor:
-                self.window.set_status("Healing Brush: Ctrl+click a clean source area")
+                self.window.set_status("Healing Brush: Alt+click to sample • [ / ] brush size • Space to pan")
         elif self.current_mode == ToolMode.PATCH:
             self.canvas.setCursor(Qt.CursorShape.SizeAllCursor)
             self.refresh_patch_preview()
 
     def _deactivate_current_mode(self) -> None:
+        if self.current_mode in {ToolMode.RECT, ToolMode.BBOX}:
+            self.cancel_annotation_gesture()
+        if self.current_mode == ToolMode.HEALING_BRUSH:
+            self.cancel_healing_preview()
         if self.current_mode == ToolMode.MOVE:
             self.canvas.end_pan()
         elif self.current_mode in self.SELECTION_MODES:
@@ -426,7 +579,7 @@ class ToolManager:
         elif self.current_mode == ToolMode.PATCH:
             self.tool(ToolMode.PATCH).end_move_drag()
             self.tool(ToolMode.PATCH).end_rotation_drag()
-            self.canvas.clear_patch_preview()
+            self.patch_preview.clear()
         elif self.current_mode == ToolMode.BBOX:
             self.tool(ToolMode.BBOX).reset()
 
@@ -455,6 +608,10 @@ class ToolManager:
             return
         tool: RectSelectionTool = self.tool(ToolMode.RECT)
         point = self._image_point(event)
+        if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            self.canvas.cycle_annotation(point=point)
+            event.accept()
+            return
         combine_mode = tool.combine_mode_from_modifiers(event.modifiers())
 
         handle = None
@@ -467,6 +624,8 @@ class ToolManager:
             self.canvas.selection_edit_bounds(),
             self.canvas.selected_annotation_index,
         ):
+            if self.canvas.selected_annotation_index >= 0:
+                self.canvas.begin_annotation_edit()
             self.canvas.setCursor(self.canvas.cursor_for_selection_handle(handle))
             event.accept()
             return
@@ -481,6 +640,7 @@ class ToolManager:
                 self.canvas.selection_edit_bounds(),
                 self.canvas.selected_annotation_index,
             ):
+                self.canvas.begin_annotation_edit()
                 self.canvas.setCursor(self.canvas.cursor_for_selection_handle("move"))
                 event.accept()
             return
@@ -506,11 +666,14 @@ class ToolManager:
         self._update_rect_hover_cursor(point, combine_mode)
 
     def _release_rect(self, event) -> None:
+        if event.button() != Qt.MouseButton.LeftButton:
+            return
         tool: RectSelectionTool = self.tool(ToolMode.RECT)
         point = self._image_point(event)
         if tool.is_dragging_selection:
             result = tool.finish_existing_selection_drag(point, self._image_rect())
             self._apply_selection_drag_result(result, notify=True)
+            self.canvas.finish_annotation_edit()
             self._update_rect_hover_cursor(point, tool.combine_mode_from_modifiers(event.modifiers()))
             event.accept()
             return
@@ -590,27 +753,37 @@ class ToolManager:
             return
         tool: HealingBrushTool = self.tool(ToolMode.HEALING_BRUSH)
         point = self._image_point(event)
-        if event.modifiers() & Qt.KeyboardModifier.ControlModifier:
+        if not self._image_rect().contains(point):
+            return
+        if self.window._healing_task_id in self.window._active_task_ids:
+            self.window.set_status("힐링 브러시 적용 중입니다. 완료 후 다음 획을 그려 주세요.")
+            return
+        if event.modifiers() & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier):
+            self.cancel_healing_preview()
             tool.set_source_anchor(point)
+            self._healing_source_identity = (str(self.window.current_image_path), self.canvas.pixmap.size())
             self.canvas.update()
             self.window.set_status("Healing Brush source set")
             event.accept()
             return
         if not tool.has_source_anchor:
-            self.window.set_status("Ctrl+click a clean source area before healing")
+            self.window.set_status("Alt+click a clean source area before healing (Ctrl+click also works)")
             return
-        self._begin_image_edit_history()
         stroke = tool.begin_healing_stroke(point)
         if stroke is not None:
-            self.window.set_status("Healing Brush: release to apply to every MapSet map")
+            self.healing_preview.begin(tool.stroke_size, tool.stroke_opacity)
+            self.healing_preview.request(tool.strokes)
+            self.window.set_status("힐링 브러시: 드래그하며 결과 확인 · 놓으면 적용 · Esc 취소")
             event.accept()
 
     def _move_healing(self, event) -> None:
         if not (event.buttons() & Qt.MouseButton.LeftButton):
             return
-        stroke = self.tool(ToolMode.HEALING_BRUSH).continue_healing_stroke(self._image_point(event))
+        tool = self.tool(ToolMode.HEALING_BRUSH)
+        stroke = tool.continue_healing_stroke(self._image_point(event))
         if stroke is None:
             return
+        self.healing_preview.request(tool.strokes)
         event.accept()
 
     def _release_healing(self, event) -> None:
@@ -619,7 +792,8 @@ class ToolManager:
         finish = self.tool(ToolMode.HEALING_BRUSH).finish_healing_stroke(self._image_point(event))
         if finish is None:
             return
-        self._commit_healing_strokes(finish.strokes, self.tool(ToolMode.HEALING_BRUSH).options)
+        self.healing_preview.request(finish.strokes)
+        self._commit_healing_strokes(finish.strokes, finish.size, finish.opacity)
         event.accept()
 
     # Fill, patch placement, and bbox label events.
@@ -629,7 +803,6 @@ class ToolManager:
             return
         if self._apply_fill(self.tool(ToolMode.FILL).options):
             event.accept()
-            self.complete_current_tool(ToolMode.MOVE)
 
     def _press_patch(self, event) -> None:
         tool: PatchTool = self.tool(ToolMode.PATCH)
@@ -665,7 +838,14 @@ class ToolManager:
     def _press_bbox(self, event) -> None:
         if event.button() != Qt.MouseButton.LeftButton:
             return
-        self.tool(ToolMode.BBOX).begin_bbox(self._image_point(event))
+        point = self._image_point(event)
+        if not self._image_rect().contains(point):
+            return
+        if self.window.annotationClassCombo.currentData() is None:
+            self.window.set_status("먼저 오른쪽 '클래스 관리'에서 클래스를 등록해 주세요.")
+            return
+        self.canvas.clear_annotation_selection()
+        self.tool(ToolMode.BBOX).begin_bbox(point)
 
     def _move_bbox(self, event) -> None:
         preview = self.tool(ToolMode.BBOX).preview_bbox(self._image_point(event))
@@ -678,7 +858,9 @@ class ToolManager:
         if preview is None:
             return
         self._apply_bbox_preview(preview)
-        self.window.show_label_manager()
+        bounds = self.canvas.selection_bounds()
+        if bounds.width() >= 1 and bounds.height() >= 1:
+            self.window.quick_add_annotation()
 
     # Canvas mutation and MainWindow commit helpers.
 
@@ -717,31 +899,27 @@ class ToolManager:
         self.canvas._revision += 1
         self.canvas.image_changed.emit()
 
-    def _commit_healing_strokes(self, strokes: list[HealingStroke], options: PaintOptions) -> None:
+    def _commit_healing_strokes(self, strokes: list[HealingStroke], size: int, opacity: float) -> None:
         if not strokes:
             return
-        applied = self.window.apply_mapset_healing_strokes(
-            list(strokes),
-            options.size,
-            options.opacity,
-        )
+        applied = self.window.apply_mapset_healing_strokes(list(strokes), size, opacity)
         if applied:
+            self.healing_preview.mark_committing()
             return
-        self.canvas._revision += 1
-        self.canvas.image_changed.emit()
+        self.healing_preview.clear()
 
     def _apply_fill(self, options: PaintOptions) -> bool:
+        """Fill the current selection without widening it on a fallback path."""
         if self.canvas.pixmap.isNull():
             return False
-        if self.canvas.has_selection():
-            if self.window.apply_mapset_selection_fill(options.color, options.opacity):
-                return True
-        self.window.select_all()
+        if not self.canvas.has_selection():
+            self.window.select_all()
         if self.window.apply_mapset_selection_fill(options.color, options.opacity):
             return True
         self._begin_image_edit_history()
         pixmap = QPixmap(self.canvas.pixmap)
         painter = QPainter(pixmap)
+        painter.setOpacity(options.opacity)
         if self.canvas.has_selection():
             painter.fillPath(self.canvas.selection_path, options.color)
         else:
@@ -797,7 +975,6 @@ class ToolManager:
             return None
         gray = mask_image.convertToFormat(QImage.Format.Format_Grayscale8)
         bits = gray.bits()
-        bits.setsize(gray.sizeInBytes())
         view = np.frombuffer(bits, dtype=np.uint8).reshape(gray.height(), gray.bytesPerLine())
         return np.where(view[:, :gray.width()] > 0, 255, 0).astype(np.uint8).copy()
 
@@ -811,6 +988,8 @@ class ToolManager:
             self.patch_state_changed(self.patch_state)
 
     def _clear_active_tool_state(self, clear_canvas: bool) -> None:
+        if self.current_mode == ToolMode.HEALING_BRUSH:
+            self.cancel_healing_preview()
         if self.current_mode in self.SELECTION_MODES:
             self.tool(self.current_mode).cancel_selection(clear_canvas=clear_canvas)
             if clear_canvas:

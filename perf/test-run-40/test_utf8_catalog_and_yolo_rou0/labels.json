@@ -1,0 +1,12 @@
+{
+  "labels": [
+    {
+      "class_id": 2,
+      "class_name": "균열"
+    },
+    {
+      "class_id": 7,
+      "class_name": "찍힘"
+    }
+  ]
+}

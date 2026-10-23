@@ -7,7 +7,7 @@ import threading
 import json
 import os
 from collections import Counter, OrderedDict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import cv2
@@ -28,6 +28,7 @@ from core.image_ops import rotate_bound
 from core.logging_setup import get_logger
 from core.mask_ops import make_nonzero_mask, nonzero_bbox
 from service import editing_service, labeling_service
+from service import dataset_output as output
 from service.editing_service import clone_mode_from_text
 from service.labeling_service import (
     YoloLabel,
@@ -79,6 +80,7 @@ class AutoYoloAugmentOptions:
     val_ratio: float = AUTOAUGMENT_VALIDATION_PERCENT / 100.0
     test_ratio: float = AUTOAUGMENT_TEST_PERCENT / 100.0
     seed: int = 0
+    class_ids: list[int] | None = None
 
 
 @dataclass(frozen=True)
@@ -198,150 +200,107 @@ def run_orientation_augmentation(mapsets, options, progress_callback=None) -> di
 
     return {"samples": written, "output_root": str(output_root)}
 
-def run_auto_yolo_augmentation(project, options: AutoYoloAugmentOptions, progress_callback=None):
-    """Generate a YOLO dataset from global Poisson-balanced base samples."""
-    logger = get_logger()
+def run_auto_yolo_augmentation(project, options: AutoYoloAugmentOptions, progress_callback=None, check_cancelled=None):
+    """Generate an isolated, source-grouped dataset and a durable execution report."""
+    def report(percent, message):
+        if check_cancelled:
+            check_cancelled()
+        if progress_callback:
+            progress_callback(percent, 100, message)
 
-    def emit_progress(percent: int, message: str) -> None:
-        """Emit monotonic, stage-weighted progress through the worker callback."""
-        if progress_callback is not None:
-            progress_callback(max(0, min(100, int(percent))), 100, message)
-
-    emit_progress(0, "Preparing inputs | Scanning target images and defect patches")
-    logger.info(
-        "AutoAugment started: target_map=%s samples=%s poisson_mode=%s output=%s",
-        options.target_map_key,
-        options.generate_samples,
-        options.poisson_mode,
-        options.output_root,
-    )
-    items = collect_auto_yolo_items(project.mapsets, options.target_map_key)
+    report(0, "입력 검사 중")
+    observed = {label.class_id for item in collect_auto_yolo_items(project.mapsets, options.target_map_key) for label in item["labels"]}
     patches = collect_target_map_patches(options.defect_root, options.target_map_key, project.root_path)
-    logger.info("AutoAugment inputs: target_images=%s patches=%s", len(items), len(patches))
-    if not items:
-        emit_progress(100, "Complete | No target images were found")
-        return {
-            "images": 0,
-            "labels": 0,
-            "annotations": 0,
-            "poisson_samples": 0,
-            "split_images": {},
-            "class_distribution": {},
-            "failed_or_skipped": 0,
-            "preview_image": "",
-            "sample_images": [],
-            "output_root": str(options.output_root),
-        }
-
-    options.output_root.mkdir(parents=True, exist_ok=True)
-    for split in _split_names(options):
-        (options.output_root / "images" / split).mkdir(parents=True, exist_ok=True)
-        (options.output_root / "labels" / split).mkdir(parents=True, exist_ok=True)
-
-    rng = random.Random(options.seed)
-    catalog = class_catalog(project.root_path)
-    patches_by_class: dict[int, list[Path]] = {}
-    for patch_path in patches:
-        class_id = defect_class_id(patch_path, catalog)
-        patches_by_class.setdefault(class_id, []).append(patch_path)
-
-    output_written = 0
-    annotations_written = 0
-    poisson_written = 0
-    split_images: Counter[str] = Counter()
-    class_distribution: Counter[int] = Counter()
-    preview_image: Path | None = None
-    sample_images: list[Path] = []
-    total_outputs = max(1, estimate_auto_yolo_outputs(len(items), options, bool(patches_by_class)))
-    poisson_total = (
-        max(0, int(options.generate_samples))
-        if options.enable_poisson and patches_by_class
-        else 0
-    )
-
-    def report_poisson(current: int, message: str) -> None:
-        fraction = current / max(1, poisson_total)
-        percent = 5 + round(min(1.0, fraction) * 30)
-        emit_progress(percent, f"Generating Poisson samples | {message}")
-
-    def write_staged(split: str, name: str, image: np.ndarray, labels: list[YoloLabel]) -> None:
-        nonlocal output_written, annotations_written, preview_image
-        stage_name = {
-            "train": "Writing train outputs",
-            "val": "Writing val outputs",
-            "test": "Writing test outputs",
-        }.get(split, "Writing outputs")
-        for staged_name, staged_image, staged_labels in iter_staged_samples(split, name, image, labels, options, rng):
-            image_out, _label_out = write_auto_yolo_sample(
-                options, split, staged_name, staged_image, staged_labels
-            )
-            output_written += 1
-            annotations_written += len(staged_labels)
-            class_distribution.update(label.class_id for label in staged_labels)
-            split_images[split] += 1
-            if preview_image is None:
-                preview_image = image_out
-            if len(sample_images) < 3:
-                sample_images.append(image_out)
-            if output_written % 25 == 0 or output_written == total_outputs:
-                percent = 40 + round(min(1.0, output_written / total_outputs) * 55)
-                emit_progress(
-                    percent,
-                    f"{stage_name} | {output_written}/{total_outputs} files",
-                )
-
-    emit_progress(5, "Generating Poisson samples | Preparing base records")
-    base_records = build_base_records(items, patches_by_class, options, rng, report_poisson)
-    poisson_written = sum(1 for record in base_records if record["kind"] == "poisson")
-
-    emit_progress(36, "Shuffling and splitting dataset | Assigning base records to train, val, and test")
-    split_records = split_base_records(base_records, options, rng)
-    for split, records in split_records.items():
-        stage_name = {
-            "train": "Writing train outputs",
-            "val": "Writing val outputs",
-            "test": "Writing test outputs",
-        }.get(split, "Writing outputs")
-        emit_progress(
-            max(40, 40 + round(min(1.0, output_written / total_outputs) * 55)),
-            f"{stage_name} | 0/{len(records)} base samples",
-        )
-        for record_index, record in enumerate(records, start=1):
-            sample = load_base_record_sample(record, options)
+    if options.class_names:
+        ids = options.class_ids if options.class_ids is not None else range(len(options.class_names))
+        catalog = {name.casefold(): class_id for class_id, name in zip(ids, options.class_names)}
+    else:
+        catalog = class_catalog(project.root_path, project.mapsets)
+    observed.update(defect_class_id(path, catalog) for path in patches)
+    mapping, names = output.class_mapping(options.class_names, options.class_ids, observed)
+    root, result = output.begin_run(options, "augment", names, mapping)
+    run_options = replace(options, output_root=root)
+    requested = max(0, int(options.generate_samples)) if options.enable_poisson else 0
+    result["requested_poisson"] = requested
+    result["generation_diagnostics"] = {"attempts": 0, "successful": 0, "reasons": {}}
+    items, patches_by_class = [], {}
+    try:
+        seen = set()
+        for mapset in project.mapsets:
+            report(1, f"입력 검사: {mapset.name}")
+            image_path = mapset.map_paths.get(options.target_map_key)
+            if image_path is None:
+                output.add_issue(result, mapset.folder, "선택한 맵이 없습니다.", "skipped")
+                continue
+            source = output.source_id(image_path)
+            if source in seen:
+                continue
+            seen.add(source)
+            try:
+                label_path = _label_path_for_mapset(mapset)
+                if mapset.label_path is not None and not mapset.label_path.is_file():
+                    raise ValueError("지정된 라벨 파일이 없습니다.")
+                labels = output.read_labels(label_path)
+                output.validate_labels(labels, mapping)
+                if _read_cached(image_path) is None:
+                    raise ValueError("원본 이미지를 읽을 수 없습니다.")
+                items.append({"mapset": mapset, "image_path": image_path, "label_path": label_path, "labels": labels})
+            except (OSError, ValueError) as error:
+                output.add_issue(result, image_path, error)
+        result["original_sources"] = len(items)
+        for path in patches:
+            class_id = defect_class_id(path, catalog)
+            if class_id not in mapping:
+                output.add_issue(result, path, f"등록되지 않은 결함 클래스 ID: {class_id}", "skipped")
+            else:
+                patches_by_class.setdefault(class_id, []).append(path)
+        # Assign sources before generating derivatives, independent of retry RNG.
+        source_splits = output.split_groups([output.source_id(item["image_path"]) for item in items], (options.train_ratio, options.val_ratio, options.test_ratio), options.seed)
+        assignment = {source: split for split, sources in source_splits.items() for source in sources}
+        result["source_splits"] = assignment
+        rng = random.Random(options.seed)
+        base_records = build_base_records(items, patches_by_class, run_options, rng, lambda current, message: report(5 + round(30 * current / max(1, requested)), message), result["generation_diagnostics"], check_cancelled)
+        result["poisson_samples"] = sum(record["kind"] == "poisson" for record in base_records)
+        missing = requested - result["poisson_samples"]
+        if missing > 0:
+            reason = "사용 가능한 결함 패치나 원본이 없습니다." if not patches_by_class or not items else "합성 조건을 충족하지 못했습니다. 시도별 원인은 생성 진단에 기록했습니다."
+            result["skipped"] += missing
+            result["issues"].append({"kind": "skipped", "source": "합성 요청", "count": missing, "reason": reason})
+        for index, record in enumerate(base_records):
+            report(40 + round(50 * index / max(1, len(base_records))), f"저장 중: {index + 1}/{len(base_records)}")
+            source = record["source_id"]
+            split = assignment[source]
+            sample = load_base_record_sample(record, run_options)
             if sample is None:
+                output.add_issue(result, record["name"], "생성된 기반 이미지를 읽을 수 없습니다.")
                 continue
             name, image, labels = sample
-            write_staged(split, name, image, labels)
-            if record_index % 10 == 0:
-                percent = 40 + round(min(1.0, output_written / total_outputs) * 55)
-                emit_progress(
-                    percent,
-                    f"{stage_name} | {record_index}/{len(records)} base samples",
-                )
+            for staged_name, staged_image, staged_labels in iter_staged_samples(split, name, image, labels, run_options, rng):
+                if check_cancelled:
+                    check_cancelled()
+                try:
+                    final_labels = output.remap_labels(staged_labels, mapping)
+                    image_path, label_path = write_auto_yolo_sample(run_options, split, staged_name, staged_image, final_labels)
+                    output.add_entry(result, root, image_path, label_path, final_labels, source, split, record["kind"], options.target_map_key)
+                except (OSError, ValueError) as error:
+                    output.add_issue(result, staged_name, error)
+            if index % 25 == 0:
+                output.save_manifest(result)
+        report(94, "저장 파일 및 라벨 검증 중")
+        output.write_yaml(root, names, {entry["split"] for entry in result["entries"]})
+        output.validate_run(result, check_cancelled)
+        cleanup_base_records(base_records)
+        result["poisson_output_images"] = sum(entry["kind"] == "poisson" for entry in result["entries"])
+        if not result["entries"]:
+            result["warnings"].append("저장된 이미지가 없습니다.")
+        output.finish_run(result)
+        report(100, "완료" if result["status"] == "complete" else "일부 완료: 오류 내역 확인")
+        return result
+    except Exception as error:
+        result["warnings"].append(str(error) or "작업이 중단됐습니다.")
+        output.finish_run(result, "interrupted")
+        raise
 
-    emit_progress(97, "Finalizing dataset | Removing temporary files and writing data.yaml")
-    cleanup_base_records(base_records)
-    write_yolo_yaml(options.output_root, options.class_names)
-    logger.info(
-        "AutoAugment complete: images=%s labels=%s poisson_samples=%s output=%s",
-        output_written,
-        output_written,
-        poisson_written,
-        options.output_root,
-    )
-    emit_progress(100, "Complete | AutoAugment dataset is ready")
-    return {
-        "images": output_written,
-        "labels": output_written,
-        "annotations": annotations_written,
-        "poisson_samples": poisson_written,
-        "split_images": dict(split_images),
-        "class_distribution": dict(class_distribution),
-        "failed_or_skipped": max(0, total_outputs - output_written),
-        "preview_image": str(preview_image) if preview_image is not None else "",
-        "sample_images": [str(path) for path in sample_images],
-        "output_root": str(options.output_root),
-    }
 
 def auto_yolo_summary(project, target_map_key: str, defect_root: Path | None = None) -> dict:
     """Return selected-map counts used by the AutoAugment page."""
@@ -407,7 +366,7 @@ def _auto_class_counts(items: list[dict]) -> tuple[dict[int, int], dict[str, dic
         for label in item["labels"]:
             counts[label.class_id] = counts.get(label.class_id, 0) + 1
             class_counts[label.class_id] = class_counts.get(label.class_id, 0) + 1
-        image_counts[item["mapset"].name] = counts
+        image_counts[output.source_id(item["image_path"])] = counts
     return class_counts, image_counts
 
 def _choose_lowest_count_class(class_counts: dict[int, int], patches_by_class: dict[int, list[Path]]) -> int:
@@ -416,7 +375,7 @@ def _choose_lowest_count_class(class_counts: dict[int, int], patches_by_class: d
 def _choose_target_item(items: list[dict], image_class_counts: dict[str, dict[int, int]], class_id: int, options: AutoYoloAugmentOptions, rng) -> dict | None:
     candidates = []
     for item in items:
-        counts = image_class_counts.get(item["mapset"].name, {})
+        counts = image_class_counts.get(output.source_id(item["image_path"]), {})
         same_count = counts.get(class_id, 0)
         if same_count >= max(1, int(options.max_same_class_per_image)):
             continue
@@ -433,7 +392,7 @@ def _choose_target_item(items: list[dict], image_class_counts: dict[str, dict[in
 def _choose_weighted_low_label_item(items: list[dict], image_class_counts: dict[str, dict[int, int]], rng) -> dict | None:
     candidates = []
     for item in items:
-        counts = image_class_counts.get(item["mapset"].name, {})
+        counts = image_class_counts.get(output.source_id(item["image_path"]), {})
         candidates.append((sum(counts.values()), item["mapset"].name, item))
     if not candidates:
         return None
@@ -552,13 +511,15 @@ def _load_original_auto_sample(item: dict, options: AutoYoloAugmentOptions) -> t
     image, labels = _resize_for_yolo(np.ascontiguousarray(image), list(item["labels"]), options.image_size)
     return item["mapset"].name, image, labels
 
-def build_base_records(items: list[dict], patches_by_class: dict[int, list[Path]], options: AutoYoloAugmentOptions, rng, report) -> list[dict]:
+def build_base_records(items: list[dict], patches_by_class: dict[int, list[Path]], options: AutoYoloAugmentOptions, rng, report, diagnostics=None, check_cancelled=None) -> list[dict]:
+    """Build source-linked originals and composites with measured attempt diagnostics."""
     records = []
     if options.include_original:
         for item in items:
             records.append({
                 "kind": "original",
-                "name": item["mapset"].name,
+                "name": output.safe_name(item["mapset"].name)[:32] + "-" + output.source_id(item["image_path"]),
+                "source_id": output.source_id(item["image_path"]),
                 "item": item,
             })
 
@@ -581,6 +542,8 @@ def build_base_records(items: list[dict], patches_by_class: dict[int, list[Path]
     max_attempts = max(num_poisson * 3, num_poisson + 20)
 
     while written < num_poisson and attempts < max_attempts:
+        if check_cancelled:
+            check_cancelled()
         attempts += 1
 
         target_item = _choose_weighted_low_label_item(items, image_class_counts, rng)
@@ -598,7 +561,7 @@ def build_base_records(items: list[dict], patches_by_class: dict[int, list[Path]
         target_name = target_item["mapset"].name
 
         working_class_counts = dict(class_counts)
-        working_image_counts = dict(image_class_counts.get(target_name, {}))
+        working_image_counts = dict(image_class_counts.get(output.source_id(target_item["image_path"]), {}))
         for label in result_labels:
             working_class_counts[label.class_id] = working_class_counts.get(label.class_id, 0) + 1
             working_image_counts[label.class_id] = working_image_counts.get(label.class_id, 0) + 1
@@ -628,14 +591,17 @@ def build_base_records(items: list[dict], patches_by_class: dict[int, list[Path]
         resized, labels = _resize_for_yolo(result_image, result_labels, options.image_size)
         written += 1
         class_counts = working_class_counts
-        image_class_counts[target_name] = working_image_counts
+        image_class_counts[output.source_id(target_item["image_path"])] = working_image_counts
 
-        base_name = f"{target_name}_poisson_{written:06d}"
+        source = output.source_id(target_item["image_path"])
+        base_name = f"{output.safe_name(target_name)[:32]}-{source}_poisson_{written:06d}"
         image_path = cache_dir / f"{_safe_output_name(base_name)}.png"
-        write_png(image_path, resized)
+        if not write_png(image_path, resized):
+            raise OSError(f"합성 기반 이미지 저장 실패: {image_path}")
         records.append({
             "kind": "poisson",
             "name": base_name,
+            "source_id": source,
             "image_path": image_path,
             "labels": labels,
         })
@@ -652,6 +618,8 @@ def build_base_records(items: list[dict], patches_by_class: dict[int, list[Path]
         get_logger().info(message)
         report(written, message)
 
+    if diagnostics is not None:
+        diagnostics.update(attempts=attempts, successful=written, reasons=dict(failure_counts))
     return records
 
 def _format_poisson_debug_message(prefix: str, attempts: int, max_attempts: int, written: int, requested: int, failure_counts: Counter[str]) -> str:
@@ -718,7 +686,6 @@ def iter_staged_samples(split: str, name: str, image: np.ndarray, labels: list[Y
                 yield staged_name, staged_image, staged_labels
 
 def write_auto_yolo_sample(
-    self,
     options: AutoYoloAugmentOptions,
     split: str,
     name: str,
@@ -729,10 +696,9 @@ def write_auto_yolo_sample(
     safe_name = _safe_output_name(name)
     image_out = options.output_root / "images" / split / f"{safe_name}.png"
     label_out = options.output_root / "labels" / split / f"{safe_name}.txt"
-    if not write_png(image_out, image):
-        raise OSError(f"Failed to write AutoAugment image: {image_out}")
-    label_out.write_text("\n".join(_labels_to_yolo_lines(labels)) + ("\n" if labels else ""), encoding="utf-8")
+    output.write_pair(image_out, label_out, image, labels)
     return image_out, label_out
+
 
 def _flip_yolo_sample(image: np.ndarray, labels: list[YoloLabel]) -> tuple[np.ndarray, list[YoloLabel]]:
     """Horizontally flip one YOLO image and labels."""
@@ -891,21 +857,14 @@ def _output_base_name(group_name: str, name: str) -> str:
     return f"{group_name}_{name}"
 
 def split_base_records(records: list[dict], options: AutoYoloAugmentOptions, rng) -> dict[str, list[dict]]:
-    shuffled = list(records)
-    rng.shuffle(shuffled)
-    total = len(shuffled)
-    train_count = min(total, max(0, int(total * options.train_ratio)))
-    remaining = total - train_count
-    val_count = min(remaining, max(0, int(total * options.val_ratio)))
-    splits = {
-        "train": shuffled[:train_count],
-        "val": shuffled[train_count:train_count + val_count],
-    }
-    if options.test_ratio > 0:
-        splits["test"] = shuffled[train_count + val_count:]
-    elif train_count + val_count < total:
-        splits["val"].extend(shuffled[train_count + val_count:])
-    return splits
+    """Keep originals and composites from the same source in a single split."""
+    del rng
+    groups = {}
+    for record in records:
+        groups.setdefault(record["source_id"], []).append(record)
+    assigned = output.split_groups(list(groups), (options.train_ratio, options.val_ratio, options.test_ratio), options.seed)
+    return {split: [record for source in sources for record in groups[source]] for split, sources in assigned.items()}
+
 
 def estimate_auto_yolo_outputs(original_count: int, options: AutoYoloAugmentOptions, has_patches: bool = True) -> int:
     train_stage_factor = _flip_factor(options) * _rotation_factor(options) * _random_factor(options)
@@ -943,24 +902,9 @@ def _label_path_for_mapset(mapset) -> Path | None:
     candidate = mapset.folder / f"{mapset.name}.txt"
     return candidate if candidate.is_file() else None
 
-def class_catalog(project_root: Path) -> dict[str, int]:
+def class_catalog(project_root: Path, mapsets=()) -> dict[str, int]:
     """Load class-name to ID mappings used by exported defect folders."""
-    path = project_root / "labels.json"
-    if not path.is_file():
-        return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    items = payload.get("labels", payload) if isinstance(payload, dict) else payload
-    catalog = {}
-    for index, item in enumerate(items if isinstance(items, list) else []):
-        if isinstance(item, dict):
-            name = str(item.get("class_name", item.get("name", ""))).strip()
-            class_id = int(item.get("class_id", item.get("id", index)))
-            if name:
-                catalog[name.casefold()] = class_id
-    return catalog
+    return {name.casefold(): class_id for class_id, name in labeling_service.load_class_catalog(project_root, mapsets)}
 
 def defect_class_id(path: Path, catalog: dict[str, int]) -> int:
     return catalog.get(path.parent.name.casefold(), 0)
@@ -988,7 +932,6 @@ def _read_cached(path: str | Path) -> np.ndarray | None:
     return image
 
 def transform_mapset_orientation(
-    self,
     images: dict[str, np.ndarray],
     bboxes: list[tuple[float, float, float, float]],
     class_ids: list[int],
@@ -996,6 +939,7 @@ def transform_mapset_orientation(
     flip_code,
     keep_size: bool,
 ) -> SyncedTransformResult:
+    """Transform map images together with their shared bounding-box labels."""
     if albumentations_available() and keep_size:
         return apply_synced_orientation(images, bboxes, class_ids, angle, flip_code)
 
@@ -1037,7 +981,7 @@ def orientation_suffix(angle: float, flip_code) -> str:
     return f"rot{int(round(angle)) % 360:03d}_{flip_name}"
 
 def _safe_output_name(name: str) -> str:
-    return re.sub(r"[^0-9A-Za-z_.-]+", "_", str(name)).strip("._") or "sample"
+    return output.safe_name(str(name))
 
 
 def albumentations_available() -> bool:

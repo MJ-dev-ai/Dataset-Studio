@@ -24,6 +24,8 @@ class PaintStrokeFinish:
 @dataclass
 class HealingStrokeFinish:
     strokes: list[HealingStroke]
+    size: int
+    opacity: float
     preview_stroke: HealingStroke | None = None
 
 
@@ -91,6 +93,22 @@ class HealingBrushTool(BasePaintTool):
         self._source_anchor: QPointF | None = None
         self._target_anchor: QPointF | None = None
         self._healing_strokes: list[HealingStroke] = []
+        self.stroke_size = self.options.size
+        self.stroke_opacity = self.options.opacity
+
+    @property
+    def strokes(self) -> list[HealingStroke]:
+        """Return a snapshot for asynchronous preview; geometry is immutable."""
+        return list(self._healing_strokes)
+
+    @property
+    def cursor_radius(self) -> float:
+        return max(1.0, float(self.stroke_size if self.is_editing else self.options.size) / 2.0)
+
+    @property
+    def sampling_position(self) -> QPointF | None:
+        """Follow the actual source sampled by the active drag."""
+        return self._source_for_target(self._last) if self.is_editing and self._last is not None else self.source_anchor
 
     @property
     def has_source_anchor(self) -> bool:
@@ -118,6 +136,7 @@ class HealingBrushTool(BasePaintTool):
         if self._source_anchor is None:
             return None
         self._editing = True
+        self.stroke_size, self.stroke_opacity = self.options.size, self.options.opacity
         self._last = QPointF(point)
         self._target_anchor = QPointF(point)
         self._healing_strokes = []
@@ -134,7 +153,7 @@ class HealingBrushTool(BasePaintTool):
         if not self._editing:
             return None
         preview_stroke = self.continue_healing_stroke(point) if point is not None else None
-        result = HealingStrokeFinish(strokes=list(self._healing_strokes), preview_stroke=preview_stroke)
+        result = HealingStrokeFinish(list(self._healing_strokes), self.stroke_size, self.stroke_opacity, preview_stroke)
         self.reset()
         return result
 
@@ -149,6 +168,8 @@ class HealingBrushTool(BasePaintTool):
             (float(start.x()), float(start.y())),
             (float(end.x()), float(end.y())),
         )
+        if self._healing_strokes and start == end:
+            return None
         self._healing_strokes.append(stroke)
         return stroke
 

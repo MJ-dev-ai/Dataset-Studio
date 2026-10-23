@@ -20,14 +20,27 @@ def transform_patch(
     """Scale and rotate a patch while preserving its binary selection mask."""
     height, width = image.shape[:2]
     size = (max(1, int(round(width * scale))), max(1, int(round(height * scale))))
-    scaled = cv2.resize(image, size, interpolation=cv2.INTER_LINEAR)
+    # Resample selected colours with coverage, so black pixels outside the
+    # selection cannot bleed into rotated/scaled defect edges.
+    source_mask = np.max(mask, axis=2) if mask is not None and mask.ndim == 3 else mask
+    coverage = None if source_mask is None else (source_mask > 0).astype(np.float32)
+    pixels = image if coverage is None else image.astype(np.float32) * (coverage[:, :, None] if image.ndim == 3 else coverage)
+    scaled = cv2.resize(pixels, size, interpolation=cv2.INTER_LINEAR)
     scaled_mask = (
         make_nonzero_mask(scaled)
         if mask is None
-        else cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
+        else cv2.resize(source_mask, size, interpolation=cv2.INTER_NEAREST)
     )
     rotated = rotate_bound(scaled, angle, interpolation=cv2.INTER_LINEAR)
     rotated_mask = rotate_bound(scaled_mask, angle, interpolation=cv2.INTER_NEAREST)
+    if coverage is not None:
+        weights = rotate_bound(cv2.resize(coverage, size, interpolation=cv2.INTER_LINEAR), angle, interpolation=cv2.INTER_LINEAR)
+        divisor = weights[:, :, None] if image.ndim == 3 else weights
+        rotated = np.divide(rotated, divisor, out=np.zeros_like(rotated), where=divisor > 1e-6)
+        if np.issubdtype(image.dtype, np.integer):
+            limits = np.iinfo(image.dtype)
+            rotated = np.clip(np.rint(rotated), limits.min, limits.max)
+        rotated = rotated.astype(image.dtype)
     if rotated_mask.ndim == 3:
         rotated_mask = np.max(rotated_mask[:, :, :3], axis=2)
     return rotated, np.where(rotated_mask > 0, 255, 0).astype(np.uint8)
@@ -75,6 +88,9 @@ class PatchTool:
         self._rotation_angle_start = 0.0
         self._active_clip: PatchClip | None = None
         self._target_size: tuple[int, int] | None = None
+        self._transform_key = None
+        self._transform_sources = None
+        self._transform_result = None
 
     @property
     def has_active_placement(self) -> bool:
@@ -214,6 +230,7 @@ class PatchTool:
         self._rotation_drag_active = False
         self._active_clip = None
         self.state = PatchState()
+        self._transform_key = self._transform_sources = self._transform_result = None
 
     # Preview and worker payloads.
 
@@ -221,12 +238,12 @@ class PatchTool:
         """Return the patch and mask after the current scale and rotation."""
         if self.state.patch is None or self.state.mask is None:
             raise ValueError("Copy a selection before transforming a patch")
-        return transform_patch(
-            self.state.patch,
-            self.state.scale,
-            self.state.angle,
-            self.state.mask,
-        )
+        key = (id(self.state.patch), id(self.state.mask), self.state.scale, self.state.angle)
+        if key != self._transform_key:
+            self._transform_result = transform_patch(self.state.patch, self.state.scale, self.state.angle, self.state.mask)
+            self._transform_sources = (self.state.patch, self.state.mask)
+            self._transform_key = key
+        return self._transform_result
 
     def preview_payload(self) -> PatchPreview | None:
         if not self.state.placement_active or self.state.patch is None or self.state.mask is None:
